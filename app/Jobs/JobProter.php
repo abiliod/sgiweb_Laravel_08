@@ -113,7 +113,7 @@ class JobProter implements ShouldQueue
                     'no_do_objeto' => $dado['no_do_objeto']
                 ],
                     [
-                    'data_da_pendencia' => $data_da_pendencia
+                        'data_da_pendencia' => $data_da_pendencia
                     ,'data_da_entrega' => $data_da_entrega
                     ,'data_da_postagem' => $data_da_postagem
                     ,'data_de_leitura' => $data_de_leitura

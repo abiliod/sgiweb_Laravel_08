@@ -3371,7 +3371,6 @@ class AvaliaInspecao implements ShouldQueue
 
 
 //  Inicio  do teste Alarme Arme/desarme
-
                             if((($registro->numeroGrupoVerificacao == 206 )&&($registro->numeroDoTeste == 1 ))
                                 || (( $registro->numeroGrupoVerificacao == 335 ) && ( $registro->numeroDoTeste == 1 ))
                                 || (($registro->numeroGrupoVerificacao == 232)&&($registro->numeroDoTeste == 3 ))
@@ -3505,6 +3504,7 @@ class AvaliaInspecao implements ShouldQueue
                                             ->orderBy('data' ,'asc')
                                             ->orderBy('hora' ,'asc')
                                             ->get();
+
 //                                  ############   Início Acessos fora do Padrão   #################
                                         $eventos = DB::table('alarmes')
                                             ->select('alarmes.*')
@@ -3658,19 +3658,51 @@ class AvaliaInspecao implements ShouldQueue
 //                          ############   Início Acessos fora do Padrão   #################
                                     if(! $eventos->isEmpty()) {
                                         $dtmax = $eventos->max('data');
+
                                         if((isset($registro->inicio_expediente)) && (!empty($registro->inicio_expediente))
-                                            ||(isset($registro->final_expediente)) && (!empty($registro->final_expediente)) ) {
+                                            ||(isset($registro->final_expediente)) && (!empty($registro->final_expediente))) {
 
-                                            $minutosinicioExpediente = (substr($registro->inicio_expediente,0,2)*60)+substr($registro->inicio_expediente,3,2);
-                                            $minutosfinalExpediente = (substr($registro->final_expediente,0,2)*60)+substr($registro->final_expediente,3,2);
+                                           $linhaTransporteInicioexp =  DB::table('apontamento_c_v_s')
+                                                ->where('ponto_parada', '=', $registro->an8)
+                                                ->orderBy('horario_chegada_previsto', asc)
+                                                ->first();
+
+                                           $linhaTransporteFimexp =  DB::table('apontamento_c_v_s')
+                                                ->where('ponto_parada', '=', $registro->an8)
+                                                ->orderBy('horario_partida_previsto', desc)
+                                           ->first();
+
+                                           if(! $linhaTransporteInicioexp->isEmpty()){
+                                                if ($linhaTransporte->horario_chegada_previsto < $registro->inicio_expediente){
+                                                    $minutosinicioExpediente = (substr($linhaTransporte->horario_chegada_previsto,0,2)*60)+substr($linhaTransporte->horario_chegada_previsto,3,2);
+                                                }
+                                                else{
+                                                    $minutosinicioExpediente = (substr($registro->inicio_expediente,0,2)*60)+substr($registro->inicio_expediente,3,2);
+                                                }
+                                           }
+                                           else{
+                                                $minutosinicioExpediente = (substr($registro->inicio_expediente,0,2)*60)+substr($registro->inicio_expediente,3,2);
+                                           }
+                                           if(! $linhaTransporteInicioexp->isEmpty()){
+                                               if ($linhaTransporte->horario_partida_previsto > $registro->final_expediente){
+                                                   $minutosfinalExpediente = (substr($linhaTransporte->horario_partida_previsto,0,2)*60)+substr($linhaTransporte->horario_partida_previsto,3,2);
+                                               }
+                                               else{
+                                                   $minutosfinalExpediente = (substr($registro->final_expediente,0,2)*60)+substr($registro->final_expediente,3,2);
+                                               }
+                                           }
+                                           else{
+                                                $minutosfinalExpediente = (substr($registro->final_expediente,0,2)*60)+substr($registro->final_expediente,3,2);
+                                           }
+
+//        19/04/2021  Amilton         alarme feito ajuste falta testar
+
                                             foreach ($eventos  as $evento) {
-                                                $eventominutos = (substr($evento->hora,0,2)*60)+substr($evento->hora,3,2);
-                                                if ($evento->armedesarme =='Desarme' ) {
 
+                                               $eventominutos = (substr($evento->hora,0,2)*60)+substr($evento->hora,3,2);
+                                               if ($evento->armedesarme =='Desarme' ) {
                                                     if (($eventominutos < ($minutosinicioExpediente-90))) {
-
                                                         $diferencaAbertura =  $minutosinicioExpediente - $eventominutos;
-
                                                         if($diferencaAbertura <0) {
                                                             $diferencaAbertura = $diferencaAbertura *-1;
                                                         }
@@ -3731,15 +3763,13 @@ class AvaliaInspecao implements ShouldQueue
                                                                 'DiferencaTempoDeAbertura' => $diferencaAbertura],
                                                         ]);
                                                         $rowtempoAberturaPosExpediente++;
-                                                    }
-                                                }
-                                                $periodo = CarbonPeriod::create($dtmax ,  $now );
-
-                                                $dataultimoevento = date('d/m/Y', strtotime($evento->data));
-
-                                                if ($periodo->count()>=15) {
+                                                   }
+                                               }
+                                               $periodo = CarbonPeriod::create($dtmax ,  $now );
+                                               $dataultimoevento = date('d/m/Y', strtotime($evento->data));
+                                               if ($periodo->count()>=15) {
                                                     $aviso = 'a) Não foi possível avaliar eventos recente da utilização do alarme monitorado dado que a unidade não está sendo monitorada há '. $periodo->count().' dias. Incluindo a data da Inspeção. Adicionalmente verificaram que o último evento transmitido foi no dia ' .$dataultimoevento. '.';
-                                                }
+                                               }
                                             }
                                         }
                                         else {

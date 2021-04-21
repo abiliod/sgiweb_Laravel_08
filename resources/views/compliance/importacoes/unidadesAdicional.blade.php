@@ -19,7 +19,7 @@
                 <div class="card-content white-text">
                     <span class="card-title">Dados Adicionais de Unidades</span>
                     <p>Unidades<br>Assunto: Cadastro de Dados Adicionais Unidades.</p>
-                    <p>GCAD | PARÂMETROS_CADASTRAIS-ORGAOS-HORÁRIOS.xlsx</p>
+                    <p>DERAT | Analítico - Para horário das Agências</p>
                     <p>
                         <input id ="exibe" type="checkbox" class="filled-in col s1" onclick="Mudarestado('ajuda')"/>
                         <label for="exibe">

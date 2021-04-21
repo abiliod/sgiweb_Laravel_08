@@ -21,11 +21,12 @@ class JobUnidades implements ShouldQueue
      *
      * @return void
      */
-    protected   $unidades;
+    protected   $unidades, $dt_job;
 
-    public function __construct()
+    public function __construct($unidades, $dt_job)
     {
         $this->unidades = $unidades;
+        $this->dt_job = $dt_job;
     }
 
     /**
@@ -36,6 +37,10 @@ class JobUnidades implements ShouldQueue
     public function handle()
     {
         $unidades = $this->unidades;
+
+//        Atenção: o arquivo desse job dee ser exclusivamente oriundo do relatório ERP R55001A
+//        1000 linhas por job aproximadamente
+
         ini_set('memory_limit', '512M');
         foreach($unidades as $dados) {
             foreach($dados as $registro) {
@@ -167,37 +172,13 @@ class JobUnidades implements ShouldQueue
                         $unidade->email=$registro['email_da_unidade'];
                         $unidade->tipoEstrutura = $registro['tipo_de_estrutura'];
                         $unidade->subordinacao_tecnica =$registro['subordinacao_tecnica'];
-//   10/02/2021 - Abilio - Não atualizar dados de horário
-//                            if(!empty($registro['inicio_expediente']))
-//                            {
-//                                $unidade->inicio_atendimento =$registro['inicio_atendimento'];
-//                                $unidade->final_atendimento =$registro['final_atendimento'];
-//                                $unidade->inicio_expediente =$registro['inicio_expediente'];
-//                                $unidade->final_expediente =$registro['final_expediente'];
-//                                $unidade->inicio_intervalo_refeicao =$registro['inicio_intervalo_refeicao'];
-//                                $unidade->final_intervalo_refeicao =$registro['final_intervalo_refeicao'];
-//                                $unidade->trabalha_sabado =$registro['trabalha_sabado'];
-//                                $unidade->inicio_expediente_sabado =$registro['inicio_expediente_sabado'];
-//                                $unidade->final_expediente_sabado =$registro['final_expediente_sabado'];
-//                                $unidade->trabalha_domingo =$registro['trabalha_domingo'];
-//                                $unidade->inicio_expediente_domingo =$registro['inicio_expediente_domingo'];
-//                                $unidade->final_expediente_domingo =$registro['final_expediente_domingo'];
-//                                $unidade->tem_plantao =$registro['tem_plantao'];
-//                                $unidade->inicio_plantao_sabado =$registro['inicio_plantao_sabado'];
-//                                $unidade->final_plantao_sabado =$registro['final_plantao_sabado'];
-//                                $unidade->inicio_plantao_domingo =$registro['inicio_plantao_domingo'];
-//                                $unidade->final_plantao_domingo =$registro['final_plantao_domingo'];
-//                                $unidade->inicio_distribuicao =$registro['inicio_distribuicao'];
-//                                $unidade->final_distribuicao =$registro['final_distribuicao'];
-//                                $unidade->horario_lim_post_na_semana =$registro['horario_lim_post_na_semana'];
-//                                $unidade->horario_lim_post_final_semana =$registro['horario_lim_post_final_semana'];
-//                            }
+
                         $unidade->update();
                         $enderecos->update();
                     }
                 }
             }
         }
-        ini_set('memory_limit', '64M');
+        ini_set('memory_limit', '128M');
     }
 }
