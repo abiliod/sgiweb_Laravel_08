@@ -152,17 +152,17 @@
                                     @include('compliance.inspecao.modal._form270-4')
                             @endif
 
-                            @if( (($registro->numeroGrupoVerificacao == 205)&&($registro->numeroDoTeste == 2))
-                                || (($registro->numeroGrupoVerificacao==334)&&($registro->numeroDoTeste==1))
-                                || (($registro->numeroGrupoVerificacao==372)&&($registro->numeroDoTeste==1))
-                                || (($registro->numeroGrupoVerificacao==286)&&($registro->numeroDoTeste==2))
-                                || (($registro->numeroGrupoVerificacao==221)&&($registro->numeroDoTeste==2))
-                                || (($registro->numeroGrupoVerificacao==354)&&($registro->numeroDoTeste==1))
-                                || (($registro->numeroGrupoVerificacao == 231)&&($registro->numeroDoTeste == 1))
-                                || (($registro->numeroGrupoVerificacao==271)&&($registro->numeroDoTeste==1)) )
+{{--                            @if( (($registro->numeroGrupoVerificacao == 205)&&($registro->numeroDoTeste == 2))--}}
+{{--                                || (($registro->numeroGrupoVerificacao==334)&&($registro->numeroDoTeste==1))--}}
+{{--                                || (($registro->numeroGrupoVerificacao==372)&&($registro->numeroDoTeste==1))--}}
+{{--                                || (($registro->numeroGrupoVerificacao==286)&&($registro->numeroDoTeste==2))--}}
+{{--                                || (($registro->numeroGrupoVerificacao==221)&&($registro->numeroDoTeste==2))--}}
+{{--                                || (($registro->numeroGrupoVerificacao==354)&&($registro->numeroDoTeste==1))--}}
+{{--                                || (($registro->numeroGrupoVerificacao == 231)&&($registro->numeroDoTeste == 1))--}}
+{{--                                || (($registro->numeroGrupoVerificacao==271)&&($registro->numeroDoTeste==1)) )--}}
 
-                                    @include('compliance.inspecao.modal._form271-1')
-                            @endif
+{{--                                    @include('compliance.inspecao.modal._form271-1')--}}
+{{--                            @endif--}}
 
                             @if( (($registro->numeroGrupoVerificacao==232)&&($registro->numeroDoTeste==2))
 	                            || ( ($registro->numeroGrupoVerificacao==272)&&($registro->numeroDoTeste==1) ))

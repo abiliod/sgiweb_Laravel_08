@@ -108,6 +108,206 @@ class AvaliaInspecao implements ShouldQueue
                         $orientacao = $registro->orientacao;
 
 
+// Inicio SGDO Distribuição
+                        if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==1))
+                            || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==1))
+                            || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==1))
+                            || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==1))) {
+
+                            $codVerificacaoAnterior = null;
+                            $numeroGrupoReincidente = null;
+                            $numeroItemReincidente = null;
+                            $evidencia = null;
+                            $valorSobra = null;
+                            $valorFalta = null;
+                            $valorRisco = null;
+                            $total = 0;
+                            $pontuado = null;
+                            $aviso = null;
+                            $itemQuantificado = 'Não';
+                            $reincidente = 0;
+                            $reinc = 'Não';
+
+                            $dtini = $dtmenos120dias;
+                            $dtfim = $dtnow;
+                            $count = 0;
+
+                            if( substr($registro->tem_distribuicao, 0, 4) !== 'Não') {
+
+                                $reincidencia = DB::table('snci')
+                                    ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
+                                    ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                                    ->where([['sto', '=', $registro->sto]])
+                                    ->orderBy('no_inspecao', 'desc')
+                                    ->first();
+
+                                try {
+
+                                    if ( $reincidencia->no_inspecao > 1) {
+//                                        dd($reincidencia);
+                                        $reincidente = 1;
+                                        $reinc = 'Sim';
+                                        $periodo = new CarbonPeriod();
+                                        $codVerificacaoAnterior = $reincidencia->no_inspecao;
+                                        $numeroGrupoReincidente = $reincidencia->no_grupo;
+                                        $numeroItemReincidente = $reincidencia->no_item;
+                                        $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
+                                        $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
+
+                                        $sgdo_distribuicao = DB::table('sgdo_distribuicao')
+                                            ->select( 'sgdo_distribuicao.*' )
+                                            ->where([['mcu', '=',  $registro->mcu  ]])
+                                            ->where([['data_incio_atividade', '>=',  $reincidencia_dt_fim_inspecao  ]])
+                                            ->get();
+                                        $dtini = $reincidencia_dt_fim_inspecao;
+
+                                    } else {
+                                        $sgdo_distribuicao = DB::table('sgdo_distribuicao')
+                                            ->select( 'sgdo_distribuicao.*' )
+                                            ->where([['mcu', '=',  $registro->mcu  ]])
+                                            ->where([['data_incio_atividade', '>=',  $dtmenos120dias  ]])
+                                            ->get();
+                                    }
+                                } catch (\Exception $e) {
+
+                                    $sgdo_distribuicao = DB::table('sgdo_distribuicao')
+                                        ->select( 'sgdo_distribuicao.*' )
+                                        ->where([['mcu', '=',  $registro->mcu  ]])
+                                        ->where([['data_incio_atividade', '>=',  $dtmenos120dias  ]])
+                                        ->get();
+                                }
+                                if(! $sgdo_distribuicao->isEmpty()) {
+                                    $count = $sgdo_distribuicao->count('mcu');
+                                    $dtfim = $sgdo_distribuicao->max('data_incio_atividade');
+                                    $dtini = $sgdo_distribuicao->min('data_incio_atividade');
+
+                                    if ($count >= 1){
+                                        $avaliacao = 'Não Conforme';
+                                        $oportunidadeAprimoramento = 'Em análise aos registros do sistema SGDO (Relatório Detalhado das Distribuições), período de '. date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .' , constatou-se as seguintes inconsistências relacionadas aos lançamentos obrigatórios:';
+
+                                        $evidencia = $evidencia
+                                            . "\n" . 'Matricula'
+                                            . "\t" . 'Data Início Atividade'
+                                            . "\t" . 'Data Saída'
+                                            . "\t" . 'Data Retorno'
+                                            . "\t" . 'Data TPC'
+                                            . "\t" . 'Data Término Atividade';
+
+                                        foreach($sgdo_distribuicao as $dados) {
+
+                                            $data_incio_atividade = ''. ($dados->data_incio_atividade == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_incio_atividade)));
+
+                                            if ((!empty($dados->data_saida)) && ($dados->data_saida <> $dados->data_incio_atividade)) {
+                                                $data_saida = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_saida));
+                                            }
+                                            else{
+                                                $data_saida = ''. ($dados->data_saida == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_saida)));
+                                            }
+
+                                            if ((!empty($dados->data_retorno)) && ($dados->data_retorno <> $dados->data_incio_atividade)) {
+                                                $data_retorno = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_retorno));
+                                            }
+                                            else{
+                                                $data_retorno = ''. ($dados->data_retorno == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_retorno)));
+                                            }
+
+                                            if ((!empty($dados->data_tpc)) && ($dados->data_tpc <> $dados->data_incio_atividade)) {
+                                                $data_tpc = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_tpc));
+                                            }
+                                            else{
+                                                $data_tpc = ''. ($dados->data_tpc == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_tpc)));
+                                            }
+
+
+                                            if ((!empty($dados->data_termino_atividade)) && ($dados->data_termino_atividade <> $dados->data_incio_atividade)) {
+                                                $data_termino_atividade = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_termino_atividade));
+                                            }
+                                            else{
+                                                $data_termino_atividade = ''. ($dados->data_termino_atividade == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_termino_atividade)));
+                                            }
+                                            $evidencia = $evidencia
+                                                . "\n" . $dados->matricula
+                                                . "\t" . $data_incio_atividade
+                                                . "\t" . $data_saida
+                                                . "\t" . $data_retorno
+                                                . "\t" . $data_tpc
+                                                . "\t" . $data_termino_atividade;
+                                        }
+
+                                        $quebra = DB::table('relevancias')
+                                            ->select('valor_final')
+                                            ->where('fator_multiplicador', '=', 1)
+                                            ->first();
+                                        $quebracaixa = $quebra->valor_final * 0.1;
+
+                                        if( $valorFalta > $quebracaixa){
+                                            $fm = DB::table('relevancias')
+                                                ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+                                                ->where('valor_inicio', '<=', $total)
+                                                ->orderBy('valor_final', 'desc')
+                                                ->first();
+                                            $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                                        }
+                                        else{
+                                            if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                                        }
+
+
+
+                                    }
+                                    else{
+                                        $avaliacao = 'Conforme';
+                                        $oportunidadeAprimoramento = 'Em análise aos registros do sistema SGDO (Relatório Detalhado das Distribuições), período de '. date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .' , constatou-se que não havia inconsistências relacionadas aos lançamentos obrigatórios na unidade.';
+                                        $consequencias = null;
+                                        $orientacao = null;
+                                    }
+                                }
+                                else {
+//                                      sgdo não verificado, unidade não tem dados na tabela SGDO
+                                    $avaliacao = 'Não Verificado'; // não avalia o item  terá uma segunda etapa na presencial
+                                    $oportunidadeAprimoramento = 'Não foi possível avaliar informações referente a unidade no Sistema SGDO dado que não há lançamentos sobre as rotinas da Distribuição. Verificaram o período a partir do dia' . date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .'.';
+                                    $consequencias = $registro->consequencias;
+                                    $orientacao = $registro->orientacao;
+                                }
+
+                            }
+                            else {
+                                //                                   sgdo não verificado, unidade não tem distribuição
+                                $avaliacao = 'Não Executa Tarefa'; // não avalia o item  terá uma segunda etapa na presencial
+                                $oportunidadeAprimoramento = 'A unidade não executa essa tarefa.';
+                                $consequencias = null;
+                                $orientacao = null;
+                            }
+
+                            $dto = DB::table('itensdeinspecoes')
+                                ->Where([['inspecao_id', '=', $registro->inspecao_id]])
+                                ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
+                                ->select('itensdeinspecoes.*')
+                                ->first();
+                            $itensdeinspecao = Itensdeinspecao::find($dto->id);
+                            $itensdeinspecao->avaliacao = $avaliacao;
+                            $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
+                            $itensdeinspecao->evidencia = $evidencia;
+                            $itensdeinspecao->valorFalta = $valorFalta;
+                            $itensdeinspecao->valorSobra = $valorSobra;
+                            $itensdeinspecao->valorRisco = $valorRisco;
+                            $itensdeinspecao->situacao = 'Inspecionado';
+                            $itensdeinspecao->pontuado = $pontuado;
+                            $itensdeinspecao->itemQuantificado = $itemQuantificado;
+                            $itensdeinspecao->orientacao = $registro->orientacao;
+                            $itensdeinspecao->eventosSistema = 'Item avaliado Remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
+                            $itensdeinspecao->reincidencia = $reinc;
+                            $itensdeinspecao->consequencias = $consequencias;
+                            $itensdeinspecao->orientacao = $orientacao;
+                            $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
+                            $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
+                            $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
+                            $itensdeinspecao->update();
+
+                        }
+// Fim SGDO Distribuição
+
+
 //    Inicio abertura da Unidade
                         if(($registro->numeroGrupoVerificacao==238) && ($registro->numeroDoTeste==2)){
 
@@ -135,7 +335,7 @@ class AvaliaInspecao implements ShouldQueue
 
                             $reincidencia = DB::table('snci')
                                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                ->where([['descricao_item', 'like', '%Os procedimentos de embarque e desembarque da carga%']])
+                                ->where([['descricao_item', 'like', '% abertura da Unidade é realizada por dois empregados indicados a criterio da Gerência%']])
                                 ->where([['sto', '=', $registro->sto]])
                                 ->orderBy('no_inspecao', 'desc')
                                 ->first();
@@ -2951,6 +3151,206 @@ class AvaliaInspecao implements ShouldQueue
                             $orientacao = $registro->orientacao;
 
 
+// Inicio SGDO Distribuição
+                            if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==1))
+                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==1))
+                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==1))
+                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==1))) {
+
+                                $codVerificacaoAnterior = null;
+                                $numeroGrupoReincidente = null;
+                                $numeroItemReincidente = null;
+                                $evidencia = null;
+                                $valorSobra = null;
+                                $valorFalta = null;
+                                $valorRisco = null;
+                                $total = 0;
+                                $pontuado = null;
+                                $aviso = null;
+                                $itemQuantificado = 'Não';
+                                $reincidente = 0;
+                                $reinc = 'Não';
+
+                                $dtini = $dtmenos120dias;
+                                $dtfim = $dtnow;
+                                $count = 0;
+
+                                if( substr($registro->tem_distribuicao, 0, 4) !== 'Não') {
+
+                                    $reincidencia = DB::table('snci')
+                                        ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
+                                        ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                                        ->where([['sto', '=', $registro->sto]])
+                                        ->orderBy('no_inspecao', 'desc')
+                                        ->first();
+
+                                    try {
+
+                                        if ( $reincidencia->no_inspecao > 1) {
+//                                        dd($reincidencia);
+                                            $reincidente = 1;
+                                            $reinc = 'Sim';
+                                            $periodo = new CarbonPeriod();
+                                            $codVerificacaoAnterior = $reincidencia->no_inspecao;
+                                            $numeroGrupoReincidente = $reincidencia->no_grupo;
+                                            $numeroItemReincidente = $reincidencia->no_item;
+                                            $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
+                                            $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
+
+                                            $sgdo_distribuicao = DB::table('sgdo_distribuicao')
+                                                ->select( 'sgdo_distribuicao.*' )
+                                                ->where([['mcu', '=',  $registro->mcu  ]])
+                                                ->where([['data_incio_atividade', '>=',  $reincidencia_dt_fim_inspecao  ]])
+                                                ->get();
+                                            $dtini = $reincidencia_dt_fim_inspecao;
+
+                                        } else {
+                                            $sgdo_distribuicao = DB::table('sgdo_distribuicao')
+                                                ->select( 'sgdo_distribuicao.*' )
+                                                ->where([['mcu', '=',  $registro->mcu  ]])
+                                                ->where([['data_incio_atividade', '>=',  $dtmenos120dias  ]])
+                                                ->get();
+                                        }
+                                    } catch (\Exception $e) {
+
+                                        $sgdo_distribuicao = DB::table('sgdo_distribuicao')
+                                            ->select( 'sgdo_distribuicao.*' )
+                                            ->where([['mcu', '=',  $registro->mcu  ]])
+                                            ->where([['data_incio_atividade', '>=',  $dtmenos120dias  ]])
+                                            ->get();
+                                    }
+                                    if(! $sgdo_distribuicao->isEmpty()) {
+                                        $count = $sgdo_distribuicao->count('mcu');
+                                        $dtfim = $sgdo_distribuicao->max('data_incio_atividade');
+                                        $dtini = $sgdo_distribuicao->min('data_incio_atividade');
+
+                                        if ($count >= 1){
+                                            $avaliacao = 'Não Conforme';
+                                            $oportunidadeAprimoramento = 'Em análise aos registros do sistema SGDO (Relatório Detalhado das Distribuições), período de '. date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .' , constatou-se as seguintes inconsistências relacionadas aos lançamentos obrigatórios:';
+
+                                            $evidencia = $evidencia
+                                                . "\n" . 'Matricula'
+                                                . "\t" . 'Data Início Atividade'
+                                                . "\t" . 'Data Saída'
+                                                . "\t" . 'Data Retorno'
+                                                . "\t" . 'Data TPC'
+                                                . "\t" . 'Data Término Atividade';
+
+                                            foreach($sgdo_distribuicao as $dados) {
+
+                                                $data_incio_atividade = ''. ($dados->data_incio_atividade == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_incio_atividade)));
+
+                                                if ((!empty($dados->data_saida)) && ($dados->data_saida <> $dados->data_incio_atividade)) {
+                                                    $data_saida = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_saida));
+                                                }
+                                                else{
+                                                    $data_saida = ''. ($dados->data_saida == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_saida)));
+                                                }
+
+                                                if ((!empty($dados->data_retorno)) && ($dados->data_retorno <> $dados->data_incio_atividade)) {
+                                                    $data_retorno = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_retorno));
+                                                }
+                                                else{
+                                                    $data_retorno = ''. ($dados->data_retorno == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_retorno)));
+                                                }
+
+                                                if ((!empty($dados->data_tpc)) && ($dados->data_tpc <> $dados->data_incio_atividade)) {
+                                                    $data_tpc = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_tpc));
+                                                }
+                                                else{
+                                                    $data_tpc = ''. ($dados->data_tpc == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_tpc)));
+                                                }
+
+
+                                                if ((!empty($dados->data_termino_atividade)) && ($dados->data_termino_atividade <> $dados->data_incio_atividade)) {
+                                                    $data_termino_atividade = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_termino_atividade));
+                                                }
+                                                else{
+                                                    $data_termino_atividade = ''. ($dados->data_termino_atividade == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_termino_atividade)));
+                                                }
+                                                $evidencia = $evidencia
+                                                    . "\n" . $dados->matricula
+                                                    . "\t" . $data_incio_atividade
+                                                    . "\t" . $data_saida
+                                                    . "\t" . $data_retorno
+                                                    . "\t" . $data_tpc
+                                                    . "\t" . $data_termino_atividade;
+                                            }
+
+                                            $quebra = DB::table('relevancias')
+                                                ->select('valor_final')
+                                                ->where('fator_multiplicador', '=', 1)
+                                                ->first();
+                                            $quebracaixa = $quebra->valor_final * 0.1;
+
+                                            if( $valorFalta > $quebracaixa){
+                                                $fm = DB::table('relevancias')
+                                                    ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+                                                    ->where('valor_inicio', '<=', $total)
+                                                    ->orderBy('valor_final', 'desc')
+                                                    ->first();
+                                                $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                                            }
+                                            else{
+                                                if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                                            }
+
+
+
+                                        }
+                                        else{
+                                            $avaliacao = 'Conforme';
+                                            $oportunidadeAprimoramento = 'Em análise aos registros do sistema SGDO (Relatório Detalhado das Distribuições), período de '. date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .' , constatou-se que não havia inconsistências relacionadas aos lançamentos obrigatórios na unidade.';
+                                            $consequencias = null;
+                                            $orientacao = null;
+                                        }
+                                    }
+                                    else {
+//                                      sgdo não verificado, unidade não tem dados na tabela SGDO
+                                        $avaliacao = 'Não Verificado'; // não avalia o item  terá uma segunda etapa na presencial
+                                        $oportunidadeAprimoramento = 'Não foi possível avaliar informações referente a unidade no Sistema SGDO dado que não há lançamentos sobre as rotinas da Distribuição. Verificaram o período a partir do dia' . date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .'.';
+                                        $consequencias = $registro->consequencias;
+                                        $orientacao = $registro->orientacao;
+                                    }
+
+                                }
+                                else {
+                                    //                                   sgdo não verificado, unidade não tem distribuição
+                                    $avaliacao = 'Não Executa Tarefa'; // não avalia o item  terá uma segunda etapa na presencial
+                                    $oportunidadeAprimoramento = 'A unidade não executa essa tarefa.';
+                                    $consequencias = null;
+                                    $orientacao = null;
+                                }
+
+                                $dto = DB::table('itensdeinspecoes')
+                                    ->Where([['inspecao_id', '=', $registro->inspecao_id]])
+                                    ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
+                                    ->select('itensdeinspecoes.*')
+                                    ->first();
+                                $itensdeinspecao = Itensdeinspecao::find($dto->id);
+                                $itensdeinspecao->avaliacao = $avaliacao;
+                                $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
+                                $itensdeinspecao->evidencia = $evidencia;
+                                $itensdeinspecao->valorFalta = $valorFalta;
+                                $itensdeinspecao->valorSobra = $valorSobra;
+                                $itensdeinspecao->valorRisco = $valorRisco;
+                                $itensdeinspecao->situacao = 'Inspecionado';
+                                $itensdeinspecao->pontuado = $pontuado;
+                                $itensdeinspecao->itemQuantificado = $itemQuantificado;
+                                $itensdeinspecao->orientacao = $registro->orientacao;
+                                $itensdeinspecao->eventosSistema = 'Item avaliado Remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
+                                $itensdeinspecao->reincidencia = $reinc;
+                                $itensdeinspecao->consequencias = $consequencias;
+                                $itensdeinspecao->orientacao = $orientacao;
+                                $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
+                                $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
+                                $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
+                                $itensdeinspecao->update();
+
+                            }
+// Fim SGDO Distribuição
+
+
 //     Inicio abertura da Unidade
                             if(($registro->numeroGrupoVerificacao==238) && ($registro->numeroDoTeste==2)){
 
@@ -2978,7 +3378,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '%Os procedimentos de embarque e desembarque da carga%']])
+                                    ->where([['descricao_item', 'like', '% abertura da Unidade é realizada por dois empregados indicados a criterio da Gerência%']])
                                     ->where([['sto', '=', $registro->sto]])
                                     ->orderBy('no_inspecao', 'desc')
                                     ->first();
