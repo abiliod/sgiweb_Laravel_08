@@ -161,7 +161,7 @@ class AvaliaInspecao implements ShouldQueue
 
                             $reincidencia = DB::table('snci')
                                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                                ->where([['descricao_item', 'like', '%UNIDADE SEM SUPERVISOR OPERACIONAL - É realizada diariamente a gestão das pendências de objetos%']])
                                 ->where([['sto', '=', $registro->sto]])
                                 ->orderBy('no_inspecao', 'desc')
                                 ->first();
@@ -361,7 +361,8 @@ class AvaliaInspecao implements ShouldQueue
 
                             $reincidencia = DB::table('snci')
                                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                                ->where([['descricao_item', 'like', '%UNIDADE COM SUPERVISOR OPERACIONAL (SO) - É realizada diariamente a gestão das pendências de objetos%']])
+
                                 ->where([['sto', '=', $registro->sto]])
                                 ->orderBy('no_inspecao', 'desc')
                                 ->first();
@@ -3547,7 +3548,9 @@ class AvaliaInspecao implements ShouldQueue
 
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                                    ->where([['descricao_item', 'like', '%UNIDADE SEM SUPERVISOR OPERACIONAL - É realizada diariamente a gestão das pendências de objetos%']])
+
+
                                     ->where([['sto', '=', $registro->sto]])
                                     ->orderBy('no_inspecao', 'desc')
                                     ->first();
@@ -3747,7 +3750,8 @@ class AvaliaInspecao implements ShouldQueue
 
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                                    ->where([['descricao_item', 'like', '%UNIDADE COM SUPERVISOR OPERACIONAL (SO) - É realizada diariamente a gestão das pendências de objetos%']])
+
                                     ->where([['sto', '=', $registro->sto]])
                                     ->orderBy('no_inspecao', 'desc')
                                     ->first();

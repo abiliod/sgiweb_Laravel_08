@@ -3414,7 +3414,7 @@ class InspecaoController extends Controller
 
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                ->where([['descricao_item', 'like', '%UNIDADE SEM SUPERVISOR OPERACIONAL - É realizada diariamente a gestão das pendências de objetos%']])
                 ->where([['sto', '=', $registro->sto]])
                 ->orderBy('no_inspecao', 'desc')
                 ->first();
@@ -3625,7 +3625,7 @@ class InspecaoController extends Controller
 
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                ->where([['descricao_item', 'like', '%UNIDADE COM SUPERVISOR OPERACIONAL (SO) - É realizada diariamente a gestão das pendências de objetos%']])
                 ->where([['sto', '=', $registro->sto]])
                 ->orderBy('no_inspecao', 'desc')
                 ->first();
@@ -3781,6 +3781,72 @@ class InspecaoController extends Controller
 
         }
 // fim Pre Alerta gestão automatica unidade com supervisor
+
+ // Inicio CIE Eletrônica
+        if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==9))
+            || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==8))
+            || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==9))
+            || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==7)))
+        {
+            $dtini = $dtmenos12meses;
+            switch ($registro->se)
+            {
+                case 1 :{ $superintendência = 'CS'; } break;
+                case 4 :{ $superintendência = 'AL'; } break;
+                case 6 :{ $superintendência = 'AM'; } break;
+                case 8 :{ $superintendência = 'BA'; } break;
+                case 10 :{ $superintendência = 'BSB'; } break;
+                case 12 :{ $superintendência = 'CE'; } break;
+                case 14 :{ $superintendência = 'ES'; } break;
+                case 16 :{ $superintendência = 'GO'; } break;
+                case 18 :{ $superintendência = 'MA'; } break;
+                case 20 :{ $superintendência = 'MG'; } break;
+                case 22 :{ $superintendência = 'MS'; } break;
+                case 24 :{ $superintendência = 'MT'; } break;
+                case 26 :{ $superintendência = 'RO'; } break;
+                case 28 :{ $superintendência = 'PA'; } break;
+                case 30 :{ $superintendência = 'PB'; } break;
+                case 32 :{ $superintendência = 'PE'; } break;
+                case 34 :{ $superintendência = 'PI'; } break;
+                case 36 :{ $superintendência = 'PR'; } break;
+                case 50 :{ $superintendência = 'RJ'; } break;
+                case 60 :{ $superintendência = 'RN'; } break;
+                case 64 :{ $superintendência = 'RS'; } break;
+                case 68 :{ $superintendência = 'SC'; } break;
+                case 72 :{ $superintendência = 'SPM'; } break;
+                case 74 :{ $superintendência = 'SPI'; } break;
+                case 75 :{ $superintendência = 'TO'; } break;
+            }
+
+//            dd( ' 2012 ', $registro->se,  $superintendência);
+
+//            a) Documentos respondidos acima do prazo de 03 dias úteis;
+//            b) Se há CIEs sem registro das providências adotadas ou com ações genéricas, que não demonstrem assertividade ou não comprovem efetividade, como por exemplo: ""Empregado orientado"", ""Estamos apurando o ocorrido"";
+//            c) A ocorrência de reincidência. Considerar a existência de 03 CIEs recebidas pelos mesmos Motivos dentro do período de 01 mês;
+//            d) Comunicados de Irregularidades com status ""Pendente"" e/ou ""Não Lido"".
+            $cie_eletronicas = DB::table('cie_eletronicas')
+                ->select( 'cie_eletronicas.*' )
+                ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
+                ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
+                ->where([['cie_eletronicas.respondida', '=',  'N' ]])
+                ->get();
+            $count = $cie_eletronicas->count('respondida');
+            $dtfim = $cie_eletronicas->max('emissao');
+            return view('compliance.inspecao.editar',compact
+            (
+                'registro'
+                , 'id'
+                , 'total'
+                , 'cie_eletronicas'
+                ,'count'
+                ,'dtini'
+                ,'dtfim'
+
+
+            ));
+        }
+// Fim CIE Eletrônica
 
         if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==5))
                 || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==4))
@@ -4279,69 +4345,8 @@ class InspecaoController extends Controller
 
             }
 
-            if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==9))
-                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==8))
-                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==9))
-                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==7)))
-            {
-                $dtini = $dtmenos12meses;
-                switch ($registro->se)
-                {
-                    case 1 :{ $superintendência = 'CS'; } break;
-                    case 4 :{ $superintendência = 'AL'; } break;
-                    case 6 :{ $superintendência = 'AM'; } break;
-                    case 8 :{ $superintendência = 'BA'; } break;
-                    case 10 :{ $superintendência = 'BSB'; } break;
-                    case 12 :{ $superintendência = 'CE'; } break;
-                    case 14 :{ $superintendência = 'ES'; } break;
-                    case 16 :{ $superintendência = 'GO'; } break;
-                    case 18 :{ $superintendência = 'MA'; } break;
-                    case 20 :{ $superintendência = 'MG'; } break;
-                    case 22 :{ $superintendência = 'MS'; } break;
-                    case 24 :{ $superintendência = 'MT'; } break;
-                    case 26 :{ $superintendência = 'RO'; } break;
-                    case 28 :{ $superintendência = 'PA'; } break;
-                    case 30 :{ $superintendência = 'PB'; } break;
-                    case 32 :{ $superintendência = 'PE'; } break;
-                    case 34 :{ $superintendência = 'PI'; } break;
-                    case 36 :{ $superintendência = 'PR'; } break;
-                    case 50 :{ $superintendência = 'RJ'; } break;
-                    case 60 :{ $superintendência = 'RN'; } break;
-                    case 64 :{ $superintendência = 'RS'; } break;
-                    case 68 :{ $superintendência = 'SC'; } break;
-                    case 72 :{ $superintendência = 'SPM'; } break;
-                    case 74 :{ $superintendência = 'SPI'; } break;
-                    case 75 :{ $superintendência = 'TO'; } break;
-                }
-
-//            dd( ' 2012 ', $registro->se,  $superintendência);
-
-//            a) Documentos respondidos acima do prazo de 03 dias úteis;
-//            b) Se há CIEs sem registro das providências adotadas ou com ações genéricas, que não demonstrem assertividade ou não comprovem efetividade, como por exemplo: ""Empregado orientado"", ""Estamos apurando o ocorrido"";
-//            c) A ocorrência de reincidência. Considerar a existência de 03 CIEs recebidas pelos mesmos Motivos dentro do período de 01 mês;
-//            d) Comunicados de Irregularidades com status ""Pendente"" e/ou ""Não Lido"".
-                $cie_eletronicas = DB::table('cie_eletronicas')
-                   ->select( 'cie_eletronicas.*' )
-                   ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
-                   ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
-                   ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
-                   ->where([['cie_eletronicas.respondida', '=',  'N' ]])
-                   ->get();
-                $count = $cie_eletronicas->count('respondida');
-                $dtfim = $cie_eletronicas->max('emissao');
-                return view('compliance.inspecao.editar',compact
-                       (
-                           'registro'
-                           , 'id'
-                           , 'total'
-                           , 'cie_eletronicas'
-                           ,'count'
-                           ,'dtini'
-                           ,'dtfim'
 
 
-                       ));
-            }
       //  dd($registro);
 
             if((($registro->numeroGrupoVerificacao==209) && ($registro->numeroDoTeste==2))

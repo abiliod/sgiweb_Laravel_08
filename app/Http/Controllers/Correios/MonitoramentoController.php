@@ -68,14 +68,14 @@ class MonitoramentoController extends Controller
 //            php artisan queue:work --queue=avaliaInspecao
 
 //
-
-            $job = (new AvaliaInspecao($superintendencias, $tipodeunidade , $ciclo))
-                ->onQueue('avaliaInspecao')->delay($dtnow->addMinutes(1));
-            dispatch($job);
-
-            \Session::flash('mensagem', ['msg' => 'Job AvaliaInspecao aguardando processamento.'
-                , 'class' => 'blue white-text']);
-            return redirect()->back();
+//
+//            $job = (new AvaliaInspecao($superintendencias, $tipodeunidade , $ciclo))
+//                ->onQueue('avaliaInspecao')->delay($dtnow->addMinutes(1));
+//            dispatch($job);
+//
+//            \Session::flash('mensagem', ['msg' => 'Job AvaliaInspecao aguardando processamento.'
+//                , 'class' => 'blue white-text']);
+//            return redirect()->back();
 
 //   O valor de 134217728 bytes é equivalente a 128M
 
@@ -154,9 +154,21 @@ class MonitoramentoController extends Controller
                             ini_set('max_input_time', 350);
                             ini_set('max_execution_time', 350);
 
-// Inicio Pre Alerta gestão automatica unidade sem supervisor
-                            if((($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==7))
-                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==6))) {
+
+// Inicio CIE Eletrônica
+//            a) Documentos respondidos acima do prazo de 03 dias úteis;
+//            b) Se há CIEs sem registro das providências adotadas ou com ações genéricas, que não demonstrem assertividade ou não comprovem efetividade, como por exemplo: ""Empregado orientado"", ""Estamos apurando o ocorrido"";
+//            c) A ocorrência de reincidência. Considerar a existência de 03 CIEs recebidas pelos mesmos Motivos dentro do período de 01 mês;
+//            d) Comunicados de Irregularidades com status ""Pendente"" e/ou ""Não Lido"".
+
+                            if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==9))
+                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==8))
+                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==9))
+                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==7)))
+
+
+
+                            {
 
                                 $codVerificacaoAnterior = null;
                                 $numeroGrupoReincidente = null;
@@ -232,32 +244,42 @@ class MonitoramentoController extends Controller
                                             ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                             ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                             ->get();
+
+                                        $cie_eletronicas = DB::table('cie_eletronicas')
+                                            ->select( 'cie_eletronicas.*' )
+                                            ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
+                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                            ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
+                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
+                                            ->get();
+
                                         $dtini = $reincidencia_dt_fim_inspecao;
 
                                     } else {
-                                        $painel_extravios = DB::table('painel_extravios')
-                                            ->select( 'painel_extravios.*' )
-                                            ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
-                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
-                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
+                                        $cie_eletronicas = DB::table('cie_eletronicas')
+                                            ->select( 'cie_eletronicas.*' )
+                                            ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
+                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                            ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
+                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
                                             ->get();
+
                                     }
                                 } catch (\Exception $e) {
 
-                                    $painel_extravios = DB::table('painel_extravios')
-                                        ->select( 'painel_extravios.*' )
-                                        ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
-                                        ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
-                                        ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
+                                    $cie_eletronicas = DB::table('cie_eletronicas')
+                                        ->select( 'cie_eletronicas.*' )
+                                        ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
+                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                        ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
+                                        ->where([['cie_eletronicas.respondida', '=',  'N' ]])
                                         ->get();
+
                                 }
 
+                                $count = $cie_eletronicas->count('respondida');
+                                $dtfim = $cie_eletronicas->max('emissao');
 
-
-                                $count = $painel_extravios->count('unid_destino_apelido');
-                                $dtfim = $painel_extravios->max('data_evento');
                                 $cadastral = DB::table('cadastral')
                                     ->select( 'cadastral.*' )
                                     ->where([['cadastral.mcu', '=',   $registro->mcu  ]])
@@ -347,10 +369,24 @@ class MonitoramentoController extends Controller
 
                                 $itensdeinspecao->update();
 
-                            }
-// fim Pre Alerta gestão automatica unidade sem supervisor
+                                return view('compliance.inspecao.editar',compact
+                                (
+                                    'registro'
+                                    , 'id'
+                                    , 'total'
+                                    , 'cie_eletronicas'
+                                    ,'count'
+                                    ,'dtini'
+                                    ,'dtfim'
 
-// Inicio Pre Alerta gestão automatica unidade com supervisor
+
+                                ));
+
+
+                            }
+
+
+// Fim CIE Eletrônica
 
                             if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==15))
                                 || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==11))
