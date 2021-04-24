@@ -68,14 +68,14 @@ class MonitoramentoController extends Controller
 //            php artisan queue:work --queue=avaliaInspecao
 
 //
-//
-//            $job = (new AvaliaInspecao($superintendencias, $tipodeunidade , $ciclo))
-//                ->onQueue('avaliaInspecao')->delay($dtnow->addMinutes(1));
-//            dispatch($job);
-//
-//            \Session::flash('mensagem', ['msg' => 'Job AvaliaInspecao aguardando processamento.'
-//                , 'class' => 'blue white-text']);
-//            return redirect()->back();
+
+            $job = (new AvaliaInspecao($superintendencias, $tipodeunidade , $ciclo))
+                ->onQueue('avaliaInspecao')->delay($dtnow->addMinutes(1));
+            dispatch($job);
+
+            \Session::flash('mensagem', ['msg' => 'Job AvaliaInspecao aguardando processamento.'
+                , 'class' => 'blue white-text']);
+            return redirect()->back();
 
 //   O valor de 134217728 bytes é equivalente a 128M
 
@@ -137,7 +137,7 @@ class MonitoramentoController extends Controller
 //                            ->where([['sto', '=', 16303407 ]]) // alto horizonte
 //                            ->where([['sto', '=', 16300947 ]])   // Britania  16300947
 //                            ->where([['mcu', '=', 6684 ]]) //ac anicuns
-                            ->where([['itensdeinspecoes.testeVerificacao_id', '=', 3702 ]])  //3678  é smb_bdf
+//                            ->where([['itensdeinspecoes.testeVerificacao_id', '=', 3708 ]])  //3678  é smb_bdf
 //                            ->limit(100)
 
                         ->get();
@@ -150,38 +150,13 @@ class MonitoramentoController extends Controller
                             $orientacao = $registro->orientacao;
 
 
-//                            ini_set('memory_limit', '512M');
-//                            ini_set('max_input_time', 350);
-//                            ini_set('max_execution_time', 350);
-//
-////  outro evento
-//
-//
-////                                DB::enableQueryLog();
-////                                dd( DB::getQueryLog());
-////                          echo ' 1941 - Unidade -> '. "\n" . $dto->id , $itensdeinspecao;
-//
-//
-//                            ini_set('memory_limit', '128M');
-//                            ini_set('max_input_time', 120);
-//                            ini_set('max_execution_time', 120);
-
                             ini_set('memory_limit', '512M');
                             ini_set('max_input_time', 350);
                             ini_set('max_execution_time', 350);
 
-
-//                                DB::enableQueryLog();
-
-//                                dd( DB::getQueryLog());
-
-
-                            dd('203 aki', $registro);
-// Inicio SGDO Distribuição
-                            if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==1))
-                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==1))
-                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==1))
-                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==1))) {
+// Inicio Pre Alerta gestão automatica unidade sem supervisor
+                            if((($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==7))
+                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==6))) {
 
                                 $codVerificacaoAnterior = null;
                                 $numeroGrupoReincidente = null;
@@ -197,234 +172,49 @@ class MonitoramentoController extends Controller
                                 $reincidente = 0;
                                 $reinc = 'Não';
 
-                                $dtini = $dtmenos120dias;
-                                $dtfim = $dtnow;
+                                $dtini = $dtmenos150dias;
+                                $countSupervisor = 0;
                                 $count = 0;
 
-                                if( substr($registro->tem_distribuicao, 0, 4) !== 'Não') {
+                                switch ($registro->se) {
 
-                                    $reincidencia = DB::table('snci')
-                                        ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                        ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
-                                        ->where([['sto', '=', $registro->sto]])
-                                        ->orderBy('no_inspecao', 'desc')
-                                    ->first();
-
-                                    try {
-
-                                        if ( $reincidencia->no_inspecao > 1) {
-//                                        dd($reincidencia);
-                                            $reincidente = 1;
-                                            $reinc = 'Sim';
-                                            $periodo = new CarbonPeriod();
-                                            $codVerificacaoAnterior = $reincidencia->no_inspecao;
-                                            $numeroGrupoReincidente = $reincidencia->no_grupo;
-                                            $numeroItemReincidente = $reincidencia->no_item;
-                                            $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
-                                            $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
-
-                                            $sgdo_distribuicao = DB::table('sgdo_distribuicao')
-                                                ->select( 'sgdo_distribuicao.*' )
-                                                ->where([['mcu', '=',  $registro->mcu  ]])
-                                                ->where([['data_incio_atividade', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                                ->get();
-                                            $dtini = $reincidencia_dt_fim_inspecao;
-
-                                        } else {
-                                            $sgdo_distribuicao = DB::table('sgdo_distribuicao')
-                                                ->select( 'sgdo_distribuicao.*' )
-                                                ->where([['mcu', '=',  $registro->mcu  ]])
-                                                ->where([['data_incio_atividade', '>=',  $dtmenos120dias  ]])
-                                            ->get();
-                                        }
-                                    } catch (\Exception $e) {
-
-                                         $sgdo_distribuicao = DB::table('sgdo_distribuicao')
-                                            ->select( 'sgdo_distribuicao.*' )
-                                            ->where([['mcu', '=',  $registro->mcu  ]])
-                                            ->where([['data_incio_atividade', '>=',  $dtmenos120dias  ]])
-                                         ->get();
-                                    }
-                                    if(! $sgdo_distribuicao->isEmpty()) {
-                                        $count = $sgdo_distribuicao->count('mcu');
-                                        $dtfim = $sgdo_distribuicao->max('data_incio_atividade');
-                                        $dtini = $sgdo_distribuicao->min('data_incio_atividade');
-
-                                        if ($count >= 1){
-                                            $avaliacao = 'Não Conforme';
-                                            $oportunidadeAprimoramento = 'Em análise aos registros do sistema SGDO (Relatório Detalhado das Distribuições), período de '. date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .' , constatou-se as seguintes inconsistências relacionadas aos lançamentos obrigatórios:';
-
-                                            $evidencia = $evidencia
-                                                . "\n" . 'Matricula'
-                                                . "\t" . 'Data Início Atividade'
-                                                . "\t" . 'Data Saída'
-                                                . "\t" . 'Data Retorno'
-                                                . "\t" . 'Data TPC'
-                                                . "\t" . 'Data Término Atividade';
-
-                                            foreach($sgdo_distribuicao as $dados) {
-
-                                                $data_incio_atividade = ''. ($dados->data_incio_atividade == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_incio_atividade)));
-
-                                                if ((!empty($dados->data_saida)) && ($dados->data_saida <> $dados->data_incio_atividade)) {
-                                                    $data_saida = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_saida));
-                                                    }
-                                                else{
-                                                    $data_saida = ''. ($dados->data_saida == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_saida)));
-                                                }
-
-                                                if ((!empty($dados->data_retorno)) && ($dados->data_retorno <> $dados->data_incio_atividade)) {
-                                                    $data_retorno = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_retorno));
-                                                }
-                                                else{
-                                                    $data_retorno = ''. ($dados->data_retorno == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_retorno)));
-                                                }
-
-                                                if ((!empty($dados->data_tpc)) && ($dados->data_tpc <> $dados->data_incio_atividade)) {
-                                                    $data_tpc = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_tpc));
-                                                }
-                                                else{
-                                                    $data_tpc = ''. ($dados->data_tpc == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_tpc)));
-                                                }
-
-
-                                                if ((!empty($dados->data_termino_atividade)) && ($dados->data_termino_atividade <> $dados->data_incio_atividade)) {
-                                                    $data_termino_atividade = 'Data Saída Diferente '.date('d/m/Y', strtotime($dados->data_termino_atividade));
-                                                }
-                                                else{
-                                                    $data_termino_atividade = ''. ($dados->data_termino_atividade == '' ? 'Falta Lançamento' : date('d/m/Y', strtotime($dados->data_termino_atividade)));
-                                                }
-                                                $evidencia = $evidencia
-                                                    . "\n" . $dados->matricula
-                                                    . "\t" . $data_incio_atividade
-                                                    . "\t" . $data_saida
-                                                    . "\t" . $data_retorno
-                                                    . "\t" . $data_tpc
-                                                    . "\t" . $data_termino_atividade;
-                                            }
-
-                                            $quebra = DB::table('relevancias')
-                                                ->select('valor_final')
-                                                ->where('fator_multiplicador', '=', 1)
-                                                ->first();
-                                            $quebracaixa = $quebra->valor_final * 0.1;
-
-                                            if( $valorFalta > $quebracaixa){
-                                                $fm = DB::table('relevancias')
-                                                    ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
-                                                    ->where('valor_inicio', '<=', $total)
-                                                    ->orderBy('valor_final', 'desc')
-                                                    ->first();
-                                                $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
-                                            }
-                                            else{
-                                                if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
-                                            }
-
-
-
-                                        }
-                                        else{
-                                            $avaliacao = 'Conforme';
-                                            $oportunidadeAprimoramento = 'Em análise aos registros do sistema SGDO (Relatório Detalhado das Distribuições), período de '. date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .' , constatou-se que não havia inconsistências relacionadas aos lançamentos obrigatórios na unidade.';
-                                            $consequencias = null;
-                                            $orientacao = null;
-                                        }
-                                    }
-                                    else {
-//                                      sgdo não verificado, unidade não tem dados na tabela SGDO
-                                        $avaliacao = 'Não Verificado'; // não avalia o item  terá uma segunda etapa na presencial
-                                        $oportunidadeAprimoramento = 'Não foi possível avaliar informações referente a unidade no Sistema SGDO dado que não há lançamentos sobre as rotinas da Distribuição. Verificaram o período a partir do dia' . date('d/m/Y', strtotime( $dtini )) .' até '. date('d/m/Y', strtotime( $dtfim )) .'.';
-                                        $consequencias = $registro->consequencias;
-                                        $orientacao = $registro->orientacao;
-                                    }
-
+                                    case 1 :{ $superintendência = 'CS'; } break;
+                                    case 4 :{ $superintendência = 'AL'; } break;
+                                    case 6 :{ $superintendência = 'AM'; } break;
+                                    case 8 :{ $superintendência = 'BA'; } break;
+                                    case 10 :{ $superintendência = 'BSB'; } break;
+                                    case 12 :{ $superintendência = 'CE'; } break;
+                                    case 14 :{ $superintendência = 'ES'; } break;
+                                    case 16 :{ $superintendência = 'GO'; } break;
+                                    case 18 :{ $superintendência = 'MA'; } break;
+                                    case 20 :{ $superintendência = 'MG'; } break;
+                                    case 22 :{ $superintendência = 'MS'; } break;
+                                    case 24 :{ $superintendência = 'MT'; } break;
+                                    case 26 :{ $superintendência = 'RO'; } break;
+                                    case 28 :{ $superintendência = 'PA'; } break;
+                                    case 30 :{ $superintendência = 'PB'; } break;
+                                    case 32 :{ $superintendência = 'PE'; } break;
+                                    case 34 :{ $superintendência = 'PI'; } break;
+                                    case 36 :{ $superintendência = 'PR'; } break;
+                                    case 50 :{ $superintendência = 'RJ'; } break;
+                                    case 60 :{ $superintendência = 'RN'; } break;
+                                    case 64 :{ $superintendência = 'RS'; } break;
+                                    case 68 :{ $superintendência = 'SC'; } break;
+                                    case 72 :{ $superintendência = 'SPM'; } break;
+                                    case 74 :{ $superintendência = 'SPI'; } break;
+                                    case 75 :{ $superintendência = 'TO'; } break;
                                 }
-                                else {
- //                                   sgdo não verificado, unidade não tem distribuição
-                                    $avaliacao = 'Não Executa Tarefa'; // não avalia o item  terá uma segunda etapa na presencial
-                                    $oportunidadeAprimoramento = 'A unidade não executa essa tarefa.';
-                                    $consequencias = null;
-                                    $orientacao = null;
-                                }
-
-                                $dto = DB::table('itensdeinspecoes')
-                                    ->Where([['inspecao_id', '=', $registro->inspecao_id]])
-                                    ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
-                                    ->select('itensdeinspecoes.*')
-                                    ->first();
-
-                                $itensdeinspecao = Itensdeinspecao::find($dto->id);
-                                $itensdeinspecao->avaliacao = $avaliacao;
-                                $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
-                                $itensdeinspecao->evidencia = $evidencia;
-                                $itensdeinspecao->valorFalta = $valorFalta;
-                                $itensdeinspecao->valorSobra = $valorSobra;
-                                $itensdeinspecao->valorRisco = $valorRisco;
-                                $itensdeinspecao->situacao = 'Inspecionado';
-                                $itensdeinspecao->pontuado = $pontuado;
-                                $itensdeinspecao->itemQuantificado = $itemQuantificado;
-                                $itensdeinspecao->orientacao = $registro->orientacao;
-                                $itensdeinspecao->eventosSistema = 'Item avaliado Remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
-                                $itensdeinspecao->reincidencia = $reinc;
-                                $itensdeinspecao->consequencias = $consequencias;
-                                $itensdeinspecao->orientacao = $orientacao;
-                                $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
-                                $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
-                                $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-                                $itensdeinspecao->update();
-
-
-
-                            }
-// Fim SGDO Distribuição
-
-
-
-
-//                          echo ' 1941 - Unidade -> '. "\n" . $dto->id , $itensdeinspecao;
-
-
-                            ini_set('memory_limit', '128M');
-                            ini_set('max_input_time', 120);
-                            ini_set('max_execution_time', 120);
-
-//                          Inicio abertura da Unidade
-                            if (($registro->numeroGrupoVerificacao == 238) && ($registro->numeroDoTeste == 2)) {
-
-                                $codVerificacaoAnterior = null;
-                                $numeroGrupoReincidente = null;
-                                $numeroItemReincidente = null;
-                                $evidencia = null;
-                                $valorSobra = null;
-                                $valorFalta = null;
-                                $valorRisco = null;
-                                $total = 0;
-                                $pontuado = null;
-                                $aviso = null;
-                                $itemQuantificado = 'Não';
-                                $reincidente = 0;
-                                $reinc = 'Não';
-                                $dtmin = $dtnow;
-                                $count = 0;
-                                $naoMonitorado = null;
-
-                                $tempoAberturaAntecipada = null;
-
-                                $horario_chegada_previsto = null;
-                                $horario_chegada_previsto = null;
 
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '% abertura da Unidade é realizada por dois empregados indicados a criterio da Gerência%']])
+                                    ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
                                     ->where([['sto', '=', $registro->sto]])
                                     ->orderBy('no_inspecao', 'desc')
                                     ->first();
 
                                 try {
 
-                                    if ($reincidencia->no_inspecao > 1) {
+                                    if ( $reincidencia->no_inspecao > 1) {
 //                                        dd($reincidencia);
                                         $reincidente = 1;
                                         $reinc = 'Sim';
@@ -435,195 +225,105 @@ class MonitoramentoController extends Controller
                                         $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
                                         $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
 
-                                        $eventos = DB::table('alarmes')
-                                            ->select('alarmes.*')
-                                            ->where('mcu', '=', $registro->mcu)
-                                            ->where('data', '>=', $reincidencia_dt_fim_inspecao)
-                                            ->where('armedesarme', '=', 'Desarme')
-                                            ->orderBy('data', 'asc')
-                                            ->orderBy('hora', 'asc')
+                                        $painel_extravios = DB::table('painel_extravios')
+                                            ->select( 'painel_extravios.*' )
+                                            ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
+                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                             ->get();
-
                                         $dtini = $reincidencia_dt_fim_inspecao;
+
                                     } else {
-                                        $eventos = DB::table('alarmes')
-                                            ->select('alarmes.*')
-                                            ->where('mcu', '=', $registro->mcu)
-                                            ->where('data', '>=', $dtmenos12meses)
-                                            ->where('armedesarme', '=', 'Desarme')
-                                            ->orderBy('data', 'asc')
-                                            ->orderBy('hora', 'asc')
+                                        $painel_extravios = DB::table('painel_extravios')
+                                            ->select( 'painel_extravios.*' )
+                                            ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
+                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                             ->get();
                                     }
                                 } catch (\Exception $e) {
-                                    $eventos = DB::table('alarmes')
-                                        ->select('alarmes.*')
-                                        ->where('mcu', '=', $registro->mcu)
-                                        ->where('data', '>=', $dtmenos12meses)
-                                        ->where('armedesarme', '=', 'Desarme')
-                                        ->orderBy('data', 'asc')
-                                        ->orderBy('hora', 'asc')
+
+                                    $painel_extravios = DB::table('painel_extravios')
+                                        ->select( 'painel_extravios.*' )
+                                        ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
+                                        ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                         ->get();
                                 }
 
-                                $linhatransporte = DB::table('apontamento_c_v_s')
-                                    ->where('ponto_parada', '=', $registro->an8)
-                                    ->orderBy('horario_chegada_previsto', 'asc')
-                                    ->first();
 
-                                if (!empty($linhatransporte->id)) {
-                                    $minutosinicioExpediente = (substr($linhatransporte->horario_chegada_previsto, 0, 2) * 60) + substr($linhatransporte->horario_chegada_previsto, 3, 2);
-                                    $horario_chegada_previsto = $linhatransporte->horario_chegada_previsto;
-                                    $linhatransporte = DB::table('apontamento_c_v_s')
-                                        ->where('ponto_parada', '=', $registro->an8)
-                                        ->orderBy('horario_chegada_previsto', 'desc')
-                                        ->first();
-                                    $minutosfinalExpediente = (substr($linhatransporte->horario_partida_previsto, 0, 2) * 60) + substr($linhatransporte->horario_partida_previsto, 3, 2);
-                                    $horario_chegada_previsto = $linhatransporte->horario_chegada_previsto;
-                                    $horario_partida_previsto = $linhatransporte->horario_partida_previsto;
-                                    $aviso = $aviso . '- Previsão de Horários para troca de expedições da Carga, Chegada: ' . $horario_chegada_previsto . ', Partida: ' . $horario_partida_previsto;
-                                } else {
-                                    $minutosinicioExpediente = (substr($registro->inicio_atendimento, 0, 2) * 60) + substr($registro->inicio_atendimento, 3, 2);
-                                    $minutosfinalExpediente = (substr($registro->final_atendimento, 0, 2) * 60) + substr($registro->final_atendimento, 3, 2);
+
+                                $count = $painel_extravios->count('unid_destino_apelido');
+                                $dtfim = $painel_extravios->max('data_evento');
+                                $cadastral = DB::table('cadastral')
+                                    ->select( 'cadastral.*' )
+                                    ->where([['cadastral.mcu', '=',   $registro->mcu  ]])
+                                    ->where('cadastral.funcao',  'like', '%' . 'SUPERVISOR' . '%')
+                                    ->get();
+                                $countSupervisor = $cadastral->count('funcao');
+
+                                if($countSupervisor >= 1){
+                                    $avaliacao = 'Não Verificado';
+                                    $oportunidadeAprimoramento = 'Unidade avaliada em outro item Pois Possui Supervisor.';
+                                    $consequencias = null;
+                                    $orientacao = null;
+
                                 }
+                                else{
+                                    if ($count >= 1){
+                                         if(! $painel_extravios->isEmpty()){
+                                             $avaliacao = 'Não Conforme';
+                                             $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna "gesto pré-alerta" a ocorrência de "Gestão Automática" para {{$count}} objeto(s), indicando que não era realizada a "gestão diária" do Pré-Alerta na unidade, conforme relatado a seguir:';
 
-                                if (!$eventos->isEmpty()) {
-                                    $dtmax = $eventos->max('data');
+                                             $evidencia = $evidencia
+                                                 . "\n" . 'Objeto'
+                                                 . "\t" . 'Data Último Evento';
 
-                                    foreach ($eventos as $evento) {
-                                        $rowtempoAbertura = 0;
-                                        $rowtempoAberturaAntecipada = 0;
-                                        $horario_partida_previsto = null;
-                                        $eventominutos = (substr($evento->hora, 0, 2) * 60) + substr($evento->hora, 3, 2);
-                                        if ($evento->armedesarme == 'Desarme') {
-
-                                            if ($eventominutos < ($minutosinicioExpediente - 30)) {
-                                                $diferencaAbertura = $minutosinicioExpediente - $eventominutos;
-
-                                                if ($diferencaAbertura < 0) {
-                                                    $diferencaAbertura = $diferencaAbertura * -1;
-                                                }
-                                                $h = intdiv($diferencaAbertura, 60);
-                                                if ($h < 10) {
-                                                    $h = '0' . $h;
-                                                }
-                                                $m = $diferencaAbertura % 60;
-                                                if ($m < 10) {
-                                                    $m = '0' . $m;
-                                                }
-                                                $diferencaAbertura = $h . ':' . $m . ':' . substr($evento->hora, 6, 2);
-
-                                                $tempoAbertura = ([
-                                                    $rowtempoAbertura => [
-                                                        'dataInicioExpediente' => $evento->data,
-                                                        'horario_chegada_previsto_carga' => $horario_chegada_previsto,
-                                                        'InicioExpediente' => $registro->inicio_atendimento,
-                                                        'HorárioDeAbertura' => $evento->hora,
-                                                        'DiferencaTempoDeAbertura' => $diferencaAbertura],
-                                                ]);
-                                                $rowtempoAbertura++;
-                                            }
-                                            ///////////////////////   TEMPO DE ABERTURA   //////////////////////////
-
-                                            ///////////////////////   risco  DE ABERTURA   //////////////////////////
-                                            if (($eventominutos < ($minutosinicioExpediente - 30))) {
-                                                $diferencaAbertura = $minutosinicioExpediente - $eventominutos;
-                                                $h = intdiv($diferencaAbertura, 60);
-                                                if ($h < 10) {
-                                                    $h = '0' . $h;
-                                                }
-                                                $m = $diferencaAbertura % 60;
-                                                if ($m < 10) {
-                                                    $m = '0' . $m;
-                                                }
-                                                $diferencaAbertura = $h . ':' . $m . ':' . substr($evento->hora, 6, 2);
-                                                $tempoAberturaAntecipada = ([
-                                                    $rowtempoAbertura => [
-                                                        'dataInicioExpediente' => $evento->data,
-                                                        'horario_chegada_previsto_carga' => $horario_chegada_previsto,
-                                                        'InicioExpediente' => $registro->inicio_atendimento,
-                                                        'HorárioDeAbertura' => $evento->hora,
-                                                        'DiferencaTempoDeAbertura' => $diferencaAbertura],
-                                                ]);
-                                                $rowtempoAberturaAntecipada++;
-                                            }
-
-                                        }
-                                        $periodo = CarbonPeriod::create($dtmax, $dtnow);
-                                        $dataultimoevento = date('d/m/Y', strtotime($evento->data));
-                                        if ($periodo->count() >= 15) {
-                                            $aviso = $aviso . '- Não foi possível avaliar eventos recente da utilização do alarme monitorado dado que a unidade não está sendo monitorada há ' . $periodo->count() . ' dias. Incluindo a data da Inspeção. Adicionalmente verificaram que o último evento transmitido foi no dia ' . $dataultimoevento . '.';
+                                             foreach($painel_extravios as $dados){
+                                                 $ultimoEvento = $dados->ultimo_evento_data == '' ? 'Data não Registrada' : date('d/m/Y', strtotime($dados->ultimo_evento_data));
+                                                 $evidencia = $evidencia
+                                                 . "\n" . $dados->objeto
+                                                 . "\t" . $ultimoEvento;
+                                             }
+                                             $consequencias = $registro->consequencias;
+                                             $orientacao = $registro->orientacao;
                                         }
 
+                                        $quebra = DB::table('relevancias')
+                                            ->select('valor_final')
+                                            ->where('fator_multiplicador', '=', 1)
+                                            ->first();
+                                        $quebracaixa = $quebra->valor_final * 0.1;
 
-                                        $avaliacao = 'Não Conforme';
-
-                                        if ($reinc == 'Sim') {
-                                            $oportunidadeAprimoramento = 'Em análise aos dados do Relatório de “Arme e Desarme” do Sistema de Alarme em ' . date('d/m/Y', strtotime($dtnow)) . ' referente ao período de ' . date('d/m/Y', strtotime($reincidencia_dt_fim_inspecao)) . ' a ' . date('d/m/Y', strtotime($dtnow)) . ', constatou-se que constatou-se que a unidade não cumpria o horário de funcionamento, conforme relatado a seguir:';
-                                            $oportunidadeAprimoramento = $oportunidadeAprimoramento . "\n" . $aviso;
-                                        } else {
-                                            $oportunidadeAprimoramento = 'Em análise aos dados do Relatório de “Arme e Desarme” do Sistema de Alarme em ' . date('d/m/Y', strtotime($dtnow)) . ' referente ao período de ' . date('d/m/Y', strtotime($dtmenos12meses)) . ' a ' . date('d/m/Y', strtotime($dtnow)) . ', constatou-se que constatou-se que a unidade não cumpria o horário de funcionamento, conforme relatado a seguir:';
-                                            $oportunidadeAprimoramento = $oportunidadeAprimoramento . "\n" . $aviso;
+                                        if( $valorFalta > $quebracaixa){
+                                            $fm = DB::table('relevancias')
+                                                ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+                                                ->where('valor_inicio', '<=', $total)
+                                                ->orderBy('valor_final', 'desc')
+                                                ->first();
+                                            $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
                                         }
-                                        $consequencias = $registro->consequencias;
-                                        $orientacao = $registro->orientacao;
-
-                                    }
-
-                                    if (isset($tempoAbertura) && (!empty($tempoAbertura))) {
-
-                                        $evidencia = $evidencia . "\n" . 'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
-                                        $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Horário Atendimento' . "\t" . 'Horário da Abertura' . "\t" . 'Tempo Abertura';
-
-                                        foreach ($tempoAbertura as $tempo => $mdaData) {
-                                            $evidencia = $evidencia . "\n"
-                                                . date('d/m/Y', strtotime($mdaData["dataInicioExpediente"]))
-                                                . "\t" . $mdaData["InicioExpediente"] . "\t" . $mdaData["HorárioDeAbertura"]
-                                                . "\t" . $mdaData["DiferencaTempoDeAbertura"];
-                                        }
-
-                                    }
-                                    if (isset($tempoAberturaAntecipada) && (!empty($tempoAberturaAntecipada))) {
-
-                                        $evidencia = $evidencia . "\n" . ' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
-                                        $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Data Abertura' . "\t" . 'Horário de Atendimento' . "\t" . 'Hora da Abertura' . "\t" . 'Tempo Abertura';
-                                        foreach ($tempoAberturaAntecipada as $tempo => $mdaData) {
-
-                                            $evidencia = $evidencia . "\n"
-                                                . date('d/m/Y', strtotime($mdaData["dataInicioExpediente"]))
-                                                . "\t" . $mdaData["InicioExpediente"] . "\t" . $mdaData["HorárioDeAbertura"]
-                                                . "\t" . $mdaData["DiferencaTempoDeAbertura"];
-
+                                        else{
+                                            if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
                                         }
                                     }
-                                } else {
-                                    $avaliacao = ''; // não avalia o item  terá uma segunda etapa na presencial
-                                    $oportunidadeAprimoramento = 'Em análise aos dados do Relatório de “Arme e Desarme” do Sistema de Alarme em ' . date('d/m/Y', strtotime($dtnow)) . ' referente ao período de ' . date('d/m/Y', strtotime($dtmenos12meses)) . ' a ' . date('d/m/Y', strtotime($dtnow)) . ', nao constatou inconsistências quanto aos horários previstos para abertura da unidade.';
-                                    $oportunidadeAprimoramento = $oportunidadeAprimoramento . "\n" . $aviso;
-                                    $consequencias = $registro->consequencias;
-                                    $orientacao = $registro->orientacao;
+                                    else{
+                                        $avaliacao = 'Conforme';
+                                        $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna Gestão Pré-alerta que não havia ocorrência alusiva à Gestão Automática que sugerisse falha na Gestão do diária da Conferência Eletrônica da unidade inspecionada.';
+                                        $consequencias = null;
+                                        $orientacao =  null;
+                                    }
                                 }
-                                $quebra = DB::table('relevancias')
-                                    ->select('valor_final')
-                                    ->where('fator_multiplicador', '=', 1)
-                                    ->first();
-                                $quebracaixa = $quebra->valor_final * 0.1;
 
-                                if ($valorFalta > $quebracaixa) {
-                                    $fm = DB::table('relevancias')
-                                        ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
-                                        ->where('valor_inicio', '<=', $total)
-                                        ->orderBy('valor_final', 'desc')
-                                        ->first();
-                                    $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
-                                } else {
-                                    if ($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
-                                }
                                 $dto = DB::table('itensdeinspecoes')
                                     ->Where([['inspecao_id', '=', $registro->inspecao_id]])
                                     ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
                                     ->select('itensdeinspecoes.*')
                                     ->first();
+
                                 $itensdeinspecao = Itensdeinspecao::find($dto->id);
                                 $itensdeinspecao->avaliacao = $avaliacao;
                                 $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
@@ -642,10 +342,228 @@ class MonitoramentoController extends Controller
                                 $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
                                 $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
                                 $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
+
+//                                echo  "\n" .'avaliação ',$itensdeinspecao;
+
                                 $itensdeinspecao->update();
 
                             }
-//                          Fim abertura da Unidade
+// fim Pre Alerta gestão automatica unidade sem supervisor
+
+// Inicio Pre Alerta gestão automatica unidade com supervisor
+
+                            if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==15))
+                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==11))
+                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==8))
+                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==5))) {
+
+
+                                $codVerificacaoAnterior = null;
+                                $numeroGrupoReincidente = null;
+                                $numeroItemReincidente = null;
+                                $evidencia = null;
+                                $valorSobra = null;
+                                $valorFalta = null;
+                                $valorRisco = null;
+                                $total = 0;
+                                $pontuado = null;
+                                $aviso = null;
+                                $itemQuantificado = 'Não';
+                                $reincidente = 0;
+                                $reinc = 'Não';
+
+                                $dtini = $dtmenos150dias;
+                                $countSupervisor = 0;
+                                $count = 0;
+
+                                switch ($registro->se) {
+
+                                    case 1 :{ $superintendência = 'CS'; } break;
+                                    case 4 :{ $superintendência = 'AL'; } break;
+                                    case 6 :{ $superintendência = 'AM'; } break;
+                                    case 8 :{ $superintendência = 'BA'; } break;
+                                    case 10 :{ $superintendência = 'BSB'; } break;
+                                    case 12 :{ $superintendência = 'CE'; } break;
+                                    case 14 :{ $superintendência = 'ES'; } break;
+                                    case 16 :{ $superintendência = 'GO'; } break;
+                                    case 18 :{ $superintendência = 'MA'; } break;
+                                    case 20 :{ $superintendência = 'MG'; } break;
+                                    case 22 :{ $superintendência = 'MS'; } break;
+                                    case 24 :{ $superintendência = 'MT'; } break;
+                                    case 26 :{ $superintendência = 'RO'; } break;
+                                    case 28 :{ $superintendência = 'PA'; } break;
+                                    case 30 :{ $superintendência = 'PB'; } break;
+                                    case 32 :{ $superintendência = 'PE'; } break;
+                                    case 34 :{ $superintendência = 'PI'; } break;
+                                    case 36 :{ $superintendência = 'PR'; } break;
+                                    case 50 :{ $superintendência = 'RJ'; } break;
+                                    case 60 :{ $superintendência = 'RN'; } break;
+                                    case 64 :{ $superintendência = 'RS'; } break;
+                                    case 68 :{ $superintendência = 'SC'; } break;
+                                    case 72 :{ $superintendência = 'SPM'; } break;
+                                    case 74 :{ $superintendência = 'SPI'; } break;
+                                    case 75 :{ $superintendência = 'TO'; } break;
+                                }
+
+                                $reincidencia = DB::table('snci')
+                                    ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
+                                    ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
+                                    ->where([['sto', '=', $registro->sto]])
+                                    ->orderBy('no_inspecao', 'desc')
+                                    ->first();
+
+                                try {
+
+                                    if ( $reincidencia->no_inspecao > 1) {
+//                                        dd($reincidencia);
+                                        $reincidente = 1;
+                                        $reinc = 'Sim';
+                                        $periodo = new CarbonPeriod();
+                                        $codVerificacaoAnterior = $reincidencia->no_inspecao;
+                                        $numeroGrupoReincidente = $reincidencia->no_grupo;
+                                        $numeroItemReincidente = $reincidencia->no_item;
+                                        $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
+                                        $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
+
+                                        $painel_extravios = DB::table('painel_extravios')
+                                            ->select( 'painel_extravios.*' )
+                                            ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
+                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
+                                            ->get();
+                                        $dtini = $reincidencia_dt_fim_inspecao;
+
+                                    } else {
+                                        $painel_extravios = DB::table('painel_extravios')
+                                            ->select( 'painel_extravios.*' )
+                                            ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
+                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
+                                            ->get();
+                                    }
+                                } catch (\Exception $e) {
+
+                                    $painel_extravios = DB::table('painel_extravios')
+                                        ->select( 'painel_extravios.*' )
+                                        ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
+                                        ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
+                                        ->get();
+                                }
+
+
+
+                                $count = $painel_extravios->count('unid_destino_apelido');
+                                $dtfim = $painel_extravios->max('data_evento');
+                                $cadastral = DB::table('cadastral')
+                                    ->select( 'cadastral.*' )
+                                    ->where([['cadastral.mcu', '=',   $registro->mcu  ]])
+                                    ->where('cadastral.funcao',  'like', '%' . 'SUPERVISOR' . '%')
+                                    ->get();
+                                $countSupervisor = $cadastral->count('funcao');
+
+                                if($countSupervisor == 0){
+                                    $avaliacao = 'Não Verificado';
+                                    $oportunidadeAprimoramento = 'Unidade avaliada em outro item dado a existênci de Supervisor no quadro de lotação.';
+                                    $consequencias = null;
+                                    $orientacao = null;
+
+                                }
+                                else{
+                                    if ($count >= 1){
+                                        if(! $painel_extravios->isEmpty()){
+                                            $avaliacao = 'Não Conforme';
+                                            $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna "gesto pré-alerta" a ocorrência de "Gestão Automática" para {{$count}} objeto(s), indicando que não era realizada a "gestão diária" do Pré-Alerta na unidade, conforme relatado a seguir:';
+
+                                            $evidencia = $evidencia
+                                                . "\n" . 'Objeto'
+                                                . "\t" . 'Data Último Evento';
+
+                                            foreach($painel_extravios as $dados){
+                                                $ultimoEvento = $dados->ultimo_evento_data == '' ? 'Data não Registrada' : date('d/m/Y', strtotime($dados->ultimo_evento_data));
+                                                $evidencia = $evidencia
+                                                    . "\n" . $dados->objeto
+                                                    . "\t" . $ultimoEvento;
+                                            }
+                                            $consequencias = $registro->consequencias;
+                                            $orientacao = $registro->orientacao;
+                                        }
+
+                                        $quebra = DB::table('relevancias')
+                                            ->select('valor_final')
+                                            ->where('fator_multiplicador', '=', 1)
+                                            ->first();
+                                        $quebracaixa = $quebra->valor_final * 0.1;
+
+                                        if( $valorFalta > $quebracaixa){
+                                            $fm = DB::table('relevancias')
+                                                ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+                                                ->where('valor_inicio', '<=', $total)
+                                                ->orderBy('valor_final', 'desc')
+                                                ->first();
+                                            $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                                        }
+                                        else{
+                                            if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                                        }
+                                    }
+                                    else{
+                                        $avaliacao = 'Conforme';
+                                        $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna Gestão Pré-alerta que não havia ocorrência alusiva à Gestão Automática que sugerisse falha na Gestão do diária da Conferência Eletrônica da unidade inspecionada.';
+                                        $consequencias = null;
+                                        $orientacao =  null;
+                                    }
+                                }
+
+                                $dto = DB::table('itensdeinspecoes')
+                                    ->Where([['inspecao_id', '=', $registro->inspecao_id]])
+                                    ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
+                                    ->select('itensdeinspecoes.*')
+                                    ->first();
+
+                                $itensdeinspecao = Itensdeinspecao::find($dto->id);
+                                $itensdeinspecao->avaliacao = $avaliacao;
+                                $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
+                                $itensdeinspecao->evidencia = $evidencia;
+                                $itensdeinspecao->valorFalta = $valorFalta;
+                                $itensdeinspecao->valorSobra = $valorSobra;
+                                $itensdeinspecao->valorRisco = $valorRisco;
+                                $itensdeinspecao->situacao = 'Inspecionado';
+                                $itensdeinspecao->pontuado = $pontuado;
+                                $itensdeinspecao->itemQuantificado = $itemQuantificado;
+                                $itensdeinspecao->orientacao = $registro->orientacao;
+                                $itensdeinspecao->eventosSistema = 'Item avaliado Remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
+                                $itensdeinspecao->reincidencia = $reinc;
+                                $itensdeinspecao->consequencias = $consequencias;
+                                $itensdeinspecao->orientacao = $orientacao;
+                                $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
+                                $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
+                                $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
+
+//                                echo  "\n" .'avaliação ',$itensdeinspecao;
+
+                                $itensdeinspecao->update();
+
+
+                            }
+// fim Pre Alerta gestão automatica unidade com supervisor
+
+
+
+//                                DB::enableQueryLog();
+
+
+//                                dd( DB::getQueryLog());
+
+
+
+                            ini_set('memory_limit', '128M');
+                            ini_set('max_input_time', 120);
+                            ini_set('max_execution_time', 120);
+
 
                         }
 
