@@ -11,6 +11,7 @@ use App\Models\Correios\Itensdeinspecao;
 use App\Models\Correios\ModelsAuxiliares\SL02_bdf;
 use App\Models\Correios\ModelsDto\AcessoFinalSemana;
 use App\Models\Correios\ModelsDto\CompartilhaSenha;
+use App\Models\Correios\ModelsDto\PgtoAdicionaisTemp;
 use App\Models\Correios\SequenceInspecao;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -67,15 +68,13 @@ class MonitoramentoController extends Controller
 //            para ativar a fila no console
 //            php artisan queue:work --queue=avaliaInspecao
 
-//
-//
-//            $job = (new AvaliaInspecao($superintendencias, $tipodeunidade , $ciclo))
-//                ->onQueue('avaliaInspecao')->delay($dtnow->addMinutes(1));
-//            dispatch($job);
-//
-//            \Session::flash('mensagem', ['msg' => 'Job AvaliaInspecao aguardando processamento.'
-//                , 'class' => 'blue white-text']);
-//            return redirect()->back();
+            $job = (new AvaliaInspecao($superintendencias, $tipodeunidade , $ciclo))
+                ->onQueue('avaliaInspecao')->delay($dtnow->addMinutes(1));
+            dispatch($job);
+
+            \Session::flash('mensagem', ['msg' => 'Job AvaliaInspecao aguardando processamento.'
+                , 'class' => 'blue white-text']);
+            return redirect()->back();
 
 //   O valor de 134217728 bytes é equivalente a 128M
 
@@ -133,13 +132,6 @@ class MonitoramentoController extends Controller
                             ->where([['se', '=', $superintendencia]])
                             ->where([['inspecoes.ciclo', '=', $ciclo]])
                             ->where([['itensdeinspecoes.tipoUnidade_id', '=', $tipodeunidade]])
-//                            ->where([['sto', '=', 16300882 ]]) // Anicuns
-//                            ->where([['sto', '=', 16303407 ]]) // alto horizonte
-//                            ->where([['sto', '=', 16300947 ]])   // Britania  16300947
-//                            ->where([['mcu', '=', 6684 ]]) //ac anicuns
-//                            ->where([['itensdeinspecoes.testeVerificacao_id', '=', 3708 ]])  //3678  é smb_bdf
-//                            ->limit(100)
-
                         ->get();
 
 
@@ -150,455 +142,359 @@ class MonitoramentoController extends Controller
                             $orientacao = $registro->orientacao;
 
 
-                            ini_set('memory_limit', '512M');
-                            ini_set('max_input_time', 350);
-                            ini_set('max_execution_time', 350);
-
-
-// Inicio CIE Eletrônica
-//            a) Documentos respondidos acima do prazo de 03 dias úteis;
-//            b) Se há CIEs sem registro das providências adotadas ou com ações genéricas, que não demonstrem assertividade ou não comprovem efetividade, como por exemplo: ""Empregado orientado"", ""Estamos apurando o ocorrido"";
-//            c) A ocorrência de reincidência. Considerar a existência de 03 CIEs recebidas pelos mesmos Motivos dentro do período de 01 mês;
-//            d) Comunicados de Irregularidades com status ""Pendente"" e/ou ""Não Lido"".
-
-                            if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==9))
-                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==8))
-                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==9))
-                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==7)))
-
-
-
-                            {
-
-                                $codVerificacaoAnterior = null;
-                                $numeroGrupoReincidente = null;
-                                $numeroItemReincidente = null;
-                                $evidencia = null;
-                                $valorSobra = null;
-                                $valorFalta = null;
-                                $valorRisco = null;
-                                $total = 0;
-                                $pontuado = null;
-                                $aviso = null;
-                                $itemQuantificado = 'Não';
-                                $reincidente = 0;
-                                $reinc = 'Não';
-
-                                $dtini = $dtmenos150dias;
-                                $countSupervisor = 0;
-                                $count = 0;
-
-                                switch ($registro->se) {
-
-                                    case 1 :{ $superintendência = 'CS'; } break;
-                                    case 4 :{ $superintendência = 'AL'; } break;
-                                    case 6 :{ $superintendência = 'AM'; } break;
-                                    case 8 :{ $superintendência = 'BA'; } break;
-                                    case 10 :{ $superintendência = 'BSB'; } break;
-                                    case 12 :{ $superintendência = 'CE'; } break;
-                                    case 14 :{ $superintendência = 'ES'; } break;
-                                    case 16 :{ $superintendência = 'GO'; } break;
-                                    case 18 :{ $superintendência = 'MA'; } break;
-                                    case 20 :{ $superintendência = 'MG'; } break;
-                                    case 22 :{ $superintendência = 'MS'; } break;
-                                    case 24 :{ $superintendência = 'MT'; } break;
-                                    case 26 :{ $superintendência = 'RO'; } break;
-                                    case 28 :{ $superintendência = 'PA'; } break;
-                                    case 30 :{ $superintendência = 'PB'; } break;
-                                    case 32 :{ $superintendência = 'PE'; } break;
-                                    case 34 :{ $superintendência = 'PI'; } break;
-                                    case 36 :{ $superintendência = 'PR'; } break;
-                                    case 50 :{ $superintendência = 'RJ'; } break;
-                                    case 60 :{ $superintendência = 'RN'; } break;
-                                    case 64 :{ $superintendência = 'RS'; } break;
-                                    case 68 :{ $superintendência = 'SC'; } break;
-                                    case 72 :{ $superintendência = 'SPM'; } break;
-                                    case 74 :{ $superintendência = 'SPI'; } break;
-                                    case 75 :{ $superintendência = 'TO'; } break;
-                                }
-
-                                $reincidencia = DB::table('snci')
-                                    ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
-                                    ->where([['sto', '=', $registro->sto]])
-                                    ->orderBy('no_inspecao', 'desc')
-                                    ->first();
-
-                                try {
-
-                                    if ( $reincidencia->no_inspecao > 1) {
-//                                        dd($reincidencia);
-                                        $reincidente = 1;
-                                        $reinc = 'Sim';
-                                        $periodo = new CarbonPeriod();
-                                        $codVerificacaoAnterior = $reincidencia->no_inspecao;
-                                        $numeroGrupoReincidente = $reincidencia->no_grupo;
-                                        $numeroItemReincidente = $reincidencia->no_item;
-                                        $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
-                                        $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
-
-                                        $painel_extravios = DB::table('painel_extravios')
-                                            ->select( 'painel_extravios.*' )
-                                            ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
-                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
-                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
-                                            ->get();
-
-                                        $cie_eletronicas = DB::table('cie_eletronicas')
-                                            ->select( 'cie_eletronicas.*' )
-                                            ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
-                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
-                                            ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
-                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
-                                            ->get();
-
-                                        $dtini = $reincidencia_dt_fim_inspecao;
-
-                                    } else {
-                                        $cie_eletronicas = DB::table('cie_eletronicas')
-                                            ->select( 'cie_eletronicas.*' )
-                                            ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
-                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
-                                            ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
-                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
-                                            ->get();
-
-                                    }
-                                } catch (\Exception $e) {
-
-                                    $cie_eletronicas = DB::table('cie_eletronicas')
-                                        ->select( 'cie_eletronicas.*' )
-                                        ->where([['cie_eletronicas.emissao', '>=',  $dtmenos365dias  ]])
-                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
-                                        ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
-                                        ->where([['cie_eletronicas.respondida', '=',  'N' ]])
-                                        ->get();
-
-                                }
-
-                                $count = $cie_eletronicas->count('respondida');
-                                $dtfim = $cie_eletronicas->max('emissao');
-
-                                $cadastral = DB::table('cadastral')
-                                    ->select( 'cadastral.*' )
-                                    ->where([['cadastral.mcu', '=',   $registro->mcu  ]])
-                                    ->where('cadastral.funcao',  'like', '%' . 'SUPERVISOR' . '%')
-                                    ->get();
-                                $countSupervisor = $cadastral->count('funcao');
-
-                                if($countSupervisor >= 1){
-                                    $avaliacao = 'Não Verificado';
-                                    $oportunidadeAprimoramento = 'Unidade avaliada em outro item Pois Possui Supervisor.';
-                                    $consequencias = null;
-                                    $orientacao = null;
-
-                                }
-                                else{
-                                    if ($count >= 1){
-                                         if(! $painel_extravios->isEmpty()){
-                                             $avaliacao = 'Não Conforme';
-                                             $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna "gesto pré-alerta" a ocorrência de "Gestão Automática" para {{$count}} objeto(s), indicando que não era realizada a "gestão diária" do Pré-Alerta na unidade, conforme relatado a seguir:';
-
-                                             $evidencia = $evidencia
-                                                 . "\n" . 'Objeto'
-                                                 . "\t" . 'Data Último Evento';
-
-                                             foreach($painel_extravios as $dados){
-                                                 $ultimoEvento = $dados->ultimo_evento_data == '' ? 'Data não Registrada' : date('d/m/Y', strtotime($dados->ultimo_evento_data));
-                                                 $evidencia = $evidencia
-                                                 . "\n" . $dados->objeto
-                                                 . "\t" . $ultimoEvento;
-                                             }
-                                             $consequencias = $registro->consequencias;
-                                             $orientacao = $registro->orientacao;
-                                        }
-
-                                        $quebra = DB::table('relevancias')
-                                            ->select('valor_final')
-                                            ->where('fator_multiplicador', '=', 1)
-                                            ->first();
-                                        $quebracaixa = $quebra->valor_final * 0.1;
-
-                                        if( $valorFalta > $quebracaixa){
-                                            $fm = DB::table('relevancias')
-                                                ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
-                                                ->where('valor_inicio', '<=', $total)
-                                                ->orderBy('valor_final', 'desc')
-                                                ->first();
-                                            $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
-                                        }
-                                        else{
-                                            if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
-                                        }
-                                    }
-                                    else{
-                                        $avaliacao = 'Conforme';
-                                        $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna Gestão Pré-alerta que não havia ocorrência alusiva à Gestão Automática que sugerisse falha na Gestão do diária da Conferência Eletrônica da unidade inspecionada.';
-                                        $consequencias = null;
-                                        $orientacao =  null;
-                                    }
-                                }
-
-                                $dto = DB::table('itensdeinspecoes')
-                                    ->Where([['inspecao_id', '=', $registro->inspecao_id]])
-                                    ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
-                                    ->select('itensdeinspecoes.*')
-                                    ->first();
-
-                                $itensdeinspecao = Itensdeinspecao::find($dto->id);
-                                $itensdeinspecao->avaliacao = $avaliacao;
-                                $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
-                                $itensdeinspecao->evidencia = $evidencia;
-                                $itensdeinspecao->valorFalta = $valorFalta;
-                                $itensdeinspecao->valorSobra = $valorSobra;
-                                $itensdeinspecao->valorRisco = $valorRisco;
-                                $itensdeinspecao->situacao = 'Inspecionado';
-                                $itensdeinspecao->pontuado = $pontuado;
-                                $itensdeinspecao->itemQuantificado = $itemQuantificado;
-                                $itensdeinspecao->orientacao = $registro->orientacao;
-                                $itensdeinspecao->eventosSistema = 'Item avaliado Remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
-                                $itensdeinspecao->reincidencia = $reinc;
-                                $itensdeinspecao->consequencias = $consequencias;
-                                $itensdeinspecao->orientacao = $orientacao;
-                                $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
-                                $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
-                                $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-//                                echo  "\n" .'avaliação ',$itensdeinspecao;
-
-                                $itensdeinspecao->update();
-
-                                return view('compliance.inspecao.editar',compact
-                                (
-                                    'registro'
-                                    , 'id'
-                                    , 'total'
-                                    , 'cie_eletronicas'
-                                    ,'count'
-                                    ,'dtini'
-                                    ,'dtfim'
-
-
-                                ));
-
-
-                            }
-
-
-// Fim CIE Eletrônica
-
-                            if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==15))
-                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==11))
-                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==8))
-                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==5))) {
-
-
-                                $codVerificacaoAnterior = null;
-                                $numeroGrupoReincidente = null;
-                                $numeroItemReincidente = null;
-                                $evidencia = null;
-                                $valorSobra = null;
-                                $valorFalta = null;
-                                $valorRisco = null;
-                                $total = 0;
-                                $pontuado = null;
-                                $aviso = null;
-                                $itemQuantificado = 'Não';
-                                $reincidente = 0;
-                                $reinc = 'Não';
-
-                                $dtini = $dtmenos150dias;
-                                $countSupervisor = 0;
-                                $count = 0;
-
-                                switch ($registro->se) {
-
-                                    case 1 :{ $superintendência = 'CS'; } break;
-                                    case 4 :{ $superintendência = 'AL'; } break;
-                                    case 6 :{ $superintendência = 'AM'; } break;
-                                    case 8 :{ $superintendência = 'BA'; } break;
-                                    case 10 :{ $superintendência = 'BSB'; } break;
-                                    case 12 :{ $superintendência = 'CE'; } break;
-                                    case 14 :{ $superintendência = 'ES'; } break;
-                                    case 16 :{ $superintendência = 'GO'; } break;
-                                    case 18 :{ $superintendência = 'MA'; } break;
-                                    case 20 :{ $superintendência = 'MG'; } break;
-                                    case 22 :{ $superintendência = 'MS'; } break;
-                                    case 24 :{ $superintendência = 'MT'; } break;
-                                    case 26 :{ $superintendência = 'RO'; } break;
-                                    case 28 :{ $superintendência = 'PA'; } break;
-                                    case 30 :{ $superintendência = 'PB'; } break;
-                                    case 32 :{ $superintendência = 'PE'; } break;
-                                    case 34 :{ $superintendência = 'PI'; } break;
-                                    case 36 :{ $superintendência = 'PR'; } break;
-                                    case 50 :{ $superintendência = 'RJ'; } break;
-                                    case 60 :{ $superintendência = 'RN'; } break;
-                                    case 64 :{ $superintendência = 'RS'; } break;
-                                    case 68 :{ $superintendência = 'SC'; } break;
-                                    case 72 :{ $superintendência = 'SPM'; } break;
-                                    case 74 :{ $superintendência = 'SPI'; } break;
-                                    case 75 :{ $superintendência = 'TO'; } break;
-                                }
-
-                                $reincidencia = DB::table('snci')
-                                    ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '%quantidade recebida no SGDO%']])
-                                    ->where([['sto', '=', $registro->sto]])
-                                    ->orderBy('no_inspecao', 'desc')
-                                    ->first();
-
-                                try {
-
-                                    if ( $reincidencia->no_inspecao > 1) {
-//                                        dd($reincidencia);
-                                        $reincidente = 1;
-                                        $reinc = 'Sim';
-                                        $periodo = new CarbonPeriod();
-                                        $codVerificacaoAnterior = $reincidencia->no_inspecao;
-                                        $numeroGrupoReincidente = $reincidencia->no_grupo;
-                                        $numeroItemReincidente = $reincidencia->no_item;
-                                        $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
-                                        $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
-
-                                        $painel_extravios = DB::table('painel_extravios')
-                                            ->select( 'painel_extravios.*' )
-                                            ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
-                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
-                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
-                                            ->get();
-                                        $dtini = $reincidencia_dt_fim_inspecao;
-
-                                    } else {
-                                        $painel_extravios = DB::table('painel_extravios')
-                                            ->select( 'painel_extravios.*' )
-                                            ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
-                                            ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
-                                            ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
-                                            ->get();
-                                    }
-                                } catch (\Exception $e) {
-
-                                    $painel_extravios = DB::table('painel_extravios')
-                                        ->select( 'painel_extravios.*' )
-                                        ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
-                                        ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
-                                        ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
-                                        ->get();
-                                }
-
-
-
-                                $count = $painel_extravios->count('unid_destino_apelido');
-                                $dtfim = $painel_extravios->max('data_evento');
-                                $cadastral = DB::table('cadastral')
-                                    ->select( 'cadastral.*' )
-                                    ->where([['cadastral.mcu', '=',   $registro->mcu  ]])
-                                    ->where('cadastral.funcao',  'like', '%' . 'SUPERVISOR' . '%')
-                                    ->get();
-                                $countSupervisor = $cadastral->count('funcao');
-
-                                if($countSupervisor == 0){
-                                    $avaliacao = 'Não Verificado';
-                                    $oportunidadeAprimoramento = 'Unidade avaliada em outro item dado a existênci de Supervisor no quadro de lotação.';
-                                    $consequencias = null;
-                                    $orientacao = null;
-
-                                }
-                                else{
-                                    if ($count >= 1){
-                                        if(! $painel_extravios->isEmpty()){
-                                            $avaliacao = 'Não Conforme';
-                                            $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna "gesto pré-alerta" a ocorrência de "Gestão Automática" para {{$count}} objeto(s), indicando que não era realizada a "gestão diária" do Pré-Alerta na unidade, conforme relatado a seguir:';
-
-                                            $evidencia = $evidencia
-                                                . "\n" . 'Objeto'
-                                                . "\t" . 'Data Último Evento';
-
-                                            foreach($painel_extravios as $dados){
-                                                $ultimoEvento = $dados->ultimo_evento_data == '' ? 'Data não Registrada' : date('d/m/Y', strtotime($dados->ultimo_evento_data));
-                                                $evidencia = $evidencia
-                                                    . "\n" . $dados->objeto
-                                                    . "\t" . $ultimoEvento;
-                                            }
-                                            $consequencias = $registro->consequencias;
-                                            $orientacao = $registro->orientacao;
-                                        }
-
-                                        $quebra = DB::table('relevancias')
-                                            ->select('valor_final')
-                                            ->where('fator_multiplicador', '=', 1)
-                                            ->first();
-                                        $quebracaixa = $quebra->valor_final * 0.1;
-
-                                        if( $valorFalta > $quebracaixa){
-                                            $fm = DB::table('relevancias')
-                                                ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
-                                                ->where('valor_inicio', '<=', $total)
-                                                ->orderBy('valor_final', 'desc')
-                                                ->first();
-                                            $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
-                                        }
-                                        else{
-                                            if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
-                                        }
-                                    }
-                                    else{
-                                        $avaliacao = 'Conforme';
-                                        $oportunidadeAprimoramento = 'Em análise aos relatórios disponíveis no Sistema Painel de Extravios referente ao período de '. date('d/m/Y', strtotime($dtini)) .' até ' .date('d/m/Y', strtotime($dtfim)) .', identificou-se por meio dos dados contidos na coluna Gestão Pré-alerta que não havia ocorrência alusiva à Gestão Automática que sugerisse falha na Gestão do diária da Conferência Eletrônica da unidade inspecionada.';
-                                        $consequencias = null;
-                                        $orientacao =  null;
-                                    }
-                                }
-
-                                $dto = DB::table('itensdeinspecoes')
-                                    ->Where([['inspecao_id', '=', $registro->inspecao_id]])
-                                    ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
-                                    ->select('itensdeinspecoes.*')
-                                    ->first();
-
-                                $itensdeinspecao = Itensdeinspecao::find($dto->id);
-                                $itensdeinspecao->avaliacao = $avaliacao;
-                                $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
-                                $itensdeinspecao->evidencia = $evidencia;
-                                $itensdeinspecao->valorFalta = $valorFalta;
-                                $itensdeinspecao->valorSobra = $valorSobra;
-                                $itensdeinspecao->valorRisco = $valorRisco;
-                                $itensdeinspecao->situacao = 'Inspecionado';
-                                $itensdeinspecao->pontuado = $pontuado;
-                                $itensdeinspecao->itemQuantificado = $itemQuantificado;
-                                $itensdeinspecao->orientacao = $registro->orientacao;
-                                $itensdeinspecao->eventosSistema = 'Item avaliado Remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
-                                $itensdeinspecao->reincidencia = $reinc;
-                                $itensdeinspecao->consequencias = $consequencias;
-                                $itensdeinspecao->orientacao = $orientacao;
-                                $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
-                                $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
-                                $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-//                                echo  "\n" .'avaliação ',$itensdeinspecao;
-
-                                $itensdeinspecao->update();
-
-
-                            }
-// fim Pre Alerta gestão automatica unidade com supervisor
-
-
-
-//                                DB::enableQueryLog();
-
-
-//                                dd( DB::getQueryLog());
-
-
-
-                            ini_set('memory_limit', '128M');
-                            ini_set('max_input_time', 120);
-                            ini_set('max_execution_time', 120);
+//                            ini_set('memory_limit', '512M');
+//                            ini_set('max_input_time', 350);
+//                            ini_set('max_execution_time', 350);
+//
+//
+//
+////inicio direito ao recebimento do provento
+//                            if((($registro->numeroGrupoVerificacao==209)&&($registro->numeroDoTeste==3))
+//                                || (($registro->numeroGrupoVerificacao==337)&&($registro->numeroDoTeste==2))
+//                                || (($registro->numeroGrupoVerificacao==241)&&($registro->numeroDoTeste==3))
+//                                || (($registro->numeroGrupoVerificacao==278)&&($registro->numeroDoTeste==2))) {
+//
+//                                $codVerificacaoAnterior = null;
+//                                $numeroGrupoReincidente = null;
+//                                $numeroItemReincidente = null;
+//                                $evidencia = null;
+//                                $valorSobra = null;
+//                                $valorFalta = null;
+//                                $valorRisco = null;
+//                                $total = 0;
+//                                $pontuado = null;
+//                                $aviso = null;
+//                                $itemQuantificado = 'Não';
+//                                $reincidente = 0;
+//                                $reinc = 'Não';
+//                                $count = 0;
+//
+//                                $ref = substr($dtmenos4meses,0,4). substr($dtmenos4meses,5,2);
+//                                $count_atend = 0;
+//                                $count_dist = 0;
+//                                $count = 0;
+//                                $refini = DB::table('pagamentos_adicionais')
+//                                    ->select( 'pagamentos_adicionais.ref' )
+//                                    ->where('ref', '>=', $ref)
+//                                    ->get();
+//                                $dtini = $refini->min('ref');
+//                                $dtfim = $refini->max('ref');
+//
+//                                switch ($registro->se) {
+//                                    case 1 :{ $superintendência = 'CS'; } break;
+//                                    case 4 :{ $superintendência = 'AL'; } break;
+//                                    case 6 :{ $superintendência = 'AM'; } break;
+//                                    case 8 :{ $superintendência = 'BA'; } break;
+//                                    case 10 :{ $superintendência = 'BSB'; } break;
+//                                    case 12 :{ $superintendência = 'CE'; } break;
+//                                    case 14 :{ $superintendência = 'ES'; } break;
+//                                    case 16 :{ $superintendência = 'GO'; } break;
+//                                    case 18 :{ $superintendência = 'MA'; } break;
+//                                    case 20 :{ $superintendência = 'MG'; } break;
+//                                    case 22 :{ $superintendência = 'MS'; } break;
+//                                    case 24 :{ $superintendência = 'MT'; } break;
+//                                    case 26 :{ $superintendência = 'RO'; } break;
+//                                    case 28 :{ $superintendência = 'PA'; } break;
+//                                    case 30 :{ $superintendência = 'PB'; } break;
+//                                    case 32 :{ $superintendência = 'PE'; } break;
+//                                    case 34 :{ $superintendência = 'PI'; } break;
+//                                    case 36 :{ $superintendência = 'PR'; } break;
+//                                    case 50 :{ $superintendência = 'RJ'; } break;
+//                                    case 60 :{ $superintendência = 'RN'; } break;
+//                                    case 64 :{ $superintendência = 'RS'; } break;
+//                                    case 68 :{ $superintendência = 'SC'; } break;
+//                                    case 72 :{ $superintendência = 'SPM'; } break;
+//                                    case 74 :{ $superintendência = 'SPI'; } break;
+//                                    case 75 :{ $superintendência = 'TO'; } break;
+//                                }
+//
+//                                $reincidencia = DB::table('snci')
+//                                    ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
+//                                    ->where([['descricao_item', 'like', '%realização de horas-extras%']])
+//                                    ->where([['sto', '=', $registro->sto]])
+//                                    ->orderBy('no_inspecao', 'desc')
+//                                    ->first();
+//
+//                                try {
+//
+//                                    if ( $reincidencia->no_inspecao > 1) {
+////                                        dd($reincidencia);
+//                                        $reincidente = 1;
+//                                        $reinc = 'Sim';
+//                                        $periodo = new CarbonPeriod();
+//                                        $codVerificacaoAnterior = $reincidencia->no_inspecao;
+//                                        $numeroGrupoReincidente = $reincidencia->no_grupo;
+//                                        $numeroItemReincidente = $reincidencia->no_item;
+//                                        $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
+//                                        $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
+//
+//                                        $ref =  date('Ym', strtotime($reincidencia_dt_fim_inspecao));
+//
+//                                        $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
+//                                            ->select( 'pagamentos_adicionais.*' )
+//                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+//                                            ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
+//                                            ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
+//                                            ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
+//                                        ->get();
+//
+//                                        $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
+//                                            ->select( 'pagamentos_adicionais.*' )
+//                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+//                                            ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
+//                                            ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
+//                                            ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
+//                                        ->get();
+//                                        $dtini = date('d/m/Y', strtotime($reincidencia_dt_fim_inspecao));
+//                                    } else {
+//                                        $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
+//                                            ->select( 'pagamentos_adicionais.*' )
+//                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+//                                            ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
+//                                            ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
+//                                            ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
+//                                        ->get();
+//                                        $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
+//                                            ->select( 'pagamentos_adicionais.*' )
+//                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+//                                            ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
+//                                            ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
+//                                            ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
+//                                        ->get();
+//
+//                                    }
+//                                } catch (\Exception $e) {
+//                                    $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
+//                                        ->select( 'pagamentos_adicionais.*' )
+//                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+//                                        ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
+//                                        ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
+//                                        ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
+//                                    ->get();
+//                                    $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
+//                                        ->select( 'pagamentos_adicionais.*' )
+//                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+//                                        ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
+//                                        ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
+//                                        ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
+//                                    ->get();
+//                                }
+//
+// //                  #######################   inicio          Distribuição ########################
+//
+//                                if(! $pagamentos_adicionais_dist->isEmpty()) {
+//                                    $count_dist = $pagamentos_adicionais_dist->count('sigla_lotacao');
+//                                }
+//                                else {
+//                                    $count_dist = 0;
+//                                }
+//                                if( $count_dist >= 1) {
+//                                    DB::table('pgto_adicionais_temp')
+//                                        ->where('codigo', '=', $registro->codigo)
+//                                        ->where('numeroGrupoVerificacao', '=', $registro->numeroGrupoVerificacao)
+//                                        ->where('numeroDoTeste', '=', $registro->numeroDoTeste)
+//                                ->delete(); // limpa dados anteriores existentes do empregado da tabela temporária
+//                                }
+//
+//                                foreach ($pagamentos_adicionais_dist  as $adicionais) {
+//
+//                                    $situacao="Sem eventos de Distribuição Domiciliária.";
+//                                    $mes = intval(substr($adicionais->ref,4,2));
+//                                    $sgdo_distribuicao = DB::table('sgdo_distribuicao')
+//                                        ->select('sgdo_distribuicao.*')
+//                                        ->where([[ 'mcu', '>=', $registro->mcu ]])
+//                                        ->where([[ 'matricula', '=', $adicionais->matricula ]])
+//                                        ->whereMonth('data_termino_atividade', $mes)
+//                                    ->get();
+//                                    if(! $sgdo_distribuicao->isEmpty()) {
+//                                        $count_sgdo = $sgdo_distribuicao->count('matricula');
+//                                    }
+//                                    else {
+//                                        $count_sgdo = 0;
+//                                    }
+//                                    if(! $sgdo_distribuicao->isEmpty()) {
+//                                        $pgtoAdicionaisTemp = new PgtoAdicionaisTemp();
+//                                        $pgtoAdicionaisTemp->sto = $registro->sto;
+//                                        $pgtoAdicionaisTemp->mcu = $registro->mcu;
+//                                        $pgtoAdicionaisTemp->codigo = $registro->codigo;
+//                                        $pgtoAdicionaisTemp->numeroGrupoVerificacao = $registro->numeroGrupoVerificacao;
+//                                        $pgtoAdicionaisTemp->numeroDoTeste = $registro->numeroDoTeste;
+//                                        $pgtoAdicionaisTemp->matricula = $adicionais->matricula;
+//                                        $pgtoAdicionaisTemp->cargo = $adicionais->cargo;
+//                                        $pgtoAdicionaisTemp->rubrica = $adicionais->rubrica;
+//                                        $pgtoAdicionaisTemp->ref = $adicionais->ref;
+//                                        $pgtoAdicionaisTemp->valor = $adicionais->valor;
+//                                        $pgtoAdicionaisTemp->situacao = $situacao;
+//
+//                                        $ferias_por_mcu = DB::table('ferias_por_mcu')
+//                                            ->select('ferias_por_mcu.*')
+//                                            ->where([[ 'matricula', '=', $adicionais->matricula ]])
+//                                            ->whereMonth('inicio_fruicao', $mes-1)
+//                                            ->whereYaer('inicio_fruicao', $registro->ciclo)
+//                                        ->count();
+//
+//                                        if ($ferias_por_mcu == 0){
+//                                            $pgtoAdicionaisTemp->save();
+//                                        }
+//                                        else{
+//                                            unset($pgtoAdicionaisTemp);
+//                                        }
+//                                    }
+//                                }
+////                  #######################  fim           Distribuição ########################
+//
+////                  #######################    inicio         Atendimento ########################
+//                                if(! $pagamentos_adicionais_atend->isEmpty()) {
+//                                    $count_atend = $pagamentos_adicionais_atend->count('matricula');
+//                                }
+//                                else {
+//                                    $count_atend = 0;
+//                                }
+//
+//                                foreach ($pagamentos_adicionais_atend  as $adicionais) {
+//
+//                                    $situacao="Sem eventos de atendimento a clientes.";
+//                                    $mes = intval(substr($adicionais->ref,4,2));
+//                                    $bdf_fat_02 = DB::table('bdf_fat_02')
+//                                        ->select('bdf_fat_02.*')
+//                                        ->where([[ 'cd_orgao', '>=', $registro->sto ]])
+//                                        ->where([[ 'atendimento', '=', $adicionais->matricula ]])
+//                                        ->whereMonth('dt_mov', $mes)
+//                                    ->get();
+//                                    if( ! $bdf_fat_02->isEmpty() ){
+//
+//                                        $pgtoAdicionaisTemp = new PgtoAdicionaisTemp();
+//                                        $pgtoAdicionaisTemp->sto = $registro->sto;
+//                                        $pgtoAdicionaisTemp->mcu = $registro->mcu;
+//                                        $pgtoAdicionaisTemp->codigo = $registro->codigo;
+//                                        $pgtoAdicionaisTemp->numeroGrupoVerificacao = $registro->numeroGrupoVerificacao;
+//                                        $pgtoAdicionaisTemp->numeroDoTeste = $registro->numeroDoTeste;
+//                                        $pgtoAdicionaisTemp->matricula = $adicionais->matricula;
+//                                        $pgtoAdicionaisTemp->cargo = $adicionais->cargo;
+//                                        $pgtoAdicionaisTemp->rubrica = $adicionais->rubrica;
+//                                        $pgtoAdicionaisTemp->ref = $adicionais->ref;
+//                                        $pgtoAdicionaisTemp->valor = $adicionais->valor;
+//                                        $pgtoAdicionaisTemp->situacao = $situacao;
+//
+//                                        $ferias_por_mcu = DB::table('ferias_por_mcu')
+//                                            ->select('ferias_por_mcu.*')
+//                                            ->where([[ 'matricula', '=', $adicionais->matricula ]])
+//                                            ->whereMonth('inicio_fruicao', $mes-1)
+//                                            ->whereYear('inicio_fruicao', $registro->ciclo)
+//                                        ->first();
+//
+//                                        if ($ferias_por_mcu->isEmpty()) {
+//                                            $pgtoAdicionaisTemp->save();
+//                                        }
+//                                        else{
+//                                            unset($pgtoAdicionaisTemp);
+//                                        }
+//                                    }
+//                                }
+////                  #######################    fim         Atendimento ########################
+//
+//                                if (( $count_atend >= 1 ) || ( $count_dist >= 1 )) {
+//
+//                                    $pgtoAdicionais = DB::table('pgto_adicionais_temp')
+//                                        ->where('sto',  '=', $registro->sto)
+//                                        ->where('mcu',  '=', $registro->mcu)
+//                                        ->where('codigo',  '=', $registro->codigo)
+//                                        ->where('numeroGrupoVerificacao',  '=', $registro->numeroGrupoVerificacao)
+//                                        ->where('numeroDoTeste',  '=', $registro->numeroDoTeste)
+//                                        ->select(
+//                                            'pgto_adicionais_temp.*'
+//                                        )
+//                                        ->get();
+//                                    $total=$pgtoAdicionais->sum('valor');
+//                                    $count = $pgtoAdicionais->count('matricula');
+//
+//                                    $avaliacao = 'Não Conforme';
+//                                    $oportunidadeAprimoramento = 'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, do período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .' até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4) .', constatou-se a existência de empregados que recebiam tais dicionais/funções sem desempenhar as atividades que lhes davam o direito ao recebimento.';
+//
+//                                    $evidencia = $evidencia. "\n" .'- Houve '.$count.' ocorrência(s) de pagamentos conforme a Seguir:';
+//                                    $evidencia = $evidencia
+//                                        . "\n" . 'Matricula'
+//                                        . "\t" . 'Cargo'
+//                                        . "\t" . 'Adicional'
+//                                        . "\t" . 'Período de Rec. Adicional'
+//                                        . "\t" . 'Valor ATT Recebido (R$)'
+//                                        . "\t" . 'Situação Encontrada';
+//                                    foreach($pgtoAdicionais as $dados){
+//                                        $evidencia = $evidencia
+//                                            . "\n" . $dados->matricula
+//                                            . "\n" . $dados->cargo
+//                                            . "\n" . $dados->rubrica
+//                                            . "\n" . $dados->ref
+//                                            . "\n" . $dados->valor
+//                                            . "\n" . $dados->situacao;
+//                                    }
+//                                    $consequencias = $registro->consequencias;
+//                                    $orientacao = $registro->orientacao;
+//
+//                                    $quebra = DB::table('relevancias')
+//                                        ->select('valor_final')
+//                                        ->where('fator_multiplicador', '=', 1)
+//                                        ->first();
+//                                    $quebracaixa = $quebra->valor_final * 0.1;
+//
+//                                    if( $valorFalta > $quebracaixa){
+//                                        $fm = DB::table('relevancias')
+//                                            ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+//                                            ->where('valor_inicio', '<=', $total)
+//                                            ->orderBy('valor_final', 'desc')
+//                                            ->first();
+//                                        $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+//                                    }
+//                                    else{
+//                                        if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+//                                    }
+//
+//                                }
+//                                else {
+//                                    $avaliacao = 'Conforme';
+//                                    $oportunidadeAprimoramento =  'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .'até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4).' Não foi identificado empregado(s) com recebimento(s) pela(s) Rubricas AADC-Adic.Ativ. Distrib/Coleta Ext. Bem como, Adic. de Atend. em Guichê na unidade.';
+//                                    $consequencias = null;
+//                                    $orientacao =  null;
+//
+//                                }
+//
+//                                $dto = DB::table('itensdeinspecoes')
+//                                    ->Where([['inspecao_id', '=', $registro->inspecao_id]])
+//                                    ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
+//                                    ->select('itensdeinspecoes.*')
+//                                    ->first();
+//
+//                                $itensdeinspecao = Itensdeinspecao::find($dto->id);
+//                                $itensdeinspecao->avaliacao = $avaliacao;
+//                                $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
+//                                $itensdeinspecao->evidencia = $evidencia;
+//                                $itensdeinspecao->valorFalta = $valorFalta;
+//                                $itensdeinspecao->valorSobra = $valorSobra;
+//                                $itensdeinspecao->valorRisco = $valorRisco;
+//                                $itensdeinspecao->situacao = 'Inspecionado';
+//                                $itensdeinspecao->pontuado = $pontuado;
+//                                $itensdeinspecao->itemQuantificado = $itemQuantificado;
+//                                $itensdeinspecao->orientacao = $registro->orientacao;
+//                                $itensdeinspecao->eventosSistema = 'Item avaliado Remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
+//                                $itensdeinspecao->reincidencia = $reinc;
+//                                $itensdeinspecao->consequencias = $consequencias;
+//                                $itensdeinspecao->orientacao = $orientacao;
+//                                $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
+//                                $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
+//                                $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
+//
+////                                echo  "<br/>" .'avaliação '.$avaliacao, $itensdeinspecao;
+//
+//                                $itensdeinspecao->update();
+//
+//                            }
+////final direito ao recebimento do provento
+//
+//
+//
+//                            ini_set('memory_limit', '128M');
+//                            ini_set('max_input_time', 120);
+//                            ini_set('max_execution_time', 120);
 
 
                         }
