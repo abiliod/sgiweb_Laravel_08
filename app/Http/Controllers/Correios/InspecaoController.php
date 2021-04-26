@@ -5526,7 +5526,7 @@ class InspecaoController extends Controller
                     ."\n"
                     .$registro->eventosSistema;
                  $dado->situacao = 'Corroborado' ;
-                $dado->save();
+                $dado->save(); 
             }
 
             $inspecao->status = 'Inspecionado';

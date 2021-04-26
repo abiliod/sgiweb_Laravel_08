@@ -2620,7 +2620,7 @@ class AvaliaInspecao implements ShouldQueue
                                 ->where([['descricao_item', 'like', '%alarme funciona corretamente%']])
                                 ->where([['sto', '=', $registro->sto]])
                                 ->orderBy('no_inspecao', 'desc')
-                                ->first();
+                            ->first();
 
                             try {
                                 if ($reincidencia->no_inspecao > 1) {
@@ -2635,7 +2635,6 @@ class AvaliaInspecao implements ShouldQueue
                                     $reincidencia_dt_fim_inspecao->subMonth(3);
                                     $reincidencia_dt_inic_inspecao->subMonth(3);
                                     //se houver registros de inspeções anteriores  consulta  com range  entre datas
-
 //                                        ############   Finais de semana  #################
                                     $alarmesFinalSemana = DB::table('alarmes')
                                         ->select('alarmes.*')
@@ -2644,8 +2643,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->whereIn('diaSemana', [0, 6])
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
-
+                                    ->get();
 //                                  ############   Feriados #################
                                     $feriadoporUnidades = DB::table('unidades')
                                         ->join('unidade_enderecos', 'unidades.mcu', '=', 'unidade_enderecos.mcu')
@@ -2655,9 +2653,7 @@ class AvaliaInspecao implements ShouldQueue
                                         )
                                         ->where([['unidades.mcu', '=', $registro->mcu]])
                                         ->where('data_do_feriado', '>=', $reincidencia_dt_fim_inspecao)
-                                        ->get();
-
-
+                                    ->get();
                                     $eventosf = DB::table('alarmes')
                                         ->select('alarmes.*')
                                         ->where('mcu', '=', $registro->mcu)
@@ -2665,7 +2661,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->where('armedesarme', '=', 'Desarme')
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
+                                    ->get();
 
 //                                  ############   Início Acessos fora do Padrão   #################
                                     $eventos = DB::table('alarmes')
@@ -2674,11 +2670,9 @@ class AvaliaInspecao implements ShouldQueue
                                         ->where('data', '>', $reincidencia_dt_fim_inspecao)
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
-
+                                    ->get();
                                 }
                                 else{
-
 //                                        ############   Finais de semana  #################
                                     $alarmesFinalSemana = DB::table('alarmes')
                                         ->select('alarmes.*')
@@ -2687,7 +2681,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->whereIn('diaSemana', [0, 6])
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
+                                    ->get();
 
                                     ############   Feriados #################
                                     $feriadoporUnidades = DB::table('unidades')
@@ -2698,7 +2692,7 @@ class AvaliaInspecao implements ShouldQueue
                                         )
                                         ->where([['unidades.mcu', '=', $registro->mcu]])
                                         ->where('data_do_feriado', '>=', $dtmenos12meses)
-                                        ->get();
+                                    ->get();
 
                                     $eventosf = DB::table('alarmes')
                                         ->select('alarmes.*')
@@ -2707,7 +2701,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->where('armedesarme', '=', 'Desarme')
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
+                                    ->get();
 //                                  ############   Início Acessos fora do Padrão   #################
                                     $eventos = DB::table('alarmes')
                                         ->select('alarmes.*')
@@ -2716,7 +2710,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->where('armedesarme', '=', 'Desarme')
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
+                                    ->get();
                                 }
                             }
 
@@ -2730,7 +2724,7 @@ class AvaliaInspecao implements ShouldQueue
                                     ->whereIn('diaSemana', [0, 6])
                                     ->orderBy('data' ,'asc')
                                     ->orderBy('hora' ,'asc')
-                                    ->get();
+                                ->get();
 
                                 ############   Feriados #################
                                 $feriadoporUnidades = DB::table('unidades')
@@ -2741,7 +2735,7 @@ class AvaliaInspecao implements ShouldQueue
                                     )
                                     ->where([['unidades.mcu', '=', $registro->mcu]])
                                     ->where('data_do_feriado', '>=', $dtmenos12meses)
-                                    ->get();
+                                ->get();
 
                                 $eventosf = DB::table('alarmes')
                                     ->select('alarmes.*')
@@ -2750,8 +2744,7 @@ class AvaliaInspecao implements ShouldQueue
                                     ->where('armedesarme', '=', 'Desarme')
                                     ->orderBy('data' ,'asc')
                                     ->orderBy('hora' ,'asc')
-                                    ->get();
-
+                                ->get();
 //                              ############   Início Acessos fora do Padrão   #################
                                 $eventos = DB::table('alarmes')
                                     ->select('alarmes.*')
@@ -2760,7 +2753,7 @@ class AvaliaInspecao implements ShouldQueue
                                     ->where('armedesarme', '=', 'Desarme')
                                     ->orderBy('data' ,'asc')
                                     ->orderBy('hora' ,'asc')
-                                    ->get();
+                                ->get();
                             }
 
                             $countFinalsemana = $alarmesFinalSemana->count('id');
@@ -2776,7 +2769,6 @@ class AvaliaInspecao implements ShouldQueue
                                         ->delete();
                                     foreach ($alarmesFinalSemana  as $tabela) {
                                         if($tabela->armedesarme == 'Desarme' ) {
-
                                             $tempoDesarme = (substr($tabela->hora,0,2)*60)+substr($tabela->hora,3,2);
                                             $horaDesarme = $tabela->hora;
                                             $dataDesarme = $tabela->data;
@@ -2784,7 +2776,6 @@ class AvaliaInspecao implements ShouldQueue
                                             $diaEvento = $tabela->diaSemana;
                                         }
                                         else { // Evento Desarme
-//
                                             if (( isset($diaEvento) )
                                                 && ( $diaEvento == $tabela->diaSemana )
                                                 && ( $tabela->armedesarme == 'Arme' )) {
@@ -2834,10 +2825,8 @@ class AvaliaInspecao implements ShouldQueue
                                     if ( $rowAberturaFinalSemana >= 1 ) {
                                         $acessos_final_semana = DB::table('acessos_final_semana')
                                             ->where('mcu',  '=', $registro->mcu)
-                                            ->select(
-                                                'acessos_final_semana.*'
-                                            )
-                                            ->get();
+                                            ->select('acessos_final_semana.*' )
+                                        ->get();
                                     }
                                     else { $acessos_final_semana = '';}
                                 }
@@ -2851,7 +2840,6 @@ class AvaliaInspecao implements ShouldQueue
                                             $acessosEmFeriados = ([
                                                 $row => ['Acesso' => \Carbon\Carbon::parse($evento->data)->format('d/m/Y'), 'hora' => $evento->hora],
                                             ]);
-
                                         }
                                         $row++;
                                     }
@@ -2863,17 +2851,13 @@ class AvaliaInspecao implements ShouldQueue
                                     $dtmax = $eventos->max('data');
                                     if((isset($registro->inicio_expediente)) && (!empty($registro->inicio_expediente))
                                         ||(isset($registro->final_expediente)) && (!empty($registro->final_expediente)) ) {
-
                                         $minutosinicioExpediente = (substr($registro->inicio_expediente,0,2)*60)+substr($registro->inicio_expediente,3,2);
                                         $minutosfinalExpediente = (substr($registro->final_expediente,0,2)*60)+substr($registro->final_expediente,3,2);
                                         foreach ($eventos  as $evento) {
                                             $eventominutos = (substr($evento->hora,0,2)*60)+substr($evento->hora,3,2);
                                             if ($evento->armedesarme =='Desarme' ) {
-
                                                 if (($eventominutos < ($minutosinicioExpediente-90))) {
-
                                                     $diferencaAbertura =  $minutosinicioExpediente - $eventominutos;
-
                                                     if($diferencaAbertura <0) {
                                                         $diferencaAbertura = $diferencaAbertura *-1;
                                                     }
@@ -2950,13 +2934,6 @@ class AvaliaInspecao implements ShouldQueue
                                         $oportunidadeAprimoramento = 'A Base de Dados da Unidade não está atualizada, atualize os registros da Unidade principalmente  horários de funcionamento. ';
                                         $consequencias = $registro->consequencias;
                                         $orientacao = $registro->orientacao;
-
-
-//                                            \Session::flash('mensagem',['msg'=> auth()->user()->name.', Base de Dados da Unidade não atualizada.
-//                                                                         Atualize os horários de funcionamento.'
-//                                                ,'class'=>'red white-text']);
-//                                            return redirect()->route('compliance.unidades.editar',$registro->unidade_id);
-
                                     }
 
                                 }
@@ -2974,7 +2951,6 @@ class AvaliaInspecao implements ShouldQueue
                                     $naoMonitorado = 'Não foi possível avaliar eventos recente da utilização do alarme monitorado dado que a unidade não está sendo monitorada. Aicionalmente verificaram que o último evento transmitido foi em ' .$dataultimoevento. '.';
                                 }
 //                          ############   Final Acessos fora do Padrão    #################
-
                             }
                             else{
                                 $avaliacao = 'Não Verificado';
@@ -2992,7 +2968,6 @@ class AvaliaInspecao implements ShouldQueue
 
                                 $consequencias = $registro->consequencias;
                                 $orientacao = $registro->orientacao;
-
                             }
                             else  if( ($rowAberturaFinalSemana >= 1) ||  (isset($tempoAbertura)&&(!empty($tempoAbertura))) || (isset($tempoAberturaPosExpediente)&&(!empty($tempoAberturaPosExpediente))) || (isset($acessosEmFeriados)&&(!empty($acessosEmFeriados))) || (isset($tempoAberturaAntecipada)&&(!empty($tempoAberturaAntecipada)))  ){
                                 $avaliacao = 'Não Conforme';
@@ -3006,7 +2981,6 @@ class AvaliaInspecao implements ShouldQueue
                                 $oportunidadeAprimoramento = 'Em análise aos dados do Relatório de “Arme e Desarme” do Sistema de Alarme em '. date('d/m/Y', strtotime($now)) . ' referente ao período de ' . date('d/m/Y', strtotime($dtmenos12meses)) . ' a '. date('d/m/Y', strtotime($now)) .', constatou-se que o sistema de alarme permaneceu ativado quando dos horários fora de atendimento inclusive finais de semana.:';
                                 $orientacao = null;
                                 $consequencias = null;
-
                             }
 
                             if($rowAberturaFinalSemana >= 1){
@@ -3024,7 +2998,6 @@ class AvaliaInspecao implements ShouldQueue
                             }
 
                             if(isset($tempoAbertura)&&(!empty($tempoAbertura))){
-
                                 $evidencia = $evidencia."\n\n" .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
                                 $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Horário Atendimento' . "\t" . 'Horário da Abertura' . "\t" . 'Tempo Abertura';
                                 foreach ($tempoAbertura  as $tempo => $mdaData){
@@ -3033,11 +3006,9 @@ class AvaliaInspecao implements ShouldQueue
                                         . "\t" . $mdaData["InicioExpediente"] . "\t" . $mdaData["HorárioDeAbertura"]
                                         . "\t" . $mdaData["DiferencaTempoDeAbertura"];
                                 }
-
                             }
 
                             if(isset($tempoAberturaAntecipada)&&(!empty($tempoAberturaAntecipada))){
-
                                 $evidencia = $evidencia."\n\n" .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
                                 $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Data Abertura' . "\t" . 'Horário de Atendimento' . "\t" . 'Hora da Abertura' . "\t" . 'Tempo Abertura';
                                 foreach ($tempoAberturaAntecipada  as $tempo => $mdaData){
@@ -3046,7 +3017,6 @@ class AvaliaInspecao implements ShouldQueue
                                         . date('d/m/Y', strtotime($mdaData["dataInicioExpediente"]))
                                         . "\t" . $mdaData["InicioExpediente"] . "\t" . $mdaData["HorárioDeAbertura"]
                                         . "\t" . $mdaData["DiferencaTempoDeAbertura"];
-
                                 }
                             }
 
@@ -3057,7 +3027,6 @@ class AvaliaInspecao implements ShouldQueue
                                     . "\t" . 'Horário Fechamento'
                                     . "\t" . 'Horário da Abertura'
                                     . "\t" . 'Tempo Abertura';
-
                                 foreach ($tempoAberturaPosExpediente  as $tempo => $mdaData){
                                     $evidencia = $evidencia . "\n"
                                         . date('d/m/Y', strtotime($mdaData["dataFinalExpediente"]))
@@ -3066,7 +3035,6 @@ class AvaliaInspecao implements ShouldQueue
                                         . "\t" . $mdaData["DiferencaTempoDeAbertura"];
                                 }
                             }
-
                             if(isset($acessosEmFeriados)&&(!empty($acessosEmFeriados))){
                                 $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
                                 $evidencia = $evidencia
@@ -3094,7 +3062,7 @@ class AvaliaInspecao implements ShouldQueue
                                     ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
                                     ->where('valor_inicio', '<=', $total)
                                     ->orderBy('valor_final', 'desc')
-                                    ->first();
+                                ->first();
                                 $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
                             }
                             else{
@@ -3104,7 +3072,7 @@ class AvaliaInspecao implements ShouldQueue
                                 ->Where([['inspecao_id', '=', $registro->inspecao_id]])
                                 ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
                                 ->select('itensdeinspecoes.*')
-                                ->first();
+                            ->first();
                             $itensdeinspecao = Itensdeinspecao::find($dto->id);
                             $itensdeinspecao->avaliacao = $avaliacao;
                             $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
@@ -3125,32 +3093,6 @@ class AvaliaInspecao implements ShouldQueue
                             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
 //                          echo 'line 1400 -> '.$dto->id , $itensdeinspecao;
                             $itensdeinspecao->update();
-
-
-//                                dd( $naoMonitorado , $aviso , $alarmesFinalSemana, $feriadoporUnidades,  $eventosf , $eventos);
-
-
-
-                            return view('compliance.inspecao.editar',compact
-                            (
-                                'registro'
-                                , 'id'
-                                , 'total'
-                                , 'acessos_final_semana'
-                                , 'rowAberturaFinalSemana'
-                                , 'count_alarmesFinalSemana'
-                                , 'acessosEmFeriados'
-                                , 'tempoAbertura'
-                                , 'tempoAberturaAntecipada'
-                                , 'tempoAberturaPosExpediente'
-                                , 'aviso'
-                                , 'dtmax'
-                                , 'now'
-                                ,'dtmenos12meses'
-                                ,'naoMonitorado'
-                            ));
-
-
                         }
 //  Final  do teste Alarme Arme/desarme
 
@@ -6645,15 +6587,6 @@ class AvaliaInspecao implements ShouldQueue
 
                                 $itensdeinspecao->update();
 
-//                                return view('compliance.inspecao.editar',
-//                                    compact(
-//                                        'registro'
-//                                        , 'id'
-//                                        , 'total'
-//                                        , 'plplistapendentes'
-//                                        ,'count'
-//                                        ,'dtfim'
-//                                    ));
                             }
 // Final teste PLPs Pendentes
 
@@ -6937,18 +6870,6 @@ class AvaliaInspecao implements ShouldQueue
                                 $itensdeinspecao->update();
 
 
-//                                return view('compliance.inspecao.editar',compact
-//                                (
-//                                    'registro'
-//                                    , 'id'
-//                                    , 'total'
-//                                    , 'compartilhaSenhas'
-//                                    , '$count'
-//                                    , '$dtmenos12meses'
-//                                    , 'dtnow'
-//                                    , 'naoMonitorado'
-//                                ));
-
                             }
 //             Final teste Compartilhamento de Senhas
 
@@ -6993,11 +6914,10 @@ class AvaliaInspecao implements ShouldQueue
                                 $count = 0;
                                 $naoMonitorado = null;
                                 $evidencia = null;
-
                                 $preVerificar = DB::table('testesdeverificacao')
                                     ->select('testesdeverificacao.*' )
                                     ->where([['teste',  'like', '%alarme funciona corretamente%']])
-                                    ->get();
+                                ->get();
 
                                 foreach($preVerificar as $pre){
                                     DB::table('testesdeverificacao')
@@ -7013,7 +6933,7 @@ class AvaliaInspecao implements ShouldQueue
                                     ->where([['descricao_item', 'like', '%alarme funciona corretamente%']])
                                     ->where([['sto', '=', $registro->sto]])
                                     ->orderBy('no_inspecao', 'desc')
-                                    ->first();
+                                ->first();
 
                                 try {
                                     if ($reincidencia->no_inspecao > 1) {
@@ -7048,9 +6968,7 @@ class AvaliaInspecao implements ShouldQueue
                                             )
                                             ->where([['unidades.mcu', '=', $registro->mcu]])
                                             ->where('data_do_feriado', '>=', $reincidencia_dt_fim_inspecao)
-                                            ->get();
-
-
+                                        ->get();
                                         $eventosf = DB::table('alarmes')
                                             ->select('alarmes.*')
                                             ->where('mcu', '=', $registro->mcu)
@@ -7058,7 +6976,7 @@ class AvaliaInspecao implements ShouldQueue
                                             ->where('armedesarme', '=', 'Desarme')
                                             ->orderBy('data' ,'asc')
                                             ->orderBy('hora' ,'asc')
-                                            ->get();
+                                        ->get();
 
 //                                  ############   Início Acessos fora do Padrão   #################
                                         $eventos = DB::table('alarmes')
@@ -7067,12 +6985,10 @@ class AvaliaInspecao implements ShouldQueue
                                             ->where('data', '>', $reincidencia_dt_fim_inspecao)
                                             ->orderBy('data' ,'asc')
                                             ->orderBy('hora' ,'asc')
-                                            ->get();
-
+                                        ->get();
                                     }
                                     else{
-
-//                                        ############   Finais de semana  #################
+//                              ############   Finais de semana  #################
                                         $alarmesFinalSemana = DB::table('alarmes')
                                             ->select('alarmes.*')
                                             ->where('mcu', '=', $registro->mcu)
@@ -7080,7 +6996,7 @@ class AvaliaInspecao implements ShouldQueue
                                             ->whereIn('diaSemana', [0, 6])
                                             ->orderBy('data' ,'asc')
                                             ->orderBy('hora' ,'asc')
-                                            ->get();
+                                        ->get();
 
                                         ############   Feriados #################
                                         $feriadoporUnidades = DB::table('unidades')
@@ -7091,7 +7007,7 @@ class AvaliaInspecao implements ShouldQueue
                                             )
                                             ->where([['unidades.mcu', '=', $registro->mcu]])
                                             ->where('data_do_feriado', '>=', $dtmenos12meses)
-                                            ->get();
+                                        ->get();
 
                                         $eventosf = DB::table('alarmes')
                                             ->select('alarmes.*')
@@ -7109,12 +7025,11 @@ class AvaliaInspecao implements ShouldQueue
                                             ->where('armedesarme', '=', 'Desarme')
                                             ->orderBy('data' ,'asc')
                                             ->orderBy('hora' ,'asc')
-                                            ->get();
+                                        ->get();
                                     }
                                 }
 
                                 catch (\Exception $e) {
-
 //                              ############   Finais de semana  #################
                                     $alarmesFinalSemana = DB::table('alarmes')
                                         ->select('alarmes.*')
@@ -7123,7 +7038,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->whereIn('diaSemana', [0, 6])
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
+                                    ->get();
 
                                     ############   Feriados #################
                                     $feriadoporUnidades = DB::table('unidades')
@@ -7144,7 +7059,6 @@ class AvaliaInspecao implements ShouldQueue
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
                                         ->get();
-
 //                              ############   Início Acessos fora do Padrão   #################
                                     $eventos = DB::table('alarmes')
                                         ->select('alarmes.*')
@@ -7153,7 +7067,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->where('armedesarme', '=', 'Desarme')
                                         ->orderBy('data' ,'asc')
                                         ->orderBy('hora' ,'asc')
-                                        ->get();
+                                    ->get();
                                 }
 
                                 $countFinalsemana = $alarmesFinalSemana->count('id');
@@ -7169,7 +7083,6 @@ class AvaliaInspecao implements ShouldQueue
                                             ->delete();
                                         foreach ($alarmesFinalSemana  as $tabela) {
                                             if($tabela->armedesarme == 'Desarme' ) {
-
                                                 $tempoDesarme = (substr($tabela->hora,0,2)*60)+substr($tabela->hora,3,2);
                                                 $horaDesarme = $tabela->hora;
                                                 $dataDesarme = $tabela->data;
@@ -7177,11 +7090,9 @@ class AvaliaInspecao implements ShouldQueue
                                                 $diaEvento = $tabela->diaSemana;
                                             }
                                             else { // Evento Desarme
-//
                                                 if (( isset($diaEvento) )
                                                     && ( $diaEvento == $tabela->diaSemana )
                                                     && ( $tabela->armedesarme == 'Arme' )) {
-
                                                     try{
                                                         $horaFechamento = $tabela->hora;
                                                         $tempoArme = (substr($tabela->hora, 0, 2) * 60) + substr($tabela->hora, 3, 2);
@@ -7193,7 +7104,6 @@ class AvaliaInspecao implements ShouldQueue
                                                         $h = 0;
                                                         $m = 0;
                                                     }
-
                                                     if ($tabela->diaSemana == 6) {
                                                         $diasemana = 'Sábado';
                                                     }
@@ -7202,7 +7112,6 @@ class AvaliaInspecao implements ShouldQueue
                                                     }
                                                     $peranencia = ($h < 10 ? '0' . $h : $h) . ':' . ($m < 10 ? '0' . $m : $m);
                                                     $dataDesarme = date("d/m/Y", strtotime($dataDesarme));
-
                                                     $acessoFinalSemana = new AcessoFinalSemana();
                                                     $acessoFinalSemana->mcu = $registro->mcu;
                                                     $acessoFinalSemana->evAbertura = $eventodesarme;
@@ -7244,7 +7153,6 @@ class AvaliaInspecao implements ShouldQueue
                                                 $acessosEmFeriados = ([
                                                     $row => ['Acesso' => \Carbon\Carbon::parse($evento->data)->format('d/m/Y'), 'hora' => $evento->hora],
                                                 ]);
-
                                             }
                                             $row++;
                                         }
@@ -7262,11 +7170,8 @@ class AvaliaInspecao implements ShouldQueue
                                             foreach ($eventos  as $evento) {
                                                 $eventominutos = (substr($evento->hora,0,2)*60)+substr($evento->hora,3,2);
                                                 if ($evento->armedesarme =='Desarme' ) {
-
                                                     if (($eventominutos < ($minutosinicioExpediente-90))) {
-
                                                         $diferencaAbertura =  $minutosinicioExpediente - $eventominutos;
-
                                                         if($diferencaAbertura <0) {
                                                             $diferencaAbertura = $diferencaAbertura *-1;
                                                         }
@@ -7330,9 +7235,7 @@ class AvaliaInspecao implements ShouldQueue
                                                     }
                                                 }
                                                 $periodo = CarbonPeriod::create($dtmax ,  $now );
-
                                                 $dataultimoevento = date('d/m/Y', strtotime($evento->data));
-
                                                 if ($periodo->count()>=15) {
                                                     $aviso = 'a) Não foi possível avaliar eventos recente da utilização do alarme monitorado dado que a unidade não está sendo monitorada há '. $periodo->count().' dias. Incluindo a data da Inspeção. Adicionalmente verificaram que o último evento transmitido foi no dia ' .$dataultimoevento. '.';
                                                 }
@@ -7343,17 +7246,8 @@ class AvaliaInspecao implements ShouldQueue
                                             $oportunidadeAprimoramento = 'A Base de Dados da Unidade não está atualizada, atualize os registros da Unidade principalmente  horários de funcionamento. ';
                                             $consequencias = $registro->consequencias;
                                             $orientacao = $registro->orientacao;
-
-
-//                                            \Session::flash('mensagem',['msg'=> auth()->user()->name.', Base de Dados da Unidade não atualizada.
-//                                                                         Atualize os horários de funcionamento.'
-//                                                ,'class'=>'red white-text']);
-//                                            return redirect()->route('compliance.unidades.editar',$registro->unidade_id);
-
                                         }
-
                                     }
-
                                     if(($rowAberturaFinalSemana==0) && ($row ==0) && ($rowtempoAbertura==0) && ($rowtempoAberturaAntecipada ==0) && ($rowtempoAberturaPosExpediente ==0) ) {
                                         $maxdata = DB::table('alarmes')
                                             ->where('mcu', '=', $registro->mcu )
@@ -7367,30 +7261,24 @@ class AvaliaInspecao implements ShouldQueue
                                         $naoMonitorado = 'Não foi possível avaliar eventos recente da utilização do alarme monitorado dado que a unidade não está sendo monitorada. Aicionalmente verificaram que o último evento transmitido foi em ' .$dataultimoevento. '.';
                                     }
 //                          ############   Final Acessos fora do Padrão    #################
-
                                 }
                                 else{
                                     $avaliacao = 'Não Verificado';
                                     $oportunidadeAprimoramento = 'Não há registro de eventos de alarme na base de dados para avaliar a unidade.';
-
                                     $consequencias = $registro->consequencias;
                                     $orientacao = $registro->orientacao;
-
                                 }
 //dd($registro);
                                 if ( !empty($naoMonitorado) ){
                                     $avaliacao = 'Não Conforme';
                                     $oportunidadeAprimoramento = 'Em análise aos dados do Relatório de “Arme e Desarme” do Sistema de Alarme do período de '. date('d/m/Y', strtotime($dtmenos12meses)) .' a ' . date('d/m/Y', strtotime($now)) .' , constatou-se que:';
                                     $evidencia = $naoMonitorado;
-
                                     $consequencias = $registro->consequencias;
                                     $orientacao = $registro->orientacao;
-
                                 }
                                 else  if( ($rowAberturaFinalSemana >= 1) ||  (isset($tempoAbertura)&&(!empty($tempoAbertura))) || (isset($tempoAberturaPosExpediente)&&(!empty($tempoAberturaPosExpediente))) || (isset($acessosEmFeriados)&&(!empty($acessosEmFeriados))) || (isset($tempoAberturaAntecipada)&&(!empty($tempoAberturaAntecipada)))  ){
                                     $avaliacao = 'Não Conforme';
                                     $oportunidadeAprimoramento = 'Em análise aos dados do Relatório de “Arme e Desarme” do Sistema de Alarme em '. date('d/m/Y', strtotime($now)) . ' referente ao período de ' . date('d/m/Y', strtotime($dtmenos12meses)) . ' a '. date('d/m/Y', strtotime($now)) .', constatou-se que o sistema permaneceu desativado e fora de funcionamento nos períodos relacionados a seguir:';
-
                                     $consequencias = $registro->consequencias;
                                     $orientacao = $registro->orientacao;
                                 }
@@ -7399,9 +7287,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $oportunidadeAprimoramento = 'Em análise aos dados do Relatório de “Arme e Desarme” do Sistema de Alarme em '. date('d/m/Y', strtotime($now)) . ' referente ao período de ' . date('d/m/Y', strtotime($dtmenos12meses)) . ' a '. date('d/m/Y', strtotime($now)) .', constatou-se que o sistema de alarme permaneceu ativado quando dos horários fora de atendimento inclusive finais de semana.:';
                                     $orientacao = null;
                                     $consequencias = null;
-
                                 }
-
                                 if($rowAberturaFinalSemana >= 1){
                                     $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .' - Ocorrências de desativação do alarme em períodos de finais de semana conforme a seguir:';
                                     $evidencia = $evidencia . "\n" . 'Evento Abertura' . "\t" . 'Data Abertura' . "\t" . 'Hora Abertura' . "\t" . 'Evento Fechamento' . "\t" . 'Hora Fechamento' . "\t" . 'Dia Semana' . "\t" . 'Tempo Permanência';
@@ -7415,9 +7301,7 @@ class AvaliaInspecao implements ShouldQueue
                                             . "\t" . $tabela->tempoPermanencia;
                                     }
                                 }
-
                                 if(isset($tempoAbertura)&&(!empty($tempoAbertura))){
-
                                     $evidencia = $evidencia."\n\n" .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
                                     $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Horário Atendimento' . "\t" . 'Horário da Abertura' . "\t" . 'Tempo Abertura';
                                     foreach ($tempoAbertura  as $tempo => $mdaData){
@@ -7426,23 +7310,18 @@ class AvaliaInspecao implements ShouldQueue
                                             . "\t" . $mdaData["InicioExpediente"] . "\t" . $mdaData["HorárioDeAbertura"]
                                             . "\t" . $mdaData["DiferencaTempoDeAbertura"];
                                     }
-
                                 }
-
                                 if(isset($tempoAberturaAntecipada)&&(!empty($tempoAberturaAntecipada))){
-
                                     $evidencia = $evidencia."\n\n" .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
                                     $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Data Abertura' . "\t" . 'Horário de Atendimento' . "\t" . 'Hora da Abertura' . "\t" . 'Tempo Abertura';
-                                    foreach ($tempoAberturaAntecipada  as $tempo => $mdaData){
 
+                                    foreach ($tempoAberturaAntecipada  as $tempo => $mdaData){
                                         $evidencia = $evidencia . "\n"
                                             . date('d/m/Y', strtotime($mdaData["dataInicioExpediente"]))
                                             . "\t" . $mdaData["InicioExpediente"] . "\t" . $mdaData["HorárioDeAbertura"]
                                             . "\t" . $mdaData["DiferencaTempoDeAbertura"];
-
                                     }
                                 }
-
                                 if(isset($tempoAberturaPosExpediente)&&(!empty($tempoAberturaPosExpediente))){
                                     $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em horário fora do padrão em relação ao horário de fechamento da unidade conforme a seguir:';
                                     $evidencia = $evidencia
@@ -7450,7 +7329,6 @@ class AvaliaInspecao implements ShouldQueue
                                         . "\t" . 'Horário Fechamento'
                                         . "\t" . 'Horário da Abertura'
                                         . "\t" . 'Tempo Abertura';
-
                                     foreach ($tempoAberturaPosExpediente  as $tempo => $mdaData){
                                         $evidencia = $evidencia . "\n"
                                             . date('d/m/Y', strtotime($mdaData["dataFinalExpediente"]))
@@ -7459,7 +7337,6 @@ class AvaliaInspecao implements ShouldQueue
                                             . "\t" . $mdaData["DiferencaTempoDeAbertura"];
                                     }
                                 }
-
                                 if(isset($acessosEmFeriados)&&(!empty($acessosEmFeriados))){
                                     $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
                                     $evidencia = $evidencia
@@ -7471,23 +7348,20 @@ class AvaliaInspecao implements ShouldQueue
                                             . "\t" . $mdaData["hora"];
                                     }
                                 }
-
                                 if(isset($aviso)&&(!empty($aviso))){
                                     $evidencia = $evidencia . "\n". $aviso;
                                 }
-
                                 $quebra = DB::table('relevancias')
                                     ->select('valor_final')
                                     ->where('fator_multiplicador', '=', 1)
-                                    ->first();
+                                ->first();
                                 $quebracaixa = $quebra->valor_final * 0.1;
-
                                 if( $valorFalta > $quebracaixa){
                                     $fm = DB::table('relevancias')
                                         ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
                                         ->where('valor_inicio', '<=', $total)
                                         ->orderBy('valor_final', 'desc')
-                                        ->first();
+                                    ->first();
                                     $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
                                 }
                                 else{
@@ -7497,7 +7371,7 @@ class AvaliaInspecao implements ShouldQueue
                                     ->Where([['inspecao_id', '=', $registro->inspecao_id]])
                                     ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
                                     ->select('itensdeinspecoes.*')
-                                    ->first();
+                                ->first();
                                 $itensdeinspecao = Itensdeinspecao::find($dto->id);
                                 $itensdeinspecao->avaliacao = $avaliacao;
                                 $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
@@ -7516,34 +7390,7 @@ class AvaliaInspecao implements ShouldQueue
                                 $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
                                 $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
                                 $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-//                          echo 'line 1400 -> '.$dto->id , $itensdeinspecao;
                                 $itensdeinspecao->update();
-
-
-//                                dd( $naoMonitorado , $aviso , $alarmesFinalSemana, $feriadoporUnidades,  $eventosf , $eventos);
-
-
-
-                                return view('compliance.inspecao.editar',compact
-                                (
-                                    'registro'
-                                    , 'id'
-                                    , 'total'
-                                    , 'acessos_final_semana'
-                                    , 'rowAberturaFinalSemana'
-                                    , 'count_alarmesFinalSemana'
-                                    , 'acessosEmFeriados'
-                                    , 'tempoAbertura'
-                                    , 'tempoAberturaAntecipada'
-                                    , 'tempoAberturaPosExpediente'
-                                    , 'aviso'
-                                    , 'dtmax'
-                                    , 'now'
-                                    ,'dtmenos12meses'
-                                    ,'naoMonitorado'
-                                ));
-
-
                             }
 //  Final  do teste Alarme Arme/desarme
 
@@ -7702,18 +7549,6 @@ class AvaliaInspecao implements ShouldQueue
                                 $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
 //                          dd('line 1400 -> ',$itensdeinspecao);
                                 $itensdeinspecao->update();
-//
-//                                    return view('compliance.inspecao.editar', compact
-//                                    (
-//                                        'registro'
-//                                        , 'id'
-//                                        , 'total'
-//                                        , 'resp_definidas'
-//                                        , 'dtmax'
-//                                        , 'dtmin'
-//                                        , 'count'
-//                                    ));
-
                             }
 //                      Final  do teste Extravio Responsabilidade Definida
 
