@@ -441,9 +441,28 @@ class InspecaoController extends Controller
             ->select('itensdeinspecoes.*','inspecoes.*','unidades.*','testesdeverificacao.*','gruposdeverificacao.*')
             ->where([['itensdeinspecoes.id', '=', $id ]])
             ->first();
+//        dd('aki');
 //      Início do teste WebCont
+
             if((($registro->numeroGrupoVerificacao == 230)&&($registro->numeroDoTeste == 4))
                 || (($registro->numeroGrupoVerificacao == 270)&&($registro->numeroDoTeste == 1))) {
+                $reinc = 'Não';
+                $codVerificacaoAnterior = null;
+                $numeroGrupoReincidente = null;
+                $numeroItemReincidente = null;
+
+                $preVerificar = DB::table('testesdeverificacao')
+                    ->select('testesdeverificacao.*' )
+                    ->where([['teste',  'like', '%A unidade regulariza os débitos de empregados lançados nas contas 914 %']])
+                    ->get();
+
+                foreach($preVerificar as $pre){
+                    DB::table('testesdeverificacao')
+                        ->where([['id',  '=', $pre->id]])
+                        ->update([
+                            'preVerificar' => 'Não'
+                        ]);
+                }
 
                 $reincidencia = DB::table('snci')
                     ->select('no_inspecao',   'no_grupo',  'no_item','dt_fim_inspecao','dt_inic_inspecao')
@@ -451,6 +470,8 @@ class InspecaoController extends Controller
                     ->where([['sto', '=', $registro->sto ]])
                     ->orderBy('no_inspecao' ,'desc')
                     ->first();
+
+
                 try{
                     if( $reincidencia->no_inspecao > 1) {
                         $reincidente = 1;
@@ -566,17 +587,8 @@ class InspecaoController extends Controller
                     $itensdeinspecao->orientacao= null;
                     $itensdeinspecao->eventosSistema = 'Item avaliado remotamente por Websgi em '.date( 'd/m/Y' , strtotime($dtnow)).'.';
                     $itensdeinspecao->update();
-//                                     dd($competencia);
+
                 }
-               return view('compliance.inspecao.editar',compact(
-                      'registro'
-                    , 'id'
-                    , 'debitoempregados'
-                    , 'competencia'
-                    , 'total'
-                   , 'count'
-                   ,'oportunidadeAprimoramento'
-                ));
             }
 //      Final do teste WebCont
 
@@ -590,6 +602,21 @@ class InspecaoController extends Controller
 //                dd($registro);
                 $countproters_peso =0;
                 $countproters_cep =0;
+
+                $preVerificar = DB::table('testesdeverificacao')
+                    ->select('testesdeverificacao.*' )
+                    ->where([['teste',  'like', '%PROTER%']])
+                    ->get();
+
+                foreach($preVerificar as $pre){
+                    DB::table('testesdeverificacao')
+                        ->where([['id',  '=', $pre->id]])
+                        ->update([
+                            'preVerificar' => 'Não'
+                        ]);
+                }
+
+
                 $reincidencia = DB::table('snci')
                     ->select('no_inspecao',   'no_grupo',  'no_item','dt_fim_inspecao','dt_inic_inspecao')
                     ->where([['descricao_item',  'like', '%PROTER%']])
@@ -1020,19 +1047,7 @@ class InspecaoController extends Controller
 
 
                 }
-//                          Fim se não  reincidencia
-                return view('compliance.inspecao.editar',compact('registro','id'
-                    , 'proters_con'
-                    , 'proters_cep'
-                    , 'proters_peso'
-                    , 'total_proters_cep'
-                    , 'total_proters_peso'
-                    ,'countproters_con'
-                    ,'countproters_cep'
-                    ,'countproters_peso'
-                    ,'dtmenos90dias'
-                    , 'total'
-                ));
+
             }
 //      Final do teste PROTER
 
@@ -1043,6 +1058,22 @@ class InspecaoController extends Controller
             $dtnow = new Carbon();
             $dtmenos90dias = new Carbon();
             $dtmenos90dias->subDays(90);
+            $valorSobra = null;
+            $valorFalta = null;
+            $valorRisco = null;
+
+             $preVerificar = DB::table('testesdeverificacao')
+                 ->select('testesdeverificacao.*' )
+                 ->where([['teste',  'like', '%valor depositado na conta bancária%']])
+                 ->get();
+
+                foreach($preVerificar as $pre){
+                    DB::table('testesdeverificacao')
+                        ->where([['id',  '=', $pre->id]])
+                        ->update([
+                            'preVerificar' => 'Não'
+                        ]);
+                }
 
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
@@ -1383,19 +1414,7 @@ class InspecaoController extends Controller
             }
 //                              Final  se Não tem registro de pendências SMB_BD
 
-            $dtini = $dtmenos90dias;
-            $dtfim = $dtnow;
 
-
-            return view('compliance.inspecao.editar',compact(
-                'registro'
-                ,'id'
-                ,'smb_bdf_naoconciliados'
-                ,'total'
-                ,'dtini'
-                ,'dtfim'
-                ,'dtnow'
-                ));
         }
 //      Final  do teste SMB_BDF
 
@@ -1421,6 +1440,20 @@ class InspecaoController extends Controller
             $itemQuantificado='Não';
             $reincidente = 0;
             $reinc = 'Não';
+
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%Saldo que Passa%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             $sl02bdfsMaxdata = SL02_bdf::where('cod_orgao', $registro->sto)->max('dt_movimento');
 
@@ -1661,18 +1694,6 @@ class InspecaoController extends Controller
 //        dd('line  -> ',$itensdeinspecao);
             $itensdeinspecao->update();
 
-            return view('compliance.inspecao.editar',compact(
-                'registro'
-                ,'id'
-                ,'total'
-                ,'dtnow'
-                ,'sl02bdfs30','acumulados30','ocorrencias30', 'media30', 'porcentagem30'
-                ,'sl02bdfs60','acumulados60','ocorrencias60', 'media60', 'porcentagem60'
-                ,'sl02bdfs90','acumulados90','ocorrencias90', 'media90', 'porcentagem90'
-                ,'sl02bdfs120','acumulados120','ocorrencias120', 'media120', 'porcentagem120'
-                ,'dtmenos30dias',  'dtmenos60dias' , 'dtmenos90dias' ,'dtmenos120dias'
-                ,'ocorrencias','mediaocorrencias'
-            ));
         }
 //                       Final  do teste SLD-02-BDF
 
@@ -1702,6 +1723,20 @@ class InspecaoController extends Controller
             $reinc = 'Não';
             $dtmin = $dtnow;
             $count = 0;
+
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%objetos indenizados por extravio%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             //verifica histórico de inspeções
             $reincidencia = DB::table('snci')
@@ -1831,24 +1866,12 @@ class InspecaoController extends Controller
             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
 //                          dd('line 1400 -> ',$itensdeinspecao);
             $itensdeinspecao->update();
-//
-                                    return view('compliance.inspecao.editar', compact
-                                    (
-                                        'registro'
-                                        , 'id'
-                                        , 'total'
-                                        , 'resp_definidas'
-                                        , 'dtmax'
-                                        , 'dtmin'
-                                        , 'count'
-                                    ));
 
         }
 //                      Final  do teste Extravio Responsabilidade Definida
 
 
 //  Inicio  do teste Alarme Arme/desarme
-
         if((($registro->numeroGrupoVerificacao == 206 )&&($registro->numeroDoTeste == 1 ))
             || (( $registro->numeroGrupoVerificacao == 335 ) && ( $registro->numeroDoTeste == 1 ))
             || (($registro->numeroGrupoVerificacao == 232)&&($registro->numeroDoTeste == 3 ))
@@ -1887,6 +1910,20 @@ class InspecaoController extends Controller
             $dtmin = $dtnow;
             $count = 0;
             $naoMonitorado = null;
+            $evidencia = null;
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%alarme funciona corretamente%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             //verifica histórico de inspeções
             $reincidencia = DB::table('snci')
@@ -2287,21 +2324,19 @@ class InspecaoController extends Controller
                 $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .' - Ocorrências de desativação do alarme em períodos de finais de semana conforme a seguir:';
                 $evidencia = $evidencia . "\n" . 'Evento Abertura' . "\t" . 'Data Abertura' . "\t" . 'Hora Abertura' . "\t" . 'Evento Fechamento' . "\t" . 'Hora Fechamento' . "\t" . 'Dia Semana' . "\t" . 'Tempo Permanência';
                 foreach ($acessos_final_semana as $tabela){
-                    $evidencia = $evidencia  . "\n" . '$tabela->evAbertura'
-                        . "\t" . '$tabela->evDataAbertura' . "\t"
-                        . '$tabela->evHoraAbertura'
-                        . "\t"
-                        . '$tabela->evFechamento'
-                        . "\t"
-                        . '$tabela->evHoraFechamento'
-                        . "\t" . '$tabela->diaSemana'
-                        . "\t" . '$tabela->tempoPermanencia';
+                    $evidencia = $evidencia  . "\n" . $tabela->evAbertura
+                        . "\t" . $tabela->evDataAbertura
+                        . "\t" . $tabela->evHoraAbertura
+                        . "\t" . $tabela->evFechamento
+                        . "\t" . $tabela->evHoraFechamento
+                        . "\t" . $tabela->diaSemana
+                        . "\t" . $tabela->tempoPermanencia;
                 }
             }
 
             if(isset($tempoAbertura)&&(!empty($tempoAbertura))){
 
-                $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
+                $evidencia = $evidencia."\n\n" .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
                 $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Horário Atendimento' . "\t" . 'Horário da Abertura' . "\t" . 'Tempo Abertura';
                 foreach ($tempoAbertura  as $tempo => $mdaData){
                     $evidencia = $evidencia . "\n"
@@ -2314,7 +2349,7 @@ class InspecaoController extends Controller
 
             if(isset($tempoAberturaAntecipada)&&(!empty($tempoAberturaAntecipada))){
 
-                $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
+                $evidencia = $evidencia."\n\n" .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
                 $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Data Abertura' . "\t" . 'Horário de Atendimento' . "\t" . 'Hora da Abertura' . "\t" . 'Tempo Abertura';
                 foreach ($tempoAberturaAntecipada  as $tempo => $mdaData){
 
@@ -2327,7 +2362,7 @@ class InspecaoController extends Controller
             }
 
             if(isset($tempoAberturaPosExpediente)&&(!empty($tempoAberturaPosExpediente))){
-                $evidencia = $evidencia."\n".'Unidade em Risco. Abertura da unidade em horário fora do padrão em relação ao horário de fechamento da unidade conforme a seguir:';
+                $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em horário fora do padrão em relação ao horário de fechamento da unidade conforme a seguir:';
                 $evidencia = $evidencia
                     . "\n" . 'Data'
                     . "\t" . 'Horário Fechamento'
@@ -2344,7 +2379,7 @@ class InspecaoController extends Controller
             }
 
             if(isset($acessosEmFeriados)&&(!empty($acessosEmFeriados))){
-                $evidencia = $evidencia."\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
+                $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
                 $evidencia = $evidencia
                     . "\n" . 'Data'
                     . "\t" . 'Hora';
@@ -2428,7 +2463,6 @@ class InspecaoController extends Controller
 
 
         }
-
 //  Final  do teste Alarme Arme/desarme
 
 
@@ -2454,10 +2488,19 @@ class InspecaoController extends Controller
             $dtmin = $dtnow;
             $count = 0;
             $naoMonitorado = null;
-            //verifica histórico de inspeções
 
-//                                DB::enableQueryLog();
-//                                dd( DB::getQueryLog());
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%As senhas do sistema de alarme são pessoais%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
@@ -2711,17 +2754,6 @@ class InspecaoController extends Controller
 
             $itensdeinspecao->update();
 
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'compartilhaSenhas'
-                , '$count'
-                , '$dtmenos12meses'
-                , 'dtnow'
-                , 'naoMonitorado'
-            ));
 
         }
 //   Final teste Compartilhamento de Senhas
@@ -2777,6 +2809,19 @@ class InspecaoController extends Controller
             $reinc = 'Não';
             $dtmin = $dtnow;
             $count = 0;
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like',  '%constantes nas PLP%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
@@ -2914,16 +2959,6 @@ class InspecaoController extends Controller
 //                                dd($registro->sto , $reincidencia);
 
             $itensdeinspecao->update();
-
-            return view('compliance.inspecao.editar',
-                compact(
-                    'registro'
-                    , 'id'
-                    , 'total'
-                    , 'plplistapendentes'
-                    ,'count'
-                    ,'dtfim'
-                ));
         }
 // Final teste PLPs Pendentes
 
@@ -2955,10 +2990,25 @@ class InspecaoController extends Controller
             $dtfim = $dtnow;
             $dtini = $dtmenos3meses;
             $reg=0;
+            $evidencia = null;
+            $orientacao = null;
+            $consequencias = null;
 
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%embarque e desembarque%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                ->where([['descricao_item', 'like', '%Os procedimentos de embarque e desembarque da carga%']])
+                ->where([['descricao_item', 'like', '%embarque e desembarque%']])
                 ->where([['sto', '=', $registro->sto]])
                 ->orderBy('no_inspecao', 'desc')
                 ->first();
@@ -3124,29 +3174,8 @@ class InspecaoController extends Controller
             $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
+            $itensdeinspecao->update();
 
-            echo $avaliacao , $dto->id.' - '.$avaliacao.' ,';
-//                                if ($avaliacao == 'Não Conforme') dd('line 2495 -> Não Conforme ', $itensdeinspecao);
-            if ($avaliacao == 'Conforme') dd('line 2496 -> Conforme ', $itensdeinspecao);
-//                               dd($registro->sto , $reincidencia);
-
-//                                $itensdeinspecao->update();
-
-
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'controle_de_viagens'
-                ,'dtini'
-                ,'dtfim'
-                ,'count'
-                ,'reg'
-                ,'viagens'
-                ,'viagemNaorealizada'
-
-            ));
         }
 // Final Controle de viagem
 
@@ -3174,6 +3203,20 @@ class InspecaoController extends Controller
             $dtini = $dtmenos120dias;
             $dtfim = $dtnow;
             $count = 0;
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%quantidade recebida no SGDO%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
+
 
             if( substr($registro->tem_distribuicao, 0, 4) !== 'Não') {
 
@@ -3346,17 +3389,6 @@ class InspecaoController extends Controller
             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
             $itensdeinspecao->update();
-
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'sgdo_distribuicao'
-                , 'count'
-                , 'dtini'
-                , 'dtfim'
-            ));
         }
 // Fim SGDO Distribuição
 
@@ -3382,6 +3414,18 @@ class InspecaoController extends Controller
             $dtini = $dtmenos150dias;
             $countSupervisor = 0;
             $count = 0;
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like',  '%UNIDADE SEM SUPERVISOR OPERACIONAL - É realizada diariamente a gestão das pendências de objetos%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             switch ($registro->se) {
 
@@ -3553,18 +3597,7 @@ class InspecaoController extends Controller
 //                                echo  "\n" .'avaliação ',$itensdeinspecao;
 
             $itensdeinspecao->update();
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'painel_extravios'
-                ,'count'
-                ,'dtini'
-                ,'dtfim'
-                ,'countSupervisor'
 
-            ));
         }
 // fim Pre Alerta gestão automatica unidade sem supervisor
 
@@ -3593,6 +3626,20 @@ class InspecaoController extends Controller
             $dtini = $dtmenos150dias;
             $countSupervisor = 0;
             $count = 0;
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%UNIDADE COM SUPERVISOR OPERACIONAL (SO) - É realizada diariamente a gestão das pendências de objetos%']])
+            ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
+
 
             switch ($registro->se) {
 
@@ -3760,25 +3807,7 @@ class InspecaoController extends Controller
             $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-//                                echo  "\n" .'avaliação ',$itensdeinspecao;
-
             $itensdeinspecao->update();
-
-
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'painel_extravios'
-                ,'count'
-                ,'dtini'
-                ,'dtfim'
-                ,'countSupervisor'
-
-            ));
-
         }
 // fim Pre Alerta gestão automatica unidade com supervisor
 
@@ -3803,6 +3832,19 @@ class InspecaoController extends Controller
             $reinc = 'Não';
             $dtini = $dtmenos150dias;
             $count = 0;
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%CIE Eletrônica%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             switch ($registro->se) {
                 case 1 :{ $superintendência = 'CS'; } break;
@@ -3834,7 +3876,7 @@ class InspecaoController extends Controller
 
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                ->where([['descricao_item', 'like', '%qCIE Eletrônica%']])
+                ->where([['descricao_item', 'like', '%CIE Eletrônica%']])
                 ->where([['sto', '=', $registro->sto]])
                 ->orderBy('no_inspecao', 'desc')
                 ->first();
@@ -4002,25 +4044,7 @@ class InspecaoController extends Controller
             $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-//                                echo  "\n" .'avaliação ',$itensdeinspecao;
-
             $itensdeinspecao->update();
-
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'cie_eletronicas'
-                ,'count'
-                ,'dtini'
-                ,'dtfim'
-
-
-            ));
-
-
         }
 // Fim CIE Eletrônica
 
@@ -4526,9 +4550,6 @@ class InspecaoController extends Controller
 
 // Final Atividades com SRO
 
-
-
-
 // Inicio controle sobre a realização de horas-extras
         if((($registro->numeroGrupoVerificacao==209) && ($registro->numeroDoTeste==2))
             || (($registro->numeroGrupoVerificacao==337) && ($registro->numeroDoTeste==1))
@@ -4550,6 +4571,18 @@ class InspecaoController extends Controller
             $reinc = 'Não';
             $count = 0;
 
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%realização de horas-extras%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             $ref = substr($dtmenos12meses,0,4). substr($dtmenos12meses,5,2);
             $dtini = substr($dtmenos12meses,0,4).'-'. substr($dtmenos12meses,5,2).'-01';
@@ -4857,23 +4890,8 @@ class InspecaoController extends Controller
             $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-//                                echo  "<br/>" .'avaliação '.$avaliacao,$itensdeinspecao;
-
             $itensdeinspecao->update();
 
-
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'dtini'
-                , 'count'
-                , 'pgtoAdicionais'
-                , 'counteventostfs'
-                , 'reffinal'
-            ));
         }
 
 // Final controle sobre a realização de horas-extras
@@ -4898,6 +4916,20 @@ class InspecaoController extends Controller
             $reincidente = 0;
             $reinc = 'Não';
             $count = 0;
+
+
+            $preVerificar = DB::table('testesdeverificacao')
+                ->select('testesdeverificacao.*' )
+                ->where([['teste',  'like', '%Adicionais de Atividade%']])
+                ->get();
+
+            foreach($preVerificar as $pre){
+                DB::table('testesdeverificacao')
+                    ->where([['id',  '=', $pre->id]])
+                    ->update([
+                        'preVerificar' => 'Não'
+                    ]);
+            }
 
             $ref = substr($dtmenos4meses,0,4). substr($dtmenos4meses,5,2);
             $count_atend = 0;
@@ -4940,7 +4972,7 @@ class InspecaoController extends Controller
 
             $reincidencia = DB::table('snci')
                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                ->where([['descricao_item', 'like', '%realização de horas-extras%']])
+                ->where([['descricao_item', 'like', '%Adicionais de Atividade%']])
                 ->where([['sto', '=', $registro->sto]])
                 ->orderBy('no_inspecao', 'desc')
                 ->first();
@@ -5126,60 +5158,69 @@ class InspecaoController extends Controller
             if (( $count_atend >= 1 ) || ( $count_dist >= 1 )) {
 
                 $pgtoAdicionais = DB::table('pgto_adicionais_temp')
-                    ->where('sto',  '=', $registro->sto)
-                    ->where('mcu',  '=', $registro->mcu)
-                    ->where('codigo',  '=', $registro->codigo)
-                    ->where('numeroGrupoVerificacao',  '=', $registro->numeroGrupoVerificacao)
-                    ->where('numeroDoTeste',  '=', $registro->numeroDoTeste)
+                    ->where('sto', '=', $registro->sto)
+                    ->where('mcu', '=', $registro->mcu)
+                    ->where('codigo', '=', $registro->codigo)
+                    ->where('numeroGrupoVerificacao', '=', $registro->numeroGrupoVerificacao)
+                    ->where('numeroDoTeste', '=', $registro->numeroDoTeste)
                     ->select(
                         'pgto_adicionais_temp.*'
                     )
                     ->get();
-                $total=$pgtoAdicionais->sum('valor');
+                $total = $pgtoAdicionais->sum('valor');
                 $count = $pgtoAdicionais->count('matricula');
 
-                $avaliacao = 'Não Conforme';
-                $oportunidadeAprimoramento = 'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, do período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .' até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4) .', constatou-se a existência de empregados que recebiam tais dicionais/funções sem desempenhar as atividades que lhes davam o direito ao recebimento.';
+                if ($count >= 1) {
+                    $avaliacao = 'Não Conforme';
+                    $oportunidadeAprimoramento = 'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, do período de ' . substr($dtini, 4, 2) . '/' . substr($dtini, 0, 4) . ' até ' . substr($dtfim, 4, 2) . '/' . substr($dtfim, 0, 4) . ', constatou-se a existência de empregados que recebiam tais dicionais/funções sem desempenhar as atividades que lhes davam o direito ao recebimento.';
 
-                $evidencia = $evidencia. "\n" .'- Houve '.$count.' ocorrência(s) de pagamentos conforme a Seguir:';
-                $evidencia = $evidencia
-                    . "\n" . 'Matricula'
-                    . "\t" . 'Cargo'
-                    . "\t" . 'Adicional'
-                    . "\t" . 'Período de Rec. Adicional'
-                    . "\t" . 'Valor ATT Recebido (R$)'
-                    . "\t" . 'Situação Encontrada';
-                foreach($pgtoAdicionais as $dados){
+                    $evidencia = $evidencia . "\n" . '- Houve ' . $count . ' ocorrência(s) de pagamentos conforme a Seguir:';
                     $evidencia = $evidencia
-                        . "\n" . $dados->matricula
-                        . "\n" . $dados->cargo
-                        . "\n" . $dados->rubrica
-                        . "\n" . $dados->ref
-                        . "\n" . $dados->valor
-                        . "\n" . $dados->situacao;
-                }
-                $consequencias = $registro->consequencias;
-                $orientacao = $registro->orientacao;
+                        . "\n" . 'Matricula'
+                        . "\t" . 'Cargo'
+                        . "\t" . 'Adicional'
+                        . "\t" . 'Período de Rec. Adicional'
+                        . "\t" . 'Valor ATT Recebido (R$)'
+                        . "\t" . 'Situação Encontrada';
+                    foreach ($pgtoAdicionais as $dados) {
+                        $evidencia = $evidencia
+                            . "\n" . $dados->matricula
+                            . "\n" . $dados->cargo
+                            . "\n" . $dados->rubrica
+                            . "\n" . $dados->ref
+                            . "\n" . $dados->valor
+                            . "\n" . $dados->situacao;
+                    }
+                    $consequencias = $registro->consequencias;
+                    $orientacao = $registro->orientacao;
 
-                $quebra = DB::table('relevancias')
-                    ->select('valor_final')
-                    ->where('fator_multiplicador', '=', 1)
-                    ->first();
-                $quebracaixa = $quebra->valor_final * 0.1;
-
-                if( $valorFalta > $quebracaixa){
-                    $fm = DB::table('relevancias')
-                        ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
-                        ->where('valor_inicio', '<=', $total)
-                        ->orderBy('valor_final', 'desc')
+                    $quebra = DB::table('relevancias')
+                        ->select('valor_final')
+                        ->where('fator_multiplicador', '=', 1)
                         ->first();
-                    $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                    $quebracaixa = $quebra->valor_final * 0.1;
+
+                    if ($valorFalta > $quebracaixa) {
+                        $fm = DB::table('relevancias')
+                            ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+                            ->where('valor_inicio', '<=', $total)
+                            ->orderBy('valor_final', 'desc')
+                            ->first();
+                        $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                    } else {
+                        if ($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                    }
+
                 }
                 else{
-                    if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                    $avaliacao = 'Conforme';
+                    $oportunidadeAprimoramento =  'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .'até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4).' Não foi identificado empregado(s) com recebimento(s) pela(s) Rubricas AADC-Adic.Ativ. Distrib/Coleta Ext. Bem como, Adic. de Atend. em Guichê na unidade.';
+                    $consequencias = null;
+                    $orientacao =  null;
                 }
 
             }
+
             else {
                 $avaliacao = 'Conforme';
                 $oportunidadeAprimoramento =  'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .'até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4).' Não foi identificado empregado(s) com recebimento(s) pela(s) Rubricas AADC-Adic.Ativ. Distrib/Coleta Ext. Bem como, Adic. de Atend. em Guichê na unidade.';
@@ -5213,26 +5254,7 @@ class InspecaoController extends Controller
             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
 
-//                                echo  "<br/>" .'avaliação '.$avaliacao, $itensdeinspecao;
-
-            $itensdeinspecao->update();
-
-
-            return view('compliance.inspecao.editar',compact
-            (
-                'registro'
-                , 'id'
-                , 'total'
-                , 'pagamentos_adicionais_dist'
-                , 'pagamentos_adicionais_atend'
-                , 'dtini'
-                , 'dtfim'
-                , 'pgtoAdicionais'
-                , 'count'
-            ));
-
-
-
+           $itensdeinspecao->update();
         }
 //final direito ao recebimento do provento
 
@@ -5373,6 +5395,7 @@ class InspecaoController extends Controller
     }
 
     public function index($id)  {
+
         $inspecao = Inspecao::find($id);
         $registros = DB::table('itensdeinspecoes')
             ->join('inspecoes', 'itensdeinspecoes.inspecao_id', '=', 'inspecoes.id')
@@ -5389,7 +5412,9 @@ class InspecaoController extends Controller
             ->where([['situacao', '=', 'Em Inspeção' ]])
             ->orderBy('itensdeinspecoes.testeVerificacao_id' , 'asc')
         ->paginate(10);
+
         $count = $registros->count('situacao');
+
         if($count == 0)
         {
             $registros = DB::table('itensdeinspecoes')
@@ -5429,6 +5454,7 @@ class InspecaoController extends Controller
             ->get();
             $count = $registros->count('situacao');
         }
+
         if($count == 0)
         {
 

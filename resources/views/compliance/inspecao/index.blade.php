@@ -242,10 +242,10 @@
                                     {{ $registro->situacao }}
                             </td>
                             <td>
-                                @if($dado->inspetorcolaborador ==  auth()->user()->document)
-                                    <a class="waves-effect waves-light btn orange"
-                                       href="{{ route('compliance.inspecao.editar',$registro->id) }}">Corroborar</a>
-                                @endif
+{{--                                @if($dado->inspetorcolaborador ==  auth()->user()->document)--}}
+{{--                                    <a class="waves-effect waves-light btn orange"--}}
+{{--                                       href="{{ route('compliance.inspecao.editar',$registro->id) }}">Corroborar</a>--}}
+{{--                                @endif--}}
                             </td>
                         @elseif($registro->situacao == 'Corroborado')
                         <td class="card-panel teal lighten-2">

@@ -92,18 +92,39 @@
 				<tbody>
 
 				    @forelse($registros as $registro)
-					<tr>
-				    	<td>{{ $registro->ciclo }}</td>
-                        <td>{{ $registro->tipoVerificacao }}</td>
-                        <td>{{ $registro->codigo }}</td>
-                        <td>{{ $registro->descricao }}</td>
-                        <td>{{ $registro->status }}</td>
-                        <td>{{ $registro->inspetorcoordenador }}</td>
-                        <td>{{ $registro->inspetorcolaborador }}</td>
-                        <td>{{ $registro->datainiPreInspeção }}</td>
-						<td>
+                        <tr>
 
+                        @if(($registro->status=='Em Inspeção'))
+
+                                <td>{{ $registro->ciclo }}</td>
+                                <td>{{ $registro->tipoVerificacao }}</td>
+                                <td>{{ $registro->codigo }}</td>
+                                <td>{{ $registro->descricao }}</td>
+                                <td>{{ $registro->status }}</td>
+                                <td>{{ $registro->inspetorcoordenador }}</td>
+                                <td>{{ $registro->inspetorcolaborador }}</td>
+                                <td>{{ $registro->datainiPreInspeção }}</td>
+
+                        @else
+                                <td class="blue">{{ $registro->ciclo }}</td>
+                                <td class="blue">{{ $registro->tipoVerificacao }}</td>
+                                <td class="blue">{{ $registro->codigo }}</td>
+                                <td class="blue">{{ $registro->descricao }}</td>
+                                <td class="blue">{{ $registro->status }}</td>
+                                <td class="blue">{{ $registro->inspetorcoordenador }}</td>
+                                <td class="blue">{{ $registro->inspetorcolaborador }}</td>
+                                <td class="blue">{{ $registro->datainiPreInspeção }}</td>
+
+                        @endif
+
+
+
+
+
+
+                            <td>
                             @can('inspecao_editar')
+
                                 <a class="waves-effect waves-light btn orange"
                                    href="{{ route('compliance.inspecao', $registro->id) }}">Inspecionar</a>
 

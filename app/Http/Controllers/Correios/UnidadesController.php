@@ -43,32 +43,26 @@ class UnidadesController extends Controller
                 ->orderBy('sequence','desc')
                 ->first();
 
-
-            if(!empty($sequence_inspcaos))
-            {
-                $sequence = $sequence_inspcaos->sequence;
-                $sequence ++;
-                $sequenceInspecao = SequenceInspecao::find($sequence_inspcaos->id);
-                $sequenceInspecao->se      = $unidade->se;
-                $sequenceInspecao->ciclo =  $dados['ciclo'];
-                $sequenceInspecao->sequence      = $sequence;
-                $sequenceInspecao->update();
+            if( ! empty($sequence_inspcaos)) {
+                $sequence = $sequence_inspcaos->sequence ++;
             }
-            else
-            {
-                $sequence=1;
-                $sequenceInspecao = new SequenceInspecao;
-                $sequenceInspecao->se      = $unidade->se;
-                $sequenceInspecao->ciclo =  $dados['ciclo'];
-                $sequenceInspecao->sequence      = $sequence;
-                $sequenceInspecao->save();
+            else {
+                $sequence = 1;
             }
 
-            $sequence = str_pad(  $sequenceInspecao->sequence , 4, '0', STR_PAD_LEFT);
+            SequenceInspecao :: updateOrCreate([
+                'se' => $unidade->se,
+                'ciclo' => $dados['ciclo']
+            ],[
+                'se' => $unidade->se,
+                'sequence' => $sequence,
+                'ciclo' => $dados['ciclo']
+            ]);
+
+            $sequence = str_pad(  $sequence , 4, '0', STR_PAD_LEFT);
             $codigo = $unidade->se.$sequence.$dados['ciclo'];
 
-            if( $dados ['tipoVerificacao'] != 'previa')
-            {
+            if( $dados ['tipoVerificacao'] != 'Monitorada') {
                 $inspecao = new Inspecao;
                 $inspecao->ciclo      = $dados ['ciclo'];
                 $inspecao->descricao =  $unidade->descricao;
@@ -103,7 +97,6 @@ class UnidadesController extends Controller
                 {
                     $registro = new Itensdeinspecao;
                     $registro->inspecao_id =  $inspecao->id ; //veriricação relacionada
-
                     //$parametro é um objeto, não uma matriz, então deve acessá-lo da seguinte forma:
                     $registro->unidade_id =  $dados['unidade_id']; //unidade verificada
                     $registro->tipoUnidade_id =  $dados['tipoUnidade_id']; //Tipo de unidade

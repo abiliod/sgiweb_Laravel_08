@@ -79,7 +79,7 @@ class GeraInspecao implements ShouldQueue
                                         ->update(['sequence' => $sequence]);
                                     //      dd($affected , $sequence);
                                 } else {
-                                    $sequence = 2001;
+                                    $sequence = 2001; // mario precisa automatizar esse codigo está hard cod  2001
                                     $affected =  SequenceInspecao::create([
                                         'se' => $strsuperintendencia
                                         ,'ciclo' => $ciclo

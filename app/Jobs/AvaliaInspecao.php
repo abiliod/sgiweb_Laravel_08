@@ -130,6 +130,20 @@ class AvaliaInspecao implements ShouldQueue
                             $reinc = 'Não';
                             $count = 0;
 
+
+                            $preVerificar = DB::table('testesdeverificacao')
+                                ->select('testesdeverificacao.*' )
+                                ->where([['teste',  'like', '%Adicionais de Atividade%']])
+                                ->get();
+
+                            foreach($preVerificar as $pre){
+                                DB::table('testesdeverificacao')
+                                    ->where([['id',  '=', $pre->id]])
+                                    ->update([
+                                        'preVerificar' => 'Não'
+                                    ]);
+                            }
+
                             $ref = substr($dtmenos4meses,0,4). substr($dtmenos4meses,5,2);
                             $count_atend = 0;
                             $count_dist = 0;
@@ -171,7 +185,7 @@ class AvaliaInspecao implements ShouldQueue
 
                             $reincidencia = DB::table('snci')
                                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                ->where([['descricao_item', 'like', '%realização de horas-extras%']])
+                                ->where([['descricao_item', 'like', '%Adicionais de Atividade%']])
                                 ->where([['sto', '=', $registro->sto]])
                                 ->orderBy('no_inspecao', 'desc')
                                 ->first();
@@ -357,60 +371,69 @@ class AvaliaInspecao implements ShouldQueue
                             if (( $count_atend >= 1 ) || ( $count_dist >= 1 )) {
 
                                 $pgtoAdicionais = DB::table('pgto_adicionais_temp')
-                                    ->where('sto',  '=', $registro->sto)
-                                    ->where('mcu',  '=', $registro->mcu)
-                                    ->where('codigo',  '=', $registro->codigo)
-                                    ->where('numeroGrupoVerificacao',  '=', $registro->numeroGrupoVerificacao)
-                                    ->where('numeroDoTeste',  '=', $registro->numeroDoTeste)
+                                    ->where('sto', '=', $registro->sto)
+                                    ->where('mcu', '=', $registro->mcu)
+                                    ->where('codigo', '=', $registro->codigo)
+                                    ->where('numeroGrupoVerificacao', '=', $registro->numeroGrupoVerificacao)
+                                    ->where('numeroDoTeste', '=', $registro->numeroDoTeste)
                                     ->select(
                                         'pgto_adicionais_temp.*'
                                     )
                                     ->get();
-                                $total=$pgtoAdicionais->sum('valor');
+                                $total = $pgtoAdicionais->sum('valor');
                                 $count = $pgtoAdicionais->count('matricula');
 
-                                $avaliacao = 'Não Conforme';
-                                $oportunidadeAprimoramento = 'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, do período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .' até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4) .', constatou-se a existência de empregados que recebiam tais dicionais/funções sem desempenhar as atividades que lhes davam o direito ao recebimento.';
+                                if ($count >= 1) {
+                                    $avaliacao = 'Não Conforme';
+                                    $oportunidadeAprimoramento = 'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, do período de ' . substr($dtini, 4, 2) . '/' . substr($dtini, 0, 4) . ' até ' . substr($dtfim, 4, 2) . '/' . substr($dtfim, 0, 4) . ', constatou-se a existência de empregados que recebiam tais dicionais/funções sem desempenhar as atividades que lhes davam o direito ao recebimento.';
 
-                                $evidencia = $evidencia. "\n" .'- Houve '.$count.' ocorrência(s) de pagamentos conforme a Seguir:';
-                                $evidencia = $evidencia
-                                    . "\n" . 'Matricula'
-                                    . "\t" . 'Cargo'
-                                    . "\t" . 'Adicional'
-                                    . "\t" . 'Período de Rec. Adicional'
-                                    . "\t" . 'Valor ATT Recebido (R$)'
-                                    . "\t" . 'Situação Encontrada';
-                                foreach($pgtoAdicionais as $dados){
+                                    $evidencia = $evidencia . "\n" . '- Houve ' . $count . ' ocorrência(s) de pagamentos conforme a Seguir:';
                                     $evidencia = $evidencia
-                                        . "\n" . $dados->matricula
-                                        . "\n" . $dados->cargo
-                                        . "\n" . $dados->rubrica
-                                        . "\n" . $dados->ref
-                                        . "\n" . $dados->valor
-                                        . "\n" . $dados->situacao;
-                                }
-                                $consequencias = $registro->consequencias;
-                                $orientacao = $registro->orientacao;
+                                        . "\n" . 'Matricula'
+                                        . "\t" . 'Cargo'
+                                        . "\t" . 'Adicional'
+                                        . "\t" . 'Período de Rec. Adicional'
+                                        . "\t" . 'Valor ATT Recebido (R$)'
+                                        . "\t" . 'Situação Encontrada';
+                                    foreach ($pgtoAdicionais as $dados) {
+                                        $evidencia = $evidencia
+                                            . "\n" . $dados->matricula
+                                            . "\n" . $dados->cargo
+                                            . "\n" . $dados->rubrica
+                                            . "\n" . $dados->ref
+                                            . "\n" . $dados->valor
+                                            . "\n" . $dados->situacao;
+                                    }
+                                    $consequencias = $registro->consequencias;
+                                    $orientacao = $registro->orientacao;
 
-                                $quebra = DB::table('relevancias')
-                                    ->select('valor_final')
-                                    ->where('fator_multiplicador', '=', 1)
-                                    ->first();
-                                $quebracaixa = $quebra->valor_final * 0.1;
-
-                                if( $valorFalta > $quebracaixa){
-                                    $fm = DB::table('relevancias')
-                                        ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
-                                        ->where('valor_inicio', '<=', $total)
-                                        ->orderBy('valor_final', 'desc')
+                                    $quebra = DB::table('relevancias')
+                                        ->select('valor_final')
+                                        ->where('fator_multiplicador', '=', 1)
                                         ->first();
-                                    $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                                    $quebracaixa = $quebra->valor_final * 0.1;
+
+                                    if ($valorFalta > $quebracaixa) {
+                                        $fm = DB::table('relevancias')
+                                            ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+                                            ->where('valor_inicio', '<=', $total)
+                                            ->orderBy('valor_final', 'desc')
+                                            ->first();
+                                        $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                                    } else {
+                                        if ($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                                    }
+
                                 }
                                 else{
-                                    if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                                    $avaliacao = 'Conforme';
+                                    $oportunidadeAprimoramento =  'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .'até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4).' Não foi identificado empregado(s) com recebimento(s) pela(s) Rubricas AADC-Adic.Ativ. Distrib/Coleta Ext. Bem como, Adic. de Atend. em Guichê na unidade.';
+                                    $consequencias = null;
+                                    $orientacao =  null;
                                 }
 
                             }
+
                             else {
                                 $avaliacao = 'Conforme';
                                 $oportunidadeAprimoramento =  'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .'até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4).' Não foi identificado empregado(s) com recebimento(s) pela(s) Rubricas AADC-Adic.Ativ. Distrib/Coleta Ext. Bem como, Adic. de Atend. em Guichê na unidade.';
@@ -444,10 +467,7 @@ class AvaliaInspecao implements ShouldQueue
                             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
                             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
 
-//                                echo  "<br/>" .'avaliação '.$avaliacao, $itensdeinspecao;
-
                             $itensdeinspecao->update();
-
                         }
 //final direito ao recebimento do provento
 
@@ -1879,13 +1899,14 @@ class AvaliaInspecao implements ShouldQueue
 //    Fim abertura da Unidade
 
 
-// Inicio Controle de viagem Embarque Desembarque
+// Inicio Controle de viagem
                         if((($registro->numeroGrupoVerificacao==200) && ($registro->numeroDoTeste==1))
                             || (($registro->numeroGrupoVerificacao==330) && ($registro->numeroDoTeste==1))
                             || (($registro->numeroGrupoVerificacao==287) && ($registro->numeroDoTeste==2))
                             || (($registro->numeroGrupoVerificacao==222) && ($registro->numeroDoTeste==4))
                             || (($registro->numeroGrupoVerificacao==239) && ($registro->numeroDoTeste==1))
                             || (($registro->numeroGrupoVerificacao==276) && ($registro->numeroDoTeste==1))) {
+
 
                             $codVerificacaoAnterior = null;
                             $numeroGrupoReincidente = null;
@@ -1905,10 +1926,25 @@ class AvaliaInspecao implements ShouldQueue
                             $dtfim = $dtnow;
                             $dtini = $dtmenos3meses;
                             $reg=0;
+                            $evidencia = null;
+                            $orientacao = null;
+                            $consequencias = null;
 
+                            $preVerificar = DB::table('testesdeverificacao')
+                                ->select('testesdeverificacao.*' )
+                                ->where([['teste',  'like', '%embarque e desembarque%']])
+                                ->get();
+
+                            foreach($preVerificar as $pre){
+                                DB::table('testesdeverificacao')
+                                    ->where([['id',  '=', $pre->id]])
+                                    ->update([
+                                        'preVerificar' => 'Não'
+                                    ]);
+                            }
                             $reincidencia = DB::table('snci')
                                 ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                ->where([['descricao_item', 'like', '%Os procedimentos de embarque e desembarque da carga%']])
+                                ->where([['descricao_item', 'like', '%embarque e desembarque%']])
                                 ->where([['sto', '=', $registro->sto]])
                                 ->orderBy('no_inspecao', 'desc')
                                 ->first();
@@ -1924,7 +1960,6 @@ class AvaliaInspecao implements ShouldQueue
                                     $numeroItemReincidente = $reincidencia->no_item;
                                     $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
                                     $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
-
 //                                        $reincidencia_dt_fim_inspecao->subMonth(3);
 //                                        $reincidencia_dt_inic_inspecao->subMonth(3);
                                     //se houver registros de inspeções anteriores  consulta  com data superior ao termino da inspeção reincidente
@@ -1941,6 +1976,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->where('ponto_parada', '=', $registro->an8)
                                         ->where('inicio_viagem', '=', $dtmenos3meses)
                                         ->get();
+                                    $dtini = $dtmenos3meses;
                                 }
                             }
                             catch (\Exception $e) {
@@ -1949,11 +1985,11 @@ class AvaliaInspecao implements ShouldQueue
                                     ->where('ponto_parada', '=', $registro->an8)
                                     ->where('inicio_viagem', '>=', $dtmenos3meses)
                                     ->get();
+                                $dtini = $dtmenos3meses;
                             }
 
                             if(! $controle_de_viagens->isEmpty()) {
                                 $count = $controle_de_viagens->count('ponto_parada');
-                                dd('linha2749  -> ',$count);
                                 foreach($controle_de_viagens as $dados){
                                     if( ( $controle_de_viagen->tipo_de_operacao == '' )
                                         || ($controle_de_viagen->quantidade == '')
@@ -1972,11 +2008,15 @@ class AvaliaInspecao implements ShouldQueue
                                 } elseif ($dias == 6) {
                                     $dias = 5;
                                 }
+
                                 $viagens = $dias * 2;
                                 $viagemNaorealizada = $viagens - $count;
-                                if($reg >=1) {
+
+                                if($reg >=1){
+
                                     $avaliacao = 'Não Conforme';
                                     $oportunidadeAprimoramento = ' Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se o descumprimento dos procedimentos de embarque e desembarque da carga, conforme relatado a seguir: ' . $viagens . ' - viagens prevista(s).';
+
                                     $evidencia = $evidencia
                                         . "\n"
                                         . 'Data Viagem' . "\t"
@@ -1999,26 +2039,28 @@ class AvaliaInspecao implements ShouldQueue
                                             . ($controle_de_viagen->descricao_do_servico == '' ? '   ----------  ' : $controle_de_viagen->descricao_do_servico) . "\t"
                                             . ($controle_de_viagen->local_de_destino == '' ? '   ----------  ' : $controle_de_viagen->local_de_destino);
                                     }
+
                                     $evidencia = $evidencia. "\n" . ' Foram verificada(s) todas programações de viagens no período do dia '
                                         . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y')
                                         . "\n" . ' a) verificou-se que houve ' . $count . ' viagen(s) realizadas e com possíveis operações de Embarque/Desembarque a serem realizadas.'
                                         . "\n" . ' b) Verificou a necessidade de aprimoramento na qualidade do apontamento colunas com falhas ou informações genéricas/incompletas.';
+
                                     if (intval($viagemNaorealizada / $viagens) >= 10) {
                                         // como trabalhamos com previsões se houver 10 % de viagens não realizadas adiciona a letra C.
                                         $evidencia = $evidencia  . "\n" . 'c) Adicionalmente no período havia '
                                             . $viagens. ' viagen(s) prevista(s) sendo que não houve apontamento de EMBARQUE/DESEMBARQUE para '
                                             . $viagemNaorealizada . ' viagens.';
                                     }
-
+//
                                 }
                                 else{
                                     $avaliacao = 'Conforme';
                                     $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se que não havia operações de Embarque/Desembarque em falta ou incompletas.' .' Foram verificada(s) todas programações de viagens no período do dia ' .\Carbon\Carbon::parse($dtini)->format('d/m/Y').' até '.\Carbon\Carbon::parse($dtfim)->format('d/m/Y').'.';
+
                                 }
 
                             }
                             else  {
-//                                    dd( '  linha 2827  nao tem apontamento' ,$controle_de_viagens);
                                 $avaliacao = 'Não Conforme';
                                 $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se o descumprimento dos procedimentos de embarque e desembarque da carga, conforme relatado a seguir:';
                                 $evidencia = $evidencia . "\n" . '- Verificou-se que a unidade não está executando os lançamentos obrigatórios das informações de embarque e desembarque da carga no Sistema ERP. Não há histórico de registro de embarque/desembarque para troca de expedições. - Foram verificadas as programações de viagens no período de ' . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y') .', sendo que em 100% das viagens não foi encontrado registros de apontamentos de Embarque/Desembarque.';
@@ -2068,15 +2110,11 @@ class AvaliaInspecao implements ShouldQueue
                             $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
                             $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
                             $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-//                              echo $avaliacao , $dto->id.' - '.$avaliacao.' ,';
-//                              if ($avaliacao == 'Não Conforme') dd('line 2495 -> Não Conforme ', $itensdeinspecao);
-//                              if ($avaliacao == 'Conforme') dd('line 2496 -> Conforme ', $itensdeinspecao);
-//                              dd($registro->sto , $reincidencia);
-
                             $itensdeinspecao->update();
+
                         }
-// Final Controle de viagem  Embarque Desembarque
+// Final Controle de viagem
+
 
 // Início teste PLPs Pendentes
                         if((($registro->numeroGrupoVerificacao==212) && ($registro->numeroDoTeste==2))
@@ -2523,7 +2561,6 @@ class AvaliaInspecao implements ShouldQueue
 
 
 //  Inicio  do teste Alarme Arme/desarme
-
                         if((($registro->numeroGrupoVerificacao == 206 )&&($registro->numeroDoTeste == 1 ))
                             || (( $registro->numeroGrupoVerificacao == 335 ) && ( $registro->numeroDoTeste == 1 ))
                             || (($registro->numeroGrupoVerificacao == 232)&&($registro->numeroDoTeste == 3 ))
@@ -2562,6 +2599,20 @@ class AvaliaInspecao implements ShouldQueue
                             $dtmin = $dtnow;
                             $count = 0;
                             $naoMonitorado = null;
+                            $evidencia = null;
+
+                            $preVerificar = DB::table('testesdeverificacao')
+                                ->select('testesdeverificacao.*' )
+                                ->where([['teste',  'like', '%alarme funciona corretamente%']])
+                                ->get();
+
+                            foreach($preVerificar as $pre){
+                                DB::table('testesdeverificacao')
+                                    ->where([['id',  '=', $pre->id]])
+                                    ->update([
+                                        'preVerificar' => 'Não'
+                                    ]);
+                            }
 
                             //verifica histórico de inspeções
                             $reincidencia = DB::table('snci')
@@ -2962,21 +3013,19 @@ class AvaliaInspecao implements ShouldQueue
                                 $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .' - Ocorrências de desativação do alarme em períodos de finais de semana conforme a seguir:';
                                 $evidencia = $evidencia . "\n" . 'Evento Abertura' . "\t" . 'Data Abertura' . "\t" . 'Hora Abertura' . "\t" . 'Evento Fechamento' . "\t" . 'Hora Fechamento' . "\t" . 'Dia Semana' . "\t" . 'Tempo Permanência';
                                 foreach ($acessos_final_semana as $tabela){
-                                    $evidencia = $evidencia  . "\n" . '$tabela->evAbertura'
-                                        . "\t" . '$tabela->evDataAbertura' . "\t"
-                                        . '$tabela->evHoraAbertura'
-                                        . "\t"
-                                        . '$tabela->evFechamento'
-                                        . "\t"
-                                        . '$tabela->evHoraFechamento'
-                                        . "\t" . '$tabela->diaSemana'
-                                        . "\t" . '$tabela->tempoPermanencia';
+                                    $evidencia = $evidencia  . "\n" . $tabela->evAbertura
+                                        . "\t" . $tabela->evDataAbertura
+                                        . "\t" . $tabela->evHoraAbertura
+                                        . "\t" . $tabela->evFechamento
+                                        . "\t" . $tabela->evHoraFechamento
+                                        . "\t" . $tabela->diaSemana
+                                        . "\t" . $tabela->tempoPermanencia;
                                 }
                             }
 
                             if(isset($tempoAbertura)&&(!empty($tempoAbertura))){
 
-                                $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
+                                $evidencia = $evidencia."\n\n" .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
                                 $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Horário Atendimento' . "\t" . 'Horário da Abertura' . "\t" . 'Tempo Abertura';
                                 foreach ($tempoAbertura  as $tempo => $mdaData){
                                     $evidencia = $evidencia . "\n"
@@ -2989,7 +3038,7 @@ class AvaliaInspecao implements ShouldQueue
 
                             if(isset($tempoAberturaAntecipada)&&(!empty($tempoAberturaAntecipada))){
 
-                                $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
+                                $evidencia = $evidencia."\n\n" .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
                                 $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Data Abertura' . "\t" . 'Horário de Atendimento' . "\t" . 'Hora da Abertura' . "\t" . 'Tempo Abertura';
                                 foreach ($tempoAberturaAntecipada  as $tempo => $mdaData){
 
@@ -3002,7 +3051,7 @@ class AvaliaInspecao implements ShouldQueue
                             }
 
                             if(isset($tempoAberturaPosExpediente)&&(!empty($tempoAberturaPosExpediente))){
-                                $evidencia = $evidencia."\n".'Unidade em Risco. Abertura da unidade em horário fora do padrão em relação ao horário de fechamento da unidade conforme a seguir:';
+                                $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em horário fora do padrão em relação ao horário de fechamento da unidade conforme a seguir:';
                                 $evidencia = $evidencia
                                     . "\n" . 'Data'
                                     . "\t" . 'Horário Fechamento'
@@ -3019,7 +3068,7 @@ class AvaliaInspecao implements ShouldQueue
                             }
 
                             if(isset($acessosEmFeriados)&&(!empty($acessosEmFeriados))){
-                                $evidencia = $evidencia."\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
+                                $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
                                 $evidencia = $evidencia
                                     . "\n" . 'Data'
                                     . "\t" . 'Hora';
@@ -3078,9 +3127,33 @@ class AvaliaInspecao implements ShouldQueue
                             $itensdeinspecao->update();
 
 
-                        }
+//                                dd( $naoMonitorado , $aviso , $alarmesFinalSemana, $feriadoporUnidades,  $eventosf , $eventos);
 
+
+
+                            return view('compliance.inspecao.editar',compact
+                            (
+                                'registro'
+                                , 'id'
+                                , 'total'
+                                , 'acessos_final_semana'
+                                , 'rowAberturaFinalSemana'
+                                , 'count_alarmesFinalSemana'
+                                , 'acessosEmFeriados'
+                                , 'tempoAbertura'
+                                , 'tempoAberturaAntecipada'
+                                , 'tempoAberturaPosExpediente'
+                                , 'aviso'
+                                , 'dtmax'
+                                , 'now'
+                                ,'dtmenos12meses'
+                                ,'naoMonitorado'
+                            ));
+
+
+                        }
 //  Final  do teste Alarme Arme/desarme
+
 
 //                      Inicio  do teste Extravio Responsabilidade Definida
                         if ((($registro->numeroGrupoVerificacao == 205) && ($registro->numeroDoTeste == 2))
@@ -3505,7 +3578,9 @@ class AvaliaInspecao implements ShouldQueue
 //                       Inicio  do teste SMB_BDF
                             if ((($registro->numeroGrupoVerificacao == 230) && ($registro->numeroDoTeste == 6))
                                 || (($registro->numeroGrupoVerificacao == 270) && ($registro->numeroDoTeste == 3))) {
-
+                                $valorSobra = null;
+                                $valorFalta = null;
+                                $valorRisco = null;
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
                                     ->where([['descricao_item', 'like', '%valor depositado na conta bancária%']])
@@ -4426,6 +4501,20 @@ class AvaliaInspecao implements ShouldQueue
                                 $reinc = 'Não';
                                 $count = 0;
 
+
+                                $preVerificar = DB::table('testesdeverificacao')
+                                    ->select('testesdeverificacao.*' )
+                                    ->where([['teste',  'like', '%Adicionais de Atividade%']])
+                                    ->get();
+
+                                foreach($preVerificar as $pre){
+                                    DB::table('testesdeverificacao')
+                                        ->where([['id',  '=', $pre->id]])
+                                        ->update([
+                                            'preVerificar' => 'Não'
+                                        ]);
+                                }
+
                                 $ref = substr($dtmenos4meses,0,4). substr($dtmenos4meses,5,2);
                                 $count_atend = 0;
                                 $count_dist = 0;
@@ -4467,7 +4556,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '%realização de horas-extras%']])
+                                    ->where([['descricao_item', 'like', '%Adicionais de Atividade%']])
                                     ->where([['sto', '=', $registro->sto]])
                                     ->orderBy('no_inspecao', 'desc')
                                     ->first();
@@ -4653,60 +4742,69 @@ class AvaliaInspecao implements ShouldQueue
                                 if (( $count_atend >= 1 ) || ( $count_dist >= 1 )) {
 
                                     $pgtoAdicionais = DB::table('pgto_adicionais_temp')
-                                        ->where('sto',  '=', $registro->sto)
-                                        ->where('mcu',  '=', $registro->mcu)
-                                        ->where('codigo',  '=', $registro->codigo)
-                                        ->where('numeroGrupoVerificacao',  '=', $registro->numeroGrupoVerificacao)
-                                        ->where('numeroDoTeste',  '=', $registro->numeroDoTeste)
+                                        ->where('sto', '=', $registro->sto)
+                                        ->where('mcu', '=', $registro->mcu)
+                                        ->where('codigo', '=', $registro->codigo)
+                                        ->where('numeroGrupoVerificacao', '=', $registro->numeroGrupoVerificacao)
+                                        ->where('numeroDoTeste', '=', $registro->numeroDoTeste)
                                         ->select(
                                             'pgto_adicionais_temp.*'
                                         )
                                         ->get();
-                                    $total=$pgtoAdicionais->sum('valor');
+                                    $total = $pgtoAdicionais->sum('valor');
                                     $count = $pgtoAdicionais->count('matricula');
 
-                                    $avaliacao = 'Não Conforme';
-                                    $oportunidadeAprimoramento = 'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, do período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .' até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4) .', constatou-se a existência de empregados que recebiam tais dicionais/funções sem desempenhar as atividades que lhes davam o direito ao recebimento.';
+                                    if ($count >= 1) {
+                                        $avaliacao = 'Não Conforme';
+                                        $oportunidadeAprimoramento = 'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, do período de ' . substr($dtini, 4, 2) . '/' . substr($dtini, 0, 4) . ' até ' . substr($dtfim, 4, 2) . '/' . substr($dtfim, 0, 4) . ', constatou-se a existência de empregados que recebiam tais dicionais/funções sem desempenhar as atividades que lhes davam o direito ao recebimento.';
 
-                                    $evidencia = $evidencia. "\n" .'- Houve '.$count.' ocorrência(s) de pagamentos conforme a Seguir:';
-                                    $evidencia = $evidencia
-                                        . "\n" . 'Matricula'
-                                        . "\t" . 'Cargo'
-                                        . "\t" . 'Adicional'
-                                        . "\t" . 'Período de Rec. Adicional'
-                                        . "\t" . 'Valor ATT Recebido (R$)'
-                                        . "\t" . 'Situação Encontrada';
-                                    foreach($pgtoAdicionais as $dados){
+                                        $evidencia = $evidencia . "\n" . '- Houve ' . $count . ' ocorrência(s) de pagamentos conforme a Seguir:';
                                         $evidencia = $evidencia
-                                            . "\n" . $dados->matricula
-                                            . "\n" . $dados->cargo
-                                            . "\n" . $dados->rubrica
-                                            . "\n" . $dados->ref
-                                            . "\n" . $dados->valor
-                                            . "\n" . $dados->situacao;
-                                    }
-                                    $consequencias = $registro->consequencias;
-                                    $orientacao = $registro->orientacao;
+                                            . "\n" . 'Matricula'
+                                            . "\t" . 'Cargo'
+                                            . "\t" . 'Adicional'
+                                            . "\t" . 'Período de Rec. Adicional'
+                                            . "\t" . 'Valor ATT Recebido (R$)'
+                                            . "\t" . 'Situação Encontrada';
+                                        foreach ($pgtoAdicionais as $dados) {
+                                            $evidencia = $evidencia
+                                                . "\n" . $dados->matricula
+                                                . "\n" . $dados->cargo
+                                                . "\n" . $dados->rubrica
+                                                . "\n" . $dados->ref
+                                                . "\n" . $dados->valor
+                                                . "\n" . $dados->situacao;
+                                        }
+                                        $consequencias = $registro->consequencias;
+                                        $orientacao = $registro->orientacao;
 
-                                    $quebra = DB::table('relevancias')
-                                        ->select('valor_final')
-                                        ->where('fator_multiplicador', '=', 1)
-                                        ->first();
-                                    $quebracaixa = $quebra->valor_final * 0.1;
-
-                                    if( $valorFalta > $quebracaixa){
-                                        $fm = DB::table('relevancias')
-                                            ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
-                                            ->where('valor_inicio', '<=', $total)
-                                            ->orderBy('valor_final', 'desc')
+                                        $quebra = DB::table('relevancias')
+                                            ->select('valor_final')
+                                            ->where('fator_multiplicador', '=', 1)
                                             ->first();
-                                        $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                                        $quebracaixa = $quebra->valor_final * 0.1;
+
+                                        if ($valorFalta > $quebracaixa) {
+                                            $fm = DB::table('relevancias')
+                                                ->select('fator_multiplicador', 'valor_final', 'valor_inicio')
+                                                ->where('valor_inicio', '<=', $total)
+                                                ->orderBy('valor_final', 'desc')
+                                                ->first();
+                                            $pontuado = $registro->totalPontos * $fm->fator_multiplicador;
+                                        } else {
+                                            if ($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                                        }
+
                                     }
                                     else{
-                                        if($avaliacao == 'Não Conforme') $pontuado = $registro->totalPontos * 1;
+                                        $avaliacao = 'Conforme';
+                                        $oportunidadeAprimoramento =  'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .'até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4).' Não foi identificado empregado(s) com recebimento(s) pela(s) Rubricas AADC-Adic.Ativ. Distrib/Coleta Ext. Bem como, Adic. de Atend. em Guichê na unidade.';
+                                        $consequencias = null;
+                                        $orientacao =  null;
                                     }
 
                                 }
+
                                 else {
                                     $avaliacao = 'Conforme';
                                     $oportunidadeAprimoramento =  'Em análise dos registros dos empregados contemplados com Adicionais de Distribuição e Coleta e de Atendimento em Guichê, período de '.substr($dtini,4,2).'/'.substr($dtini,0,4) .'até '.substr($dtfim,4,2).'/'.substr($dtfim,0,4).' Não foi identificado empregado(s) com recebimento(s) pela(s) Rubricas AADC-Adic.Ativ. Distrib/Coleta Ext. Bem como, Adic. de Atend. em Guichê na unidade.';
@@ -4740,10 +4838,7 @@ class AvaliaInspecao implements ShouldQueue
                                 $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
                                 $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
 
-//                                echo  "<br/>" .'avaliação '.$avaliacao, $itensdeinspecao;
-
                                 $itensdeinspecao->update();
-
                             }
 //final direito ao recebimento do provento
 
@@ -6176,13 +6271,14 @@ class AvaliaInspecao implements ShouldQueue
                             }
 //       Fim abertura da Unidade
 
-// Inicio Controle de viagem Embarque Desembarque
+// Inicio Controle de viagem
                             if((($registro->numeroGrupoVerificacao==200) && ($registro->numeroDoTeste==1))
                                 || (($registro->numeroGrupoVerificacao==330) && ($registro->numeroDoTeste==1))
                                 || (($registro->numeroGrupoVerificacao==287) && ($registro->numeroDoTeste==2))
                                 || (($registro->numeroGrupoVerificacao==222) && ($registro->numeroDoTeste==4))
                                 || (($registro->numeroGrupoVerificacao==239) && ($registro->numeroDoTeste==1))
                                 || (($registro->numeroGrupoVerificacao==276) && ($registro->numeroDoTeste==1))) {
+
 
                                 $codVerificacaoAnterior = null;
                                 $numeroGrupoReincidente = null;
@@ -6202,10 +6298,25 @@ class AvaliaInspecao implements ShouldQueue
                                 $dtfim = $dtnow;
                                 $dtini = $dtmenos3meses;
                                 $reg=0;
+                                $evidencia = null;
+                                $orientacao = null;
+                                $consequencias = null;
 
+                                $preVerificar = DB::table('testesdeverificacao')
+                                    ->select('testesdeverificacao.*' )
+                                    ->where([['teste',  'like', '%embarque e desembarque%']])
+                                    ->get();
+
+                                foreach($preVerificar as $pre){
+                                    DB::table('testesdeverificacao')
+                                        ->where([['id',  '=', $pre->id]])
+                                        ->update([
+                                            'preVerificar' => 'Não'
+                                        ]);
+                                }
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
-                                    ->where([['descricao_item', 'like', '%Os procedimentos de embarque e desembarque da carga%']])
+                                    ->where([['descricao_item', 'like', '%embarque e desembarque%']])
                                     ->where([['sto', '=', $registro->sto]])
                                     ->orderBy('no_inspecao', 'desc')
                                     ->first();
@@ -6221,7 +6332,6 @@ class AvaliaInspecao implements ShouldQueue
                                         $numeroItemReincidente = $reincidencia->no_item;
                                         $reincidencia_dt_fim_inspecao = new Carbon($reincidencia->dt_fim_inspecao);
                                         $reincidencia_dt_inic_inspecao = new Carbon($reincidencia->dt_inic_inspecao);
-
 //                                        $reincidencia_dt_fim_inspecao->subMonth(3);
 //                                        $reincidencia_dt_inic_inspecao->subMonth(3);
                                         //se houver registros de inspeções anteriores  consulta  com data superior ao termino da inspeção reincidente
@@ -6238,6 +6348,7 @@ class AvaliaInspecao implements ShouldQueue
                                             ->where('ponto_parada', '=', $registro->an8)
                                             ->where('inicio_viagem', '=', $dtmenos3meses)
                                             ->get();
+                                        $dtini = $dtmenos3meses;
                                     }
                                 }
                                 catch (\Exception $e) {
@@ -6246,11 +6357,11 @@ class AvaliaInspecao implements ShouldQueue
                                         ->where('ponto_parada', '=', $registro->an8)
                                         ->where('inicio_viagem', '>=', $dtmenos3meses)
                                         ->get();
+                                    $dtini = $dtmenos3meses;
                                 }
 
                                 if(! $controle_de_viagens->isEmpty()) {
                                     $count = $controle_de_viagens->count('ponto_parada');
-                                    dd('linha2749  -> ',$count);
                                     foreach($controle_de_viagens as $dados){
                                         if( ( $controle_de_viagen->tipo_de_operacao == '' )
                                             || ($controle_de_viagen->quantidade == '')
@@ -6269,11 +6380,15 @@ class AvaliaInspecao implements ShouldQueue
                                     } elseif ($dias == 6) {
                                         $dias = 5;
                                     }
+
                                     $viagens = $dias * 2;
                                     $viagemNaorealizada = $viagens - $count;
-                                    if($reg >=1) {
+
+                                    if($reg >=1){
+
                                         $avaliacao = 'Não Conforme';
                                         $oportunidadeAprimoramento = ' Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se o descumprimento dos procedimentos de embarque e desembarque da carga, conforme relatado a seguir: ' . $viagens . ' - viagens prevista(s).';
+
                                         $evidencia = $evidencia
                                             . "\n"
                                             . 'Data Viagem' . "\t"
@@ -6296,26 +6411,28 @@ class AvaliaInspecao implements ShouldQueue
                                                 . ($controle_de_viagen->descricao_do_servico == '' ? '   ----------  ' : $controle_de_viagen->descricao_do_servico) . "\t"
                                                 . ($controle_de_viagen->local_de_destino == '' ? '   ----------  ' : $controle_de_viagen->local_de_destino);
                                         }
+
                                         $evidencia = $evidencia. "\n" . ' Foram verificada(s) todas programações de viagens no período do dia '
                                             . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y')
                                             . "\n" . ' a) verificou-se que houve ' . $count . ' viagen(s) realizadas e com possíveis operações de Embarque/Desembarque a serem realizadas.'
                                             . "\n" . ' b) Verificou a necessidade de aprimoramento na qualidade do apontamento colunas com falhas ou informações genéricas/incompletas.';
+
                                         if (intval($viagemNaorealizada / $viagens) >= 10) {
                                             // como trabalhamos com previsões se houver 10 % de viagens não realizadas adiciona a letra C.
                                             $evidencia = $evidencia  . "\n" . 'c) Adicionalmente no período havia '
                                                 . $viagens. ' viagen(s) prevista(s) sendo que não houve apontamento de EMBARQUE/DESEMBARQUE para '
                                                 . $viagemNaorealizada . ' viagens.';
                                         }
-
+//
                                     }
                                     else{
                                         $avaliacao = 'Conforme';
                                         $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se que não havia operações de Embarque/Desembarque em falta ou incompletas.' .' Foram verificada(s) todas programações de viagens no período do dia ' .\Carbon\Carbon::parse($dtini)->format('d/m/Y').' até '.\Carbon\Carbon::parse($dtfim)->format('d/m/Y').'.';
+
                                     }
 
                                 }
                                 else  {
-//                                    dd( '  linha 2827  nao tem apontamento' ,$controle_de_viagens);
                                     $avaliacao = 'Não Conforme';
                                     $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se o descumprimento dos procedimentos de embarque e desembarque da carga, conforme relatado a seguir:';
                                     $evidencia = $evidencia . "\n" . '- Verificou-se que a unidade não está executando os lançamentos obrigatórios das informações de embarque e desembarque da carga no Sistema ERP. Não há histórico de registro de embarque/desembarque para troca de expedições. - Foram verificadas as programações de viagens no período de ' . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y') .', sendo que em 100% das viagens não foi encontrado registros de apontamentos de Embarque/Desembarque.';
@@ -6365,15 +6482,10 @@ class AvaliaInspecao implements ShouldQueue
                                 $itensdeinspecao->codVerificacaoAnterior = $codVerificacaoAnterior;
                                 $itensdeinspecao->numeroGrupoReincidente = $numeroGrupoReincidente;
                                 $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
-
-//                              echo $avaliacao , $dto->id.' - '.$avaliacao.' ,';
-//                              if ($avaliacao == 'Não Conforme') dd('line 2495 -> Não Conforme ', $itensdeinspecao);
-//                              if ($avaliacao == 'Conforme') dd('line 2496 -> Conforme ', $itensdeinspecao);
-//                              dd($registro->sto , $reincidencia);
-
                                 $itensdeinspecao->update();
+
                             }
-// Final Controle de viagem  Embarque Desembarque
+// Final Controle de viagem
 
 // Início teste PLPs Pendentes
                             if((($registro->numeroGrupoVerificacao==212) && ($registro->numeroDoTeste==2))
@@ -6841,7 +6953,6 @@ class AvaliaInspecao implements ShouldQueue
 //             Final teste Compartilhamento de Senhas
 
 
-
 //  Inicio  do teste Alarme Arme/desarme
                             if((($registro->numeroGrupoVerificacao == 206 )&&($registro->numeroDoTeste == 1 ))
                                 || (( $registro->numeroGrupoVerificacao == 335 ) && ( $registro->numeroDoTeste == 1 ))
@@ -6881,6 +6992,20 @@ class AvaliaInspecao implements ShouldQueue
                                 $dtmin = $dtnow;
                                 $count = 0;
                                 $naoMonitorado = null;
+                                $evidencia = null;
+
+                                $preVerificar = DB::table('testesdeverificacao')
+                                    ->select('testesdeverificacao.*' )
+                                    ->where([['teste',  'like', '%alarme funciona corretamente%']])
+                                    ->get();
+
+                                foreach($preVerificar as $pre){
+                                    DB::table('testesdeverificacao')
+                                        ->where([['id',  '=', $pre->id]])
+                                        ->update([
+                                            'preVerificar' => 'Não'
+                                        ]);
+                                }
 
                                 //verifica histórico de inspeções
                                 $reincidencia = DB::table('snci')
@@ -6976,7 +7101,6 @@ class AvaliaInspecao implements ShouldQueue
                                             ->orderBy('data' ,'asc')
                                             ->orderBy('hora' ,'asc')
                                             ->get();
-
 //                                  ############   Início Acessos fora do Padrão   #################
                                         $eventos = DB::table('alarmes')
                                             ->select('alarmes.*')
@@ -7130,51 +7254,19 @@ class AvaliaInspecao implements ShouldQueue
 //                          ############   Início Acessos fora do Padrão   #################
                                     if(! $eventos->isEmpty()) {
                                         $dtmax = $eventos->max('data');
-
                                         if((isset($registro->inicio_expediente)) && (!empty($registro->inicio_expediente))
-                                            ||(isset($registro->final_expediente)) && (!empty($registro->final_expediente))) {
+                                            ||(isset($registro->final_expediente)) && (!empty($registro->final_expediente)) ) {
 
-                                           $linhaTransporteInicioexp =  DB::table('apontamento_c_v_s')
-                                                ->where('ponto_parada', '=', $registro->an8)
-                                                ->orderBy('horario_chegada_previsto', asc)
-                                                ->first();
-
-                                           $linhaTransporteFimexp =  DB::table('apontamento_c_v_s')
-                                                ->where('ponto_parada', '=', $registro->an8)
-                                                ->orderBy('horario_partida_previsto', desc)
-                                           ->first();
-
-                                           if(! $linhaTransporteInicioexp->isEmpty()){
-                                                if ($linhaTransporte->horario_chegada_previsto < $registro->inicio_expediente){
-                                                    $minutosinicioExpediente = (substr($linhaTransporte->horario_chegada_previsto,0,2)*60)+substr($linhaTransporte->horario_chegada_previsto,3,2);
-                                                }
-                                                else{
-                                                    $minutosinicioExpediente = (substr($registro->inicio_expediente,0,2)*60)+substr($registro->inicio_expediente,3,2);
-                                                }
-                                           }
-                                           else{
-                                                $minutosinicioExpediente = (substr($registro->inicio_expediente,0,2)*60)+substr($registro->inicio_expediente,3,2);
-                                           }
-                                           if(! $linhaTransporteInicioexp->isEmpty()){
-                                               if ($linhaTransporte->horario_partida_previsto > $registro->final_expediente){
-                                                   $minutosfinalExpediente = (substr($linhaTransporte->horario_partida_previsto,0,2)*60)+substr($linhaTransporte->horario_partida_previsto,3,2);
-                                               }
-                                               else{
-                                                   $minutosfinalExpediente = (substr($registro->final_expediente,0,2)*60)+substr($registro->final_expediente,3,2);
-                                               }
-                                           }
-                                           else{
-                                                $minutosfinalExpediente = (substr($registro->final_expediente,0,2)*60)+substr($registro->final_expediente,3,2);
-                                           }
-
-//        19/04/2021  Amilton         alarme feito ajuste falta testar
-
+                                            $minutosinicioExpediente = (substr($registro->inicio_expediente,0,2)*60)+substr($registro->inicio_expediente,3,2);
+                                            $minutosfinalExpediente = (substr($registro->final_expediente,0,2)*60)+substr($registro->final_expediente,3,2);
                                             foreach ($eventos  as $evento) {
+                                                $eventominutos = (substr($evento->hora,0,2)*60)+substr($evento->hora,3,2);
+                                                if ($evento->armedesarme =='Desarme' ) {
 
-                                               $eventominutos = (substr($evento->hora,0,2)*60)+substr($evento->hora,3,2);
-                                               if ($evento->armedesarme =='Desarme' ) {
                                                     if (($eventominutos < ($minutosinicioExpediente-90))) {
+
                                                         $diferencaAbertura =  $minutosinicioExpediente - $eventominutos;
+
                                                         if($diferencaAbertura <0) {
                                                             $diferencaAbertura = $diferencaAbertura *-1;
                                                         }
@@ -7235,13 +7327,15 @@ class AvaliaInspecao implements ShouldQueue
                                                                 'DiferencaTempoDeAbertura' => $diferencaAbertura],
                                                         ]);
                                                         $rowtempoAberturaPosExpediente++;
-                                                   }
-                                               }
-                                               $periodo = CarbonPeriod::create($dtmax ,  $now );
-                                               $dataultimoevento = date('d/m/Y', strtotime($evento->data));
-                                               if ($periodo->count()>=15) {
+                                                    }
+                                                }
+                                                $periodo = CarbonPeriod::create($dtmax ,  $now );
+
+                                                $dataultimoevento = date('d/m/Y', strtotime($evento->data));
+
+                                                if ($periodo->count()>=15) {
                                                     $aviso = 'a) Não foi possível avaliar eventos recente da utilização do alarme monitorado dado que a unidade não está sendo monitorada há '. $periodo->count().' dias. Incluindo a data da Inspeção. Adicionalmente verificaram que o último evento transmitido foi no dia ' .$dataultimoevento. '.';
-                                               }
+                                                }
                                             }
                                         }
                                         else {
@@ -7312,21 +7406,19 @@ class AvaliaInspecao implements ShouldQueue
                                     $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .' - Ocorrências de desativação do alarme em períodos de finais de semana conforme a seguir:';
                                     $evidencia = $evidencia . "\n" . 'Evento Abertura' . "\t" . 'Data Abertura' . "\t" . 'Hora Abertura' . "\t" . 'Evento Fechamento' . "\t" . 'Hora Fechamento' . "\t" . 'Dia Semana' . "\t" . 'Tempo Permanência';
                                     foreach ($acessos_final_semana as $tabela){
-                                        $evidencia = $evidencia  . "\n" . '$tabela->evAbertura'
-                                            . "\t" . '$tabela->evDataAbertura' . "\t"
-                                            . '$tabela->evHoraAbertura'
-                                            . "\t"
-                                            . '$tabela->evFechamento'
-                                            . "\t"
-                                            . '$tabela->evHoraFechamento'
-                                            . "\t" . '$tabela->diaSemana'
-                                            . "\t" . '$tabela->tempoPermanencia';
+                                        $evidencia = $evidencia  . "\n" . $tabela->evAbertura
+                                            . "\t" . $tabela->evDataAbertura
+                                            . "\t" . $tabela->evHoraAbertura
+                                            . "\t" . $tabela->evFechamento
+                                            . "\t" . $tabela->evHoraFechamento
+                                            . "\t" . $tabela->diaSemana
+                                            . "\t" . $tabela->tempoPermanencia;
                                     }
                                 }
 
                                 if(isset($tempoAbertura)&&(!empty($tempoAbertura))){
 
-                                    $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
+                                    $evidencia = $evidencia."\n\n" .'Tempo de abertura em Relação ao Horário de Atendimento conforme a seguir:';
                                     $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Horário Atendimento' . "\t" . 'Horário da Abertura' . "\t" . 'Tempo Abertura';
                                     foreach ($tempoAbertura  as $tempo => $mdaData){
                                         $evidencia = $evidencia . "\n"
@@ -7339,7 +7431,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                 if(isset($tempoAberturaAntecipada)&&(!empty($tempoAberturaAntecipada))){
 
-                                    $evidencia = $evidencia."\n" . $rowAberturaFinalSemana .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
+                                    $evidencia = $evidencia."\n\n" .' - Unidade em Risco. Abertura da Unidade em horário fora do padrão em relação ao horário de abertura da unidade conforme a seguir';
                                     $evidencia = $evidencia . "\n" . 'Data' . "\t" . 'Data Abertura' . "\t" . 'Horário de Atendimento' . "\t" . 'Hora da Abertura' . "\t" . 'Tempo Abertura';
                                     foreach ($tempoAberturaAntecipada  as $tempo => $mdaData){
 
@@ -7352,7 +7444,7 @@ class AvaliaInspecao implements ShouldQueue
                                 }
 
                                 if(isset($tempoAberturaPosExpediente)&&(!empty($tempoAberturaPosExpediente))){
-                                    $evidencia = $evidencia."\n".'Unidade em Risco. Abertura da unidade em horário fora do padrão em relação ao horário de fechamento da unidade conforme a seguir:';
+                                    $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em horário fora do padrão em relação ao horário de fechamento da unidade conforme a seguir:';
                                     $evidencia = $evidencia
                                         . "\n" . 'Data'
                                         . "\t" . 'Horário Fechamento'
@@ -7369,7 +7461,7 @@ class AvaliaInspecao implements ShouldQueue
                                 }
 
                                 if(isset($acessosEmFeriados)&&(!empty($acessosEmFeriados))){
-                                    $evidencia = $evidencia."\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
+                                    $evidencia = $evidencia."\n\n".'Unidade em Risco. Abertura da unidade em dia de feriado conforme a seguir:';
                                     $evidencia = $evidencia
                                         . "\n" . 'Data'
                                         . "\t" . 'Hora';
@@ -7432,29 +7524,29 @@ class AvaliaInspecao implements ShouldQueue
 
 
 
-//                                return view('compliance.inspecao.editar',compact
-//                                (
-//                                    'registro'
-//                                    , 'id'
-//                                    , 'total'
-//                                    , 'acessos_final_semana'
-//                                    , 'rowAberturaFinalSemana'
-//                                    , 'count_alarmesFinalSemana'
-//                                    , 'acessosEmFeriados'
-//                                    , 'tempoAbertura'
-//                                    , 'tempoAberturaAntecipada'
-//                                    , 'tempoAberturaPosExpediente'
-//                                    , 'aviso'
-//                                    , 'dtmax'
-//                                    , 'now'
-//                                    ,'dtmenos12meses'
-//                                    ,'naoMonitorado'
-//                                ));
+                                return view('compliance.inspecao.editar',compact
+                                (
+                                    'registro'
+                                    , 'id'
+                                    , 'total'
+                                    , 'acessos_final_semana'
+                                    , 'rowAberturaFinalSemana'
+                                    , 'count_alarmesFinalSemana'
+                                    , 'acessosEmFeriados'
+                                    , 'tempoAbertura'
+                                    , 'tempoAberturaAntecipada'
+                                    , 'tempoAberturaPosExpediente'
+                                    , 'aviso'
+                                    , 'dtmax'
+                                    , 'now'
+                                    ,'dtmenos12meses'
+                                    ,'naoMonitorado'
+                                ));
 
 
                             }
-
 //  Final  do teste Alarme Arme/desarme
+
 
 //                      Inicio  do teste Extravio Responsabilidade Definida
                             if ((($registro->numeroGrupoVerificacao == 205) && ($registro->numeroDoTeste == 2))
@@ -7884,7 +7976,9 @@ class AvaliaInspecao implements ShouldQueue
 //                       Inicio  do teste SMB_BDF
                             if ((($registro->numeroGrupoVerificacao == 230) && ($registro->numeroDoTeste == 6))
                                 || (($registro->numeroGrupoVerificacao == 270) && ($registro->numeroDoTeste == 3))) {
-
+                                $valorSobra = null;
+                                $valorFalta = null;
+                                $valorRisco = null;
                                 $reincidencia = DB::table('snci')
                                     ->select('no_inspecao', 'no_grupo', 'no_item', 'dt_fim_inspecao', 'dt_inic_inspecao')
                                     ->where([['descricao_item', 'like', '%valor depositado na conta bancária%']])
