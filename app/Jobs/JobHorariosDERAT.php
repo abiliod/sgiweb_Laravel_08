@@ -277,14 +277,28 @@ class JobHorariosDERAT implements ShouldQueue
                     $dh_fim_semana    = null;
                 }
 
+
+                if($registro['funciona_sabado']!=='Sim') {
+                    $trabalha_sabado='Não';
+                }
+                if($registro['funciona_domingo']!=='Sim') {
+                    $trabalha_domingo='Não';
+                }
+                if($registro['tem_plantao']!=='Sim') {
+                    $tem_plantao='Não';
+                }
+                if($registro['tem_plantao']!=='Sim') {
+                    $tem_distribuicao='tem_distribuicao';
+                }
+
                 $res = DB::table('unidades')
                     ->where('an8', '=',  (int)$registro['no_cad_geral'])
                     ->select(
                         'unidades.*'
                     )
                     ->first();
+//                        dd('aki', $res);
                 if(!empty(  $res->id )) {
-
                     $unidade = Unidade::find($res->id);
                     $unidade->inicio_atendimento = $horario_inicio_expediente;
                     $unidade->final_atendimento = $horario_fim_expediente;
@@ -292,10 +306,10 @@ class JobHorariosDERAT implements ShouldQueue
                     $unidade->final_expediente = $horario_fim_expediente;
                     $unidade->inicio_intervalo_refeicao = $horario_inicio_almoco;
                     $unidade->final_intervalo_refeicao = $horario_fim_almoco;
-                    $unidade->trabalha_sabado =$registro['funciona_sabado'];
-                    $unidade->trabalha_domingo =$registro['funciona_domingo'];
-                    $unidade->tem_plantao = $registro['tem_plantao'];
-                    $unidade->tem_distribuicao = $registro['tem_distribuicao'];
+                    $unidade->trabalha_sabado =$trabalha_sabado;
+                    $unidade->trabalha_domingo =$trabalha_domingo;
+                    $unidade->tem_plantao = $tem_plantao;
+                    $unidade->tem_distribuicao = $tem_distribuicao;
                     $unidade->inicio_expediente_sabado = $inicio_funcionamento_sabado;
                     $unidade->final_expediente_sabado = $fim_funcionamento_sabado;
                     $unidade->inicio_expediente_domingo = $inicio_funcionamento_domingo;
@@ -309,6 +323,7 @@ class JobHorariosDERAT implements ShouldQueue
                     $unidade->horario_lim_post_na_semana = $dh_semana;
                     $unidade->horario_lim_post_final_semana = $dh_fim_semana;
                     $unidade->update();
+//                                                   dd('aki', $unidade);
                 }
             }
         }

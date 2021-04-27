@@ -50,6 +50,10 @@ class ImportUnidades implements
             'tipo_de_estrutura'  => $row['tipo_de_estrutura'],
             'subordinacao_tecnica'  => $row['subordinacao_tecnica'],
             'inicio_expediente'  => $row['inicio_expediente'],
+
+            'inicio_atendimento'  => $row['inicio_atendimento'],
+            'final_atendimento'  => $row['final_atendimento'],
+
             'final_expediente'  => $row['final_expediente'],
             'inicio_intervalo_refeicao' => $row['inicio_intervalo_refeicao'],
             'final_intervalo_refeicao' => $row['final_intervalo_refeicao'],
