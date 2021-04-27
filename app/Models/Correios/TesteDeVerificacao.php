@@ -26,6 +26,7 @@ class TesteDeVerificacao extends Model
        'riscoImgInstitucional',
        'inspecaoObrigatoria',
        'totalPontos',
+       'maximodepontos',
        'roteiroConforme',
        'roteiroNaoConforme',
        'roteiroNaoVerificado',

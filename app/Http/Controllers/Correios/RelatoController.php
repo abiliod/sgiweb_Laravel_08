@@ -67,6 +67,8 @@ class RelatoController extends Controller
     {
         $registro =  TesteDeVerificacao::find($id);
         $dados = $request->all();
+//        dd($dados['maximodepontos']);
+
         $registro->grupoVerificacao_id =  $dados['grupoVerificacao_id'];
         $registro->numeroDoTeste =  $dados['numeroDoTeste'];
         $registro->inspecaoObrigatoria =  $dados['inspecaoObrigatoria'];
@@ -83,14 +85,16 @@ class RelatoController extends Controller
         $registro->riscoSegurancaIntegridade =  $dados['riscoSegurancaIntegridade'];
         $registro->riscoImgInstitucional =  $dados['riscoImgInstitucional'];
         $registro->totalPontos = $dados['totalPontos'];
+        $registro->maximodepontos = $dados['maximodepontos'];
         $registro->consequencias = $dados['consequencias'];
         $registro->roteiroConforme = $dados['roteiroConforme'];
         $registro->roteiroNaoConforme = $dados['roteiroNaoConforme'];
         $registro->roteiroNaoVerificado = $dados['roteiroNaoVerificado'];
-        $registro->itemanosanteriores = $dados['itemanosanteriores'];
+//        $registro->itemanosanteriores = $dados['itemanosanteriores'];
         $registro->orientacao = $dados['orientacao'];
         $registro->preVerificar = $dados['preVerificar'];
         $registro->update();
+//        dd($registro);
 
         \Session::flash('mensagem',['msg'=>'Teste de Verificação atualizado com sucesso !'
         ,'class'=>'green white-text']);

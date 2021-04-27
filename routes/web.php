@@ -239,8 +239,11 @@ Route::post('/compliance/monitoramento/create', 'Correios\MonitoramentoControlle
 Route::get('/compliance/monitoramento/criar', 'Correios\MonitoramentoController@criar')->name('compliance.monitoramento.criar');
 Route::get('/compliance/monitoramento/show', 'Correios\MonitoramentoController@show')->name('compliance.monitoramento.show');
 Route::get('/compliance/monitoramento/xml', 'Correios\MonitoramentoController@xml')->name('compliance.monitoramento.xml');
-
 Route::post('/compliance/monitoramento/gerar_xml', 'Correios\MonitoramentoController@gerar_xml')->name('compliance.monitoramento.gerar_xml');
+
+Route::get('/compliance/monitoramento/concluir', 'Correios\MonitoramentoController@concluir')->name('compliance.monitoramento.concluir');
+Route::post('/compliance/monitoramento/concluir_insp', 'Correios\MonitoramentoController@concluir_insp')->name('compliance.monitoramento.concluir_insp');
+
 
 
 

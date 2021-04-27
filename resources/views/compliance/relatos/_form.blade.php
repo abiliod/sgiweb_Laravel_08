@@ -101,7 +101,7 @@
 	<label>Risco Financeiro Penalização & Multas Contratuais: </label>
 
 </div>
-<div class="input-field col s4">
+<div class="input-field col s3">
     <select name="descumprimentoLeisContratos"  id="descumprimentoLeisContratos" onchange="AtualizarTotalPontos();">
         <option value="2" {{(isset($registro->descumprimentoLeisContratos) && $registro->descumprimentoLeisContratos == '2'  ? 'selected' : '')}}>Sim</option>
         <option value="0" {{(isset($registro->descumprimentoLeisContratos) && $registro->descumprimentoLeisContratos == '0'  ? 'selected' : '')}}>Não</option>
@@ -117,7 +117,7 @@
 	<label>Descumprimento de Norma Interna:</label>
 </div>
 
-<div class="input-field col s4">
+<div class="input-field col s3">
     <select name="riscoSegurancaIntegridade" id="riscoSegurancaIntegridade" onchange="AtualizarTotalPontos();">
         <option value="3" {{(isset($registro->riscoSegurancaIntegridade) && $registro->riscoSegurancaIntegridade == '3'  ? 'selected' : '')}}>Sim</option>
         <option value="0" {{(isset($registro->riscoSegurancaIntegridade) && $registro->riscoSegurancaIntegridade == '0'  ? 'selected' : '')}}>Não</option>
@@ -125,7 +125,7 @@
 	<label>Risco de Seg. e Integ. do Patrimônio, Bens e Pessoas:</label>
 </div>
 
-<div class="input-field col s3">
+<div class="input-field col s2">
     <select name="riscoImgInstitucional" id="riscoImgInstitucional" onchange="AtualizarTotalPontos();">
         <option value="2" {{(isset($registro->riscoImgInstitucional) && $registro->riscoImgInstitucional == '2'  ? 'selected' : '')}}>Sim</option>
         <option value="0" {{(isset($registro->riscoImgInstitucional) && $registro->riscoImgInstitucional == '0'  ? 'selected' : '')}}>Não</option>
@@ -137,6 +137,14 @@
   <input type="text" name="totalPontos" id="totalPontos" value="{{ isset($registro->totalPontos) ? $registro->totalPontos : '0' }}" readonly>
 	<label class="active">Total de Pontos:</label>
 </div>
+
+
+<div class="input-field col s2" >
+    <input type="number" step="0.01" name="maximodepontos" id="maximodepontos" value="{{ isset($registro->maximodepontos) ? $registro->maximodepontos : '0' }}" >
+    <label class="active">Pontuação Máxima:</label>
+</div>
+
+
 
 <div class="input-field col s12" name="roteiroConforme" id="roteiroConforme">
     <i class="material-icons prefix">mode_edit</i>
@@ -162,13 +170,13 @@
     <label for="roteiroNaoVerificado">Roteiro Relato Não Verificado:</label>
 </div>
 
-<div class="input-field col s12" id="itemanosanteriores" style="display: none">
-    <i class="material-icons prefix">mode_edit</i>
-    <textarea  id="itemanosanteriores" name="itemanosanteriores" class="materialize-textarea">
-    {{ isset($registro->itemanosanteriores) ? $registro->itemanosanteriores : '' }}
-    </textarea>
-    <label for="itemanosanteriores">Possiveis Itens de Inspeções em Anos Anteriores:</label>
-</div>
+{{--<div class="input-field col s12" id="itemanosanteriores" style="display: none">--}}
+{{--    <i class="material-icons prefix">mode_edit</i>--}}
+{{--    <textarea  id="itemanosanteriores" name="itemanosanteriores" class="materialize-textarea">--}}
+{{--    {{ isset($registro->itemanosanteriores) ? $registro->itemanosanteriores : '' }}--}}
+{{--    </textarea>--}}
+{{--    <label for="itemanosanteriores">Possiveis Itens de Inspeções em Anos Anteriores:</label>--}}
+{{--</div>--}}
 
 <div class="input-field col s12">
 	<input type="text" name="consequencias" class="validate" value="{{ isset($registro->consequencias) ? $registro->consequencias : '' }}">

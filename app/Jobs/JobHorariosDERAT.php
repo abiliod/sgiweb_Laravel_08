@@ -276,13 +276,13 @@ class JobHorariosDERAT implements ShouldQueue
                 else {
                     $dh_fim_semana    = null;
                 }
+
                 $res = DB::table('unidades')
                     ->where('an8', '=',  (int)$registro['no_cad_geral'])
                     ->select(
                         'unidades.*'
                     )
                     ->first();
-
                 if(!empty(  $res->id )) {
 
                     $unidade = Unidade::find($res->id);
