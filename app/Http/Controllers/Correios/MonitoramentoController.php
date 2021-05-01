@@ -6,15 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\AvaliaInspecao;
 use App\Jobs\GeraInspecao;
 use App\Jobs\JobXml_Inspecao;
-use App\Models\Correios\Inspecao;
-use App\Models\Correios\Itensdeinspecao;
-use App\Models\Correios\ModelsAuxiliares\SL02_bdf;
-use App\Models\Correios\ModelsDto\AcessoFinalSemana;
-use App\Models\Correios\ModelsDto\CompartilhaSenha;
-use App\Models\Correios\ModelsDto\PgtoAdicionaisTemp;
-use App\Models\Correios\SequenceInspecao;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -9152,9 +9144,6 @@ class MonitoramentoController extends Controller {
                             }
 #################   CLASSIFICA A  INSPEÇÃO
 
-
-
-
 ############  GRAVA A INSPEÇÃO
                             DB::table('inspecoes')
                                 ->where([['id', '=', $inspecao->id]])
@@ -9182,7 +9171,7 @@ class MonitoramentoController extends Controller {
 ############ STATUS PARA CONTINUAÇÃO DE AVALIAÇÃO PRESENCIAL
 
 ############ STATUS PARA ENVIO DA INSPEÇÃO PARA O SNCI
-                            if  ($tnc < 20){
+                            if  (($tnc < 20) && ($totalitensnaoconforme>1)){
                                 DB::table('itensdeinspecoes')
                                     ->where([['inspecao_id', '=', $inspecao->id]])
                                     ->where([['avaliacao', '=', 'Não Conforme']])
