@@ -378,7 +378,7 @@ class UnidadesController extends Controller
                             )
                             ->where([['tiposdeunidade.inspecionar', '=',  'Sim']])
                             ->where([['unidades.status_unidadeDesc', '=',  $status]])
-                            ->Where([['se', '=', $mcu_subordinacaoAdm->se]])
+                            ->Where([['se', '=', $businessUnitUser->se]])
                             ->where([
                                 ['descricao', 'LIKE', '%' . $request->all()['search'] .'%' ],
                                 ['status_unidadeDesc', '=', $status],
@@ -517,14 +517,7 @@ class UnidadesController extends Controller
                     }
                     break;
             }
-
-           // return view('compliance.unidades.index',compact('registros'));
         }
-
-
-
-
-
         return view('compliance.unidades.index',compact('registros'));
     }
 
@@ -557,7 +550,7 @@ class UnidadesController extends Controller
                              ->orderBy('seDescricao', 'desc')
                              ->orderBy('tipoOrgaoDesc', 'asc')
                              ->orderBy('descricao', 'asc')
-                             ->paginate(10);
+                         ->paginate(10);
                     }
                 break;
                 case 3:
@@ -574,13 +567,11 @@ class UnidadesController extends Controller
                             ->orderBy('seDescricao', 'desc')
                             ->orderBy('tipoOrgaoDesc', 'asc')
                             ->orderBy('descricao', 'asc')
-                            ->paginate(10);
-
+                        ->paginate(10);
                     }
                 break;
                 case 4:
                     {
-
                         $registros = DB::table('unidades')
                             ->join('tiposdeunidade', 'unidades.tipoUnidade_id', '=', 'tiposdeunidade.id')
                             ->select(
@@ -593,16 +584,12 @@ class UnidadesController extends Controller
                             ->orderBy('seDescricao', 'desc')
                             ->orderBy('tipoOrgaoDesc', 'asc')
                             ->orderBy('descricao', 'asc')
-                            ->paginate(10);
-                       // ->get(1);
-
-                       // dd($businessUnitUser, $registros);
-
+                        ->paginate(10);
                     }
                 break;
                 case 5:
                     {
-                      $registros = DB::table('unidades')
+                        $registros = DB::table('unidades')
                           ->join('tiposdeunidade', 'unidades.tipoUnidade_id', '=', 'tiposdeunidade.id')
                           ->select(
                               'unidades.*', 'tiposdeunidade.inspecionar', 'tiposdeunidade.tipoInspecao'
@@ -614,36 +601,29 @@ class UnidadesController extends Controller
                           ->orderBy('seDescricao', 'desc')
                           ->orderBy('tipoOrgaoDesc', 'asc')
                           ->orderBy('descricao', 'asc')
-                          ->paginate(10);
-
+                        ->paginate(10);
                     }
                 break;
                 case 6:
                     {
-                      //      dd('caso 6');
-                            $registros = DB::table('unidades')
-                                ->join('tiposdeunidade', 'unidades.tipoUnidade_id', '=', 'tiposdeunidade.id')
-                                ->select(
-                                    'unidades.*', 'tiposdeunidade.inspecionar', 'tiposdeunidade.tipoInspecao'
-                                )
-                                ->where([['tiposdeunidade.inspecionar', '=',  'Sim']])
-                                ->where([['tiposdeunidade.tipoInspecao', '!=',  'Monitorada']])
-                                ->where([['unidades.status_unidadeDesc', '=',  $status]])
-                                ->Where([['se', '=', $businessUnitUser->se]])
-                                ->orderBy('seDescricao', 'desc')
-                                ->orderBy('tipoOrgaoDesc', 'asc')
-                                ->orderBy('descricao', 'asc')
-                                ->paginate(10);
-
-
+                        $registros = DB::table('unidades')
+                            ->join('tiposdeunidade', 'unidades.tipoUnidade_id', '=', 'tiposdeunidade.id')
+                            ->select(
+                                'unidades.*', 'tiposdeunidade.inspecionar', 'tiposdeunidade.tipoInspecao'
+                            )
+                            ->where([['tiposdeunidade.inspecionar', '=',  'Sim']])
+                            ->where([['tiposdeunidade.tipoInspecao', '!=',  'Monitorada']])
+                            ->where([['unidades.status_unidadeDesc', '=',  $status]])
+                            ->Where([['se', '=', $businessUnitUser->se]])
+                            ->orderBy('seDescricao', 'desc')
+                            ->orderBy('tipoOrgaoDesc', 'asc')
+                            ->orderBy('descricao', 'asc')
+                        ->paginate(10);
                         }
                 break;
             }
-
-           // dd($registros);
             return view('compliance.unidades.index',compact('registros'));
         }
-
         else
         {
             \Session::flash('mensagem',['msg'=>'Não foi possivel localizar a Unidade do Usuário atualize o Cadastro desse usuário.'

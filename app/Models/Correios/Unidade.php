@@ -61,27 +61,27 @@ class Unidade extends Model
 
     ];
 
-    protected $casts =
-    [
-        //verificar nomes
-        'inicio_expediente' => 'time:H:i:s',
-        'final_expediente' => 'time:H:i:s',
-        'inicio_intervalo_refeicao' => 'time:H:i:s',
-        'final_intervalo_refeicao' => 'time:H:i:s',
-        'inicio_expediente_sabado' => 'time:H:i:s',
-        'final_expediente_sabado' => 'time:H:i:s',
-        'inicio_expediente_domingo' => 'time:H:i:s',
-        'final_expediente_domingo' => 'time:H:i:s',
-        'inicio_plantao_sabaado' => 'time:H:i:s',
-        'final_plantao_sabado' => 'time:H:i:s',
-        'inicio_plantao_domingo' => 'time:H:i:s',
-        'final_plantao_domingo' => 'time:H:i:s',
-        'inicio_distribuicao' => 'time:H:i:s',
-        'final_distribuicao' => 'time:H:i:s',
-        'horario_lim_post_na_semana' => 'time:H:i:s',
-        'horario_lim_post_final_semana' => 'time:H:i:s'
-
-    ];
+//    protected $casts =
+//    [
+//        //verificar nomes
+//        'inicio_expediente' => 'time:H:i:s',
+//        'final_expediente' => 'time:H:i:s',
+//        'inicio_intervalo_refeicao' => 'time:H:i:s',
+//        'final_intervalo_refeicao' => 'time:H:i:s',
+//        'inicio_expediente_sabado' => 'time:H:i:s',
+//        'final_expediente_sabado' => 'time:H:i:s',
+//        'inicio_expediente_domingo' => 'time:H:i:s',
+//        'final_expediente_domingo' => 'time:H:i:s',
+//        'inicio_plantao_sabaado' => 'time:H:i:s',
+//        'final_plantao_sabado' => 'time:H:i:s',
+//        'inicio_plantao_domingo' => 'time:H:i:s',
+//        'final_plantao_domingo' => 'time:H:i:s',
+//        'inicio_distribuicao' => 'time:H:i:s',
+//        'final_distribuicao' => 'time:H:i:s',
+//        'horario_lim_post_na_semana' => 'time:H:i:s',
+//        'horario_lim_post_final_semana' => 'time:H:i:s'
+//
+//    ];
 
     public function tipoDeUnidade()
     {

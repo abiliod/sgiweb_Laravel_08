@@ -4404,7 +4404,6 @@ class AvaliaInspecao implements ShouldQueue
 
                     // inicio do testee para uma superintendencias
                 else {
-
                         $registros = DB::table('itensdeinspecoes')
                             ->join('inspecoes', 'itensdeinspecoes.inspecao_id', '=', 'inspecoes.id')
                             ->join('unidades', 'itensdeinspecoes.unidade_id', '=', 'unidades.id')
@@ -8672,7 +8671,8 @@ class AvaliaInspecao implements ShouldQueue
                                         $itensdeinspecao->numeroItemReincidente = $numeroItemReincidente;
                                         $itensdeinspecao->update();
                                     }
-                                } else {
+                                }
+                                else {
 //                                    dd('nao  temmmmmmm debitos');
                                     //se não houve registro para a unidade o resultado é conforme
                                     $avaliacao = 'Conforme';
@@ -8695,6 +8695,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $itensdeinspecao->update();
 //                                     dd($competencia);
                                 }
+
                             } // fim doteste webCont
                         }
                     } // Fim do teste para uma superintendencias

@@ -130,6 +130,7 @@ class GeraInspecao implements ShouldQueue
                                     $registro->testeVerificacao_id = $parametro->id;// $registro->id teste de verificação
                                     $registro->oportunidadeAprimoramento = $parametro->roteiroConforme;
                                     $registro->consequencias = $parametro->consequencias;
+                                    $registro->situacao =  'Em Inspeção';
                                     $registro->norma = $parametro->norma;
                                     $registro->save();
                                 }
@@ -232,6 +233,7 @@ class GeraInspecao implements ShouldQueue
                                     $registro->testeVerificacao_id = $parametro->id;// $registro->id teste de verificação
                                     $registro->oportunidadeAprimoramento = $parametro->roteiroConforme;
                                     $registro->consequencias = $parametro->consequencias;
+                                    $registro->situacao =  'Em Inspeção';
                                     $registro->norma = $parametro->norma;
                                     $registro->save();
                                 }

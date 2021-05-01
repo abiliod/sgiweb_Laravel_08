@@ -23,6 +23,15 @@ class Inspecao extends Model
         'numHrsDesloc',
         'numHrsInsp',
         'eventoInspecao',
+
+        'totalPontos',
+        'valor_ref_itens_inspecionados',
+        'totalpontosnaoconforme',
+        'tnc',
+        'classificacao',
+        'totalitensavaliados',
+        'totalitensnaoconforme',
+
         'xml'
     ];
 

@@ -35,7 +35,7 @@
 
         Gerar_Conteúdo
     </select>
-    <label>Inspecionar Automático?</label>
+    <label>Utilizar Modal?</label>
 </div>
 
 <div class="input-field col s12" id="teste">

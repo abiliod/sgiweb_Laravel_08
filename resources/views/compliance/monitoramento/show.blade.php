@@ -42,7 +42,7 @@
 
                 @can('integrar_XML_inspecao_automatica') @endcan
                 <div class="col s12 m6">
-                    <div class="card green darken-1">
+                    <div class="card #4a148c purple darken-4">
                         <div class="card-content white-text">
                             <span class="card-title">Concluir Inspeções Monitorada</span>
                             <p>Unidades<br>Assunto: Conclusão das inspeções por tipo de unidade e por Superintendência.</p>
