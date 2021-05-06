@@ -1,0 +1,17 @@
+AM
+BSB
+GO
+PA
+RO
+TO
+
+
+WebCont
+Pesquisar se há pendências de valores contabilizados para a Unidade de Atendimento na conta conta 11202.994000 no sistema WEBCONT (http://snu0074/webcont/menu_conciliacoes/).
+As informações são obtidas por meio: Menu Consultas > Conciliações. Selecionar a competência mais recente; Selecionar a CIA (Superintendência).
+Informar a conta 11202.994000. fazer o download do arquivo onde a prévia mais recente estiver disponível CSV.
+
+lay-out: [Cia	Conta	competencia	Data	Lote	Tp	MCU (Doc1)	nome_agencia_doc2	historico	Valor	observacoes	Documento (Ref1)	matricula_ref2	Nome Empregado (Ref3)	Ação	Justificativa (Ad1)	Ad2	Ad3	Ad4	Ad5	Ad6	Ad7	regularizacao	Anexo]
+Sugestão de nome do Arquivo modelo : 270-1-WebCont_DebitoEmpregado.xlsx .
+Frequencia: Mensal. ultima prévia.
+

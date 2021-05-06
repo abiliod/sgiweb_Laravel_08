@@ -64,7 +64,7 @@
                     </select>
                     <label for="status" >Status</label>
                 </div>
-                <div class="input-field col s6">
+                <div class="input-field col s5">
                     <select name="inspetorcoordenador" id="inspetorcoordenador">
                         <option value="">Inspetor Coordenador</option>
                         @foreach($inspetores as $inspetor)
@@ -74,7 +74,7 @@
                     <label for="inspetorcoordenador" >Inspetor Coordenador</label>
                 </div>
 
-                <div class="input-field col s6">
+                <div class="input-field col s5">
                     <select name="inspetorcolaborador" id="inspetorcolaborador">
                         <option value="">Inspetor Colaborador</option>
                         @foreach($inspetores as $inspetor)
@@ -82,6 +82,10 @@
                         @endforeach
                     </select>
                     <label for="inspetorcolaborador" >Inspetor Colaborador</label>
+                </div>
+                <div class="input-field col s2">
+                    <input   type="date" name="data_programacao"  id="data_programacao" value="{{isset($registro->data_programacao) ? $registro->data_programacao : ''}}">
+                    <label  class="active" for="data_programacao" >Data Programação</label>
                 </div>
 
                 <div class="input-field col s4">

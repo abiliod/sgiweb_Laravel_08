@@ -32,7 +32,7 @@ function ativaBtnFiltro()
         document.getElementById("btnFiltrar").disabled = false;
     } else if ((tipoUnidade_id  >= 0) && (nomegrupo !="Selecione um Grupo de Unidade")){
         document.getElementById("btnFiltrar").disabled = false;
-    }else if(tipoVerificacao == "0")
+    }else if (tipoVerificacao == "0")
     {
         document.getElementById("btnFiltrar").disabled = false;
     } else
@@ -53,9 +53,6 @@ function mostrarDiv() {
     }
 
 }
-
-
-
 
 
 function Mudarestado(el)

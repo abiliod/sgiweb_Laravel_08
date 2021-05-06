@@ -1,0 +1,40 @@
+	00434108	SUPERINTENDENCIA ESTADUAL ACR	SE/ACR	Ativo
+	00434109	SUPERINTENDENCIA ESTADUAL AL	SE/AL	Ativo
+	00434111	SUPERINTENDENCIA ESTADUAL AM	SE/AM	Ativo
+	00434110	SUPERINTENDENCIA ESTADUAL AP	SE/AP	Ativo
+	00434112	SUPERINTENDENCIA ESTADUAL BA	SE/BA	Ativo
+	00434113	SUPERINTENDENCIA ESTADUAL BSB	SE/BSB	Ativo
+	00434114	SUPERINTENDENCIA ESTADUAL CE	SE/CE	Ativo
+	00434115	SUPERINTENDENCIA ESTADUAL ES	SE/ES	Ativo
+	00434116	SUPERINTENDENCIA ESTADUAL GO	SE/GO	Ativo
+	00434117	SUPERINTENDENCIA ESTADUAL MA
+	00434118	SUPERINTENDENCIA ESTADUAL MG	SE/MG	Ativo
+	00434119	SUPERINTENDENCIA ESTADUAL MS	SE/MS	Ativo
+	00434120	SUPERINTENDENCIA ESTADUAL MT	SE/MT	Ativo
+	00434123	SUPERINTENDENCIA ESTADUAL PA	SE/PA	Ativo
+	00434124	SUPERINTENDENCIA ESTADUAL PB	SE/PB	Ativo
+	00434126	SUPERINTENDENCIA ESTADUAL PE	SE/PE	Ativo
+	00434127	SUPERINTENDENCIA ESTADUAL PI	SE/PI	Ativo
+	00434125	SUPERINTENDENCIA ESTADUAL PR	SE/PR	Ativo
+	00434121	SUPERINTENDENCIA ESTADUAL RJ	SE/RJ	Ativo
+	00434130	SUPERINTENDENCIA ESTADUAL RN	SE/RN	Ativo
+	00434122	SUPERINTENDENCIA ESTADUAL RO	SE/RO	Ativo
+	00434131	SUPERINTENDENCIA ESTADUAL RR	SE/RR	Ativo
+	00434128	SUPERINTENDENCIA ESTADUAL RS	SE/RS	Ativo
+	00434129	SUPERINTENDENCIA ESTADUAL SC	SE/SC	Ativo
+	00434132	SUPERINTENDENCIA ESTADUAL SE	SE/SE	Ativo
+	00434134	SUPERINTENDENCIA ESTADUAL SPI	SE/SPI	Ativo
+	00434133	SUPERINTENDENCIA ESTADUAL SPM	SE/SPM	Ativo
+	00434135	SUPERINTENDENCIA ESTADUAL TO	SE/TO	Ativo
+
+                                
+Fruicao de ferias por MCU
+Sistema: http://intranetmg2/WebSGQ3/principal.asp MENU F�rias -> Frui��o por MCU.
+Pesquisar  Superintendencia, selecionar a SE interessada ex:[00434122] marcar incluir org�os subordinados, em seguida importar para o excel.
+Ao salvar  renomeie para sua Regional  ex de nome: (WebSGQ3 - Fruicao de ferias por MCU-GO.xlsx).
+Frequencia: MENSAL.
+Pr� requisito: Cadastral deve estar atualizada; caso o processo seja interrompido por timeout fraguimente o arquivo tomado cuidado para n�o dividir registros de mesma matr�cula em duas importa��es, dado que o empregado pode programar a f�rias para dois per�odos distintos.
+O sistema exclui por unidade a programa��o das f�rias e cria novos registros.
+VEJA o lay-out:
+[Matr�cula	Nome	Lota��o	Fun��o	In�cio frui��o	T�rmino frui��o	Dias	Saldo	Abono]
+                                

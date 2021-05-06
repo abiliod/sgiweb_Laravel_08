@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Correios;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\JobAtualizaInspecao;
 use App\Models\Correios\Inspecao;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class PlanejamentoController extends Controller
-{
-    public function search( Request $request)
-    {
+class PlanejamentoController extends Controller {
+
+     public function search( Request $request) {
 
         $dados = $request->all();
-        $tiposDeUnidade = DB::table('tiposdeunidade')
+        DB::table('tiposdeunidade')
             ->join('gruposdeverificacao',
                 'tiposdeunidade.id',
                 '=',
@@ -583,7 +585,7 @@ class PlanejamentoController extends Controller
                             ->paginate(10);
                     }
                     break;
-                default:  return redirect()->route('home');
+                default :  return redirect()->route('home');
             }
 
             $tiposDeUnidade = DB::table('tiposdeunidade')
@@ -647,9 +649,11 @@ class PlanejamentoController extends Controller
         $validator = Validator::make($request->all(),[
              'inspetorcoordenador' => 'required'
             , 'inspetorcolaborador' => 'required'
+            , 'data_programacao' => 'required'
             , 'numHrsPreInsp' => 'required'
             , 'numHrsDesloc' => 'required'
             , 'numHrsInsp' => 'required'
+            ,
         ]);
         if($validator->passes())
         {
@@ -662,25 +666,71 @@ class PlanejamentoController extends Controller
                 return redirect()->back();
             }
 
+            $data_programacao = new Carbon($dados ['data_programacao']);
+            $dt_data_programacao = $data_programacao->subDays(2);
             $registro = Inspecao::find($id);
+
+//#########################################################################################################
+//            para ativar a fila no console
+//            php artisan queue:work --queue=atualizaInspecao
+
+            $job = (new JobAtualizaInspecao($id, $dt_data_programacao))
+                ->onQueue('atualizaInspecao')->delay($dt_data_programacao->addMinutes(1));
+            dispatch($job);
+
+            $new_job =   DB::table('jobs')
+                ->latest()
+            ->first();
+
+
+            $periodo = CarbonPeriod::create(new Carbon(), new Carbon($dados ['data_programacao']));
+
+            $dias = $periodo->count();
+
+            if($dias <= 1){
+                $result = new Carbon();
+                $result = $result->format('d/m/Y H:i:s');
+                \Session::flash('mensagem', ['msg' => 'A Inspeção Nº '.$registro->codigo.' será atualizada pelo
+                          Administrador em '.$result.'.', 'class' => 'blue white-text']);
+            }
+            else{
+                $result = $dt_data_programacao->format('d/m/Y H:i:s');
+                \Session::flash('mensagem', ['msg' => 'A Inspeção Nº '.$registro->codigo.' será atualizada pelo
+                          Administrador em '.$result.'.' ."\n\r".'Antes dessa data você poderá reprogramar a Inspeção.'
+                    , 'class' => 'blue white-text']);
+            }
+
+
+//#########################################################################################################
+            $JobOld = null;
+            if($registro->job_programado >=1)   $JobOld = $registro->job_programado;
+            $data_Insp = new Carbon($dados ['data_programacao']);
+
+
             $registro->inspetorcoordenador = $dados ['inspetorcoordenador'];
+            $registro->data_programacao = $data_Insp;
+            $registro->job_programado =  $new_job->id;
+            $registro->inspetorcolaborador = $dados ['inspetorcolaborador'];
             $registro->inspetorcolaborador = $dados ['inspetorcolaborador'];
             $registro->numHrsPreInsp       = $dados ['numHrsPreInsp'];
             $registro->numHrsDesloc        = $dados ['numHrsDesloc'];
             $registro->numHrsInsp          = $dados ['numHrsInsp'];
+
             $registro->update();
 
-            \Session::flash('mensagem',['msg'=>'Inspeção Atualizada com sucesso !'
-                ,'class'=>'green white-text']);
+            if($JobOld !== null){
+               DB::table('jobs')
+                   ->where('id', '=',$JobOld )
+               ->delete();
+            }
 
             return redirect()->route('compliance.planejamento');
         }
-        else
-        {
+        else {
             if ( (empty($dados ['inspetorcoordenador'])) ||
                 (empty($dados ['inspetorcolaborador'])))
             {
-                \Session::flash('mensagem',['msg'=>'Erro o Arquivo. Não foi atualizado vincule Inspetor.'
+                \Session::flash('mensagem',['msg'=>'Erro o Arquivo. Não foi atualizado vincule corretamente os Inspetores.'
                     ,'class'=>'red white-text']);
             }
             return back();

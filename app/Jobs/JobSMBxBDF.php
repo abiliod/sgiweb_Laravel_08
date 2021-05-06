@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Correios\ModelsAuxiliares\SMBxBDF_NaoConciliado;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,7 +46,7 @@ protected $SMBxBDF_NaoConciliado,$dtmenos120dias, $dt_job;
                         $dt_number = intVal($dado['data']);
                         if (is_numeric($dt_number)) {
                             $dt = new Carbon('1899-12-30');
-                            $dt = $data->addDays($dt_number);
+                            $dt = $dt->addDays($dt_number);
                         }
                     }
                     catch (\Exception $e) {

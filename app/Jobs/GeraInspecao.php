@@ -183,7 +183,7 @@ class GeraInspecao implements ShouldQueue
                                     //      dd($affected , $sequence);
                                 } else {
                                     $sequence = 2001;
-                                    $affected =  SequenceInspecao::create([
+                                    SequenceInspecao::create([
                                         'se' => $strsuperintendencia
                                         ,'ciclo' => $ciclo
                                         ,'sequence' => $sequence

@@ -156,31 +156,31 @@ class AvaliaInspecao implements ShouldQueue
                             $dtfim = $refini->max('ref');
 
                             switch ($registro->se) {
-                                case 1 :{ $superintendência = 'CS'; } break;
-                                case 4 :{ $superintendência = 'AL'; } break;
-                                case 6 :{ $superintendência = 'AM'; } break;
-                                case 8 :{ $superintendência = 'BA'; } break;
-                                case 10 :{ $superintendência = 'BSB'; } break;
-                                case 12 :{ $superintendência = 'CE'; } break;
-                                case 14 :{ $superintendência = 'ES'; } break;
-                                case 16 :{ $superintendência = 'GO'; } break;
-                                case 18 :{ $superintendência = 'MA'; } break;
-                                case 20 :{ $superintendência = 'MG'; } break;
-                                case 22 :{ $superintendência = 'MS'; } break;
-                                case 24 :{ $superintendência = 'MT'; } break;
-                                case 26 :{ $superintendência = 'RO'; } break;
-                                case 28 :{ $superintendência = 'PA'; } break;
-                                case 30 :{ $superintendência = 'PB'; } break;
-                                case 32 :{ $superintendência = 'PE'; } break;
-                                case 34 :{ $superintendência = 'PI'; } break;
-                                case 36 :{ $superintendência = 'PR'; } break;
-                                case 50 :{ $superintendência = 'RJ'; } break;
-                                case 60 :{ $superintendência = 'RN'; } break;
-                                case 64 :{ $superintendência = 'RS'; } break;
-                                case 68 :{ $superintendência = 'SC'; } break;
-                                case 72 :{ $superintendência = 'SPM'; } break;
-                                case 74 :{ $superintendência = 'SPI'; } break;
-                                case 75 :{ $superintendência = 'TO'; } break;
+                                case 1 :{ $superintendencia = 'CS'; } break;
+                                case 4 :{ $superintendencia = 'AL'; } break;
+                                case 6 :{ $superintendencia = 'AM'; } break;
+                                case 8 :{ $superintendencia = 'BA'; } break;
+                                case 10 :{ $superintendencia = 'BSB'; } break;
+                                case 12 :{ $superintendencia = 'CE'; } break;
+                                case 14 :{ $superintendencia = 'ES'; } break;
+                                case 16 :{ $superintendencia = 'GO'; } break;
+                                case 18 :{ $superintendencia = 'MA'; } break;
+                                case 20 :{ $superintendencia = 'MG'; } break;
+                                case 22 :{ $superintendencia = 'MS'; } break;
+                                case 24 :{ $superintendencia = 'MT'; } break;
+                                case 26 :{ $superintendencia = 'RO'; } break;
+                                case 28 :{ $superintendencia = 'PA'; } break;
+                                case 30 :{ $superintendencia = 'PB'; } break;
+                                case 32 :{ $superintendencia = 'PE'; } break;
+                                case 34 :{ $superintendencia = 'PI'; } break;
+                                case 36 :{ $superintendencia = 'PR'; } break;
+                                case 50 :{ $superintendencia = 'RJ'; } break;
+                                case 60 :{ $superintendencia = 'RN'; } break;
+                                case 64 :{ $superintendencia = 'RS'; } break;
+                                case 68 :{ $superintendencia = 'SC'; } break;
+                                case 72 :{ $superintendencia = 'SPM'; } break;
+                                case 74 :{ $superintendencia = 'SPI'; } break;
+                                case 75 :{ $superintendencia = 'TO'; } break;
                             }
 
                             $reincidencia = DB::table('snci')
@@ -207,7 +207,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                     $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
                                         ->select( 'pagamentos_adicionais.*' )
-                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                         ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                         ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                         ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
@@ -215,7 +215,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                     $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
                                         ->select( 'pagamentos_adicionais.*' )
-                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                         ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                         ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                         ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
@@ -224,14 +224,14 @@ class AvaliaInspecao implements ShouldQueue
                                 } else {
                                     $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
                                         ->select( 'pagamentos_adicionais.*' )
-                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                         ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                         ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                         ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
                                         ->get();
                                     $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
                                         ->select( 'pagamentos_adicionais.*' )
-                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                         ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                         ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                         ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
@@ -241,14 +241,14 @@ class AvaliaInspecao implements ShouldQueue
                             } catch (\Exception $e) {
                                 $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
                                     ->select( 'pagamentos_adicionais.*' )
-                                    ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                    ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                     ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                     ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                     ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
                                     ->get();
                                 $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
                                     ->select( 'pagamentos_adicionais.*' )
-                                    ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                    ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                     ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                     ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                     ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
@@ -831,31 +831,31 @@ class AvaliaInspecao implements ShouldQueue
                             $count = 0;
 
                             switch ($registro->se) {
-                                case 1 :{ $superintendência = 'CS'; } break;
-                                case 4 :{ $superintendência = 'AL'; } break;
-                                case 6 :{ $superintendência = 'AM'; } break;
-                                case 8 :{ $superintendência = 'BA'; } break;
-                                case 10 :{ $superintendência = 'BSB'; } break;
-                                case 12 :{ $superintendência = 'CE'; } break;
-                                case 14 :{ $superintendência = 'ES'; } break;
-                                case 16 :{ $superintendência = 'GO'; } break;
-                                case 18 :{ $superintendência = 'MA'; } break;
-                                case 20 :{ $superintendência = 'MG'; } break;
-                                case 22 :{ $superintendência = 'MS'; } break;
-                                case 24 :{ $superintendência = 'MT'; } break;
-                                case 26 :{ $superintendência = 'RO'; } break;
-                                case 28 :{ $superintendência = 'PA'; } break;
-                                case 30 :{ $superintendência = 'PB'; } break;
-                                case 32 :{ $superintendência = 'PE'; } break;
-                                case 34 :{ $superintendência = 'PI'; } break;
-                                case 36 :{ $superintendência = 'PR'; } break;
-                                case 50 :{ $superintendência = 'RJ'; } break;
-                                case 60 :{ $superintendência = 'RN'; } break;
-                                case 64 :{ $superintendência = 'RS'; } break;
-                                case 68 :{ $superintendência = 'SC'; } break;
-                                case 72 :{ $superintendência = 'SPM'; } break;
-                                case 74 :{ $superintendência = 'SPI'; } break;
-                                case 75 :{ $superintendência = 'TO'; } break;
+                                case 1 :{ $superintendencia = 'CS'; } break;
+                                case 4 :{ $superintendencia = 'AL'; } break;
+                                case 6 :{ $superintendencia = 'AM'; } break;
+                                case 8 :{ $superintendencia = 'BA'; } break;
+                                case 10 :{ $superintendencia = 'BSB'; } break;
+                                case 12 :{ $superintendencia = 'CE'; } break;
+                                case 14 :{ $superintendencia = 'ES'; } break;
+                                case 16 :{ $superintendencia = 'GO'; } break;
+                                case 18 :{ $superintendencia = 'MA'; } break;
+                                case 20 :{ $superintendencia = 'MG'; } break;
+                                case 22 :{ $superintendencia = 'MS'; } break;
+                                case 24 :{ $superintendencia = 'MT'; } break;
+                                case 26 :{ $superintendencia = 'RO'; } break;
+                                case 28 :{ $superintendencia = 'PA'; } break;
+                                case 30 :{ $superintendencia = 'PB'; } break;
+                                case 32 :{ $superintendencia = 'PE'; } break;
+                                case 34 :{ $superintendencia = 'PI'; } break;
+                                case 36 :{ $superintendencia = 'PR'; } break;
+                                case 50 :{ $superintendencia = 'RJ'; } break;
+                                case 60 :{ $superintendencia = 'RN'; } break;
+                                case 64 :{ $superintendencia = 'RS'; } break;
+                                case 68 :{ $superintendencia = 'SC'; } break;
+                                case 72 :{ $superintendencia = 'SPM'; } break;
+                                case 74 :{ $superintendencia = 'SPI'; } break;
+                                case 75 :{ $superintendencia = 'TO'; } break;
                             }
 
                             $reincidencia = DB::table('snci')
@@ -880,7 +880,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $cie_eletronicas = DB::table('cie_eletronicas')
                                         ->select( 'cie_eletronicas.*' )
                                         ->where([['cie_eletronicas.emissao', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendencia   ]])
                                         ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
 //                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
                                         ->get();
@@ -890,7 +890,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $cie_eletronicas = DB::table('cie_eletronicas')
                                         ->select( 'cie_eletronicas.*' )
                                         ->where([['cie_eletronicas.emissao', '>=',  $dtmenos12meses  ]])
-                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendencia   ]])
                                         ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
 //                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
                                         ->get();
@@ -899,7 +899,7 @@ class AvaliaInspecao implements ShouldQueue
                                 $cie_eletronicas = DB::table('cie_eletronicas')
                                     ->select( 'cie_eletronicas.*' )
                                     ->where([['cie_eletronicas.emissao', '>=',  $dtmenos12meses  ]])
-                                    ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                    ->where([['cie_eletronicas.se_destino', '=',   $superintendencia   ]])
                                     ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
                                     ->get();
                             }
@@ -1061,31 +1061,31 @@ class AvaliaInspecao implements ShouldQueue
 
                             switch ($registro->se) {
 
-                                case 1 :{ $superintendência = 'CS'; } break;
-                                case 4 :{ $superintendência = 'AL'; } break;
-                                case 6 :{ $superintendência = 'AM'; } break;
-                                case 8 :{ $superintendência = 'BA'; } break;
-                                case 10 :{ $superintendência = 'BSB'; } break;
-                                case 12 :{ $superintendência = 'CE'; } break;
-                                case 14 :{ $superintendência = 'ES'; } break;
-                                case 16 :{ $superintendência = 'GO'; } break;
-                                case 18 :{ $superintendência = 'MA'; } break;
-                                case 20 :{ $superintendência = 'MG'; } break;
-                                case 22 :{ $superintendência = 'MS'; } break;
-                                case 24 :{ $superintendência = 'MT'; } break;
-                                case 26 :{ $superintendência = 'RO'; } break;
-                                case 28 :{ $superintendência = 'PA'; } break;
-                                case 30 :{ $superintendência = 'PB'; } break;
-                                case 32 :{ $superintendência = 'PE'; } break;
-                                case 34 :{ $superintendência = 'PI'; } break;
-                                case 36 :{ $superintendência = 'PR'; } break;
-                                case 50 :{ $superintendência = 'RJ'; } break;
-                                case 60 :{ $superintendência = 'RN'; } break;
-                                case 64 :{ $superintendência = 'RS'; } break;
-                                case 68 :{ $superintendência = 'SC'; } break;
-                                case 72 :{ $superintendência = 'SPM'; } break;
-                                case 74 :{ $superintendência = 'SPI'; } break;
-                                case 75 :{ $superintendência = 'TO'; } break;
+                                case 1 :{ $superintendencia = 'CS'; } break;
+                                case 4 :{ $superintendencia = 'AL'; } break;
+                                case 6 :{ $superintendencia = 'AM'; } break;
+                                case 8 :{ $superintendencia = 'BA'; } break;
+                                case 10 :{ $superintendencia = 'BSB'; } break;
+                                case 12 :{ $superintendencia = 'CE'; } break;
+                                case 14 :{ $superintendencia = 'ES'; } break;
+                                case 16 :{ $superintendencia = 'GO'; } break;
+                                case 18 :{ $superintendencia = 'MA'; } break;
+                                case 20 :{ $superintendencia = 'MG'; } break;
+                                case 22 :{ $superintendencia = 'MS'; } break;
+                                case 24 :{ $superintendencia = 'MT'; } break;
+                                case 26 :{ $superintendencia = 'RO'; } break;
+                                case 28 :{ $superintendencia = 'PA'; } break;
+                                case 30 :{ $superintendencia = 'PB'; } break;
+                                case 32 :{ $superintendencia = 'PE'; } break;
+                                case 34 :{ $superintendencia = 'PI'; } break;
+                                case 36 :{ $superintendencia = 'PR'; } break;
+                                case 50 :{ $superintendencia = 'RJ'; } break;
+                                case 60 :{ $superintendencia = 'RN'; } break;
+                                case 64 :{ $superintendencia = 'RS'; } break;
+                                case 68 :{ $superintendencia = 'SC'; } break;
+                                case 72 :{ $superintendencia = 'SPM'; } break;
+                                case 74 :{ $superintendencia = 'SPI'; } break;
+                                case 75 :{ $superintendencia = 'TO'; } break;
                             }
 
                             $reincidencia = DB::table('snci')
@@ -1111,7 +1111,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $painel_extravios = DB::table('painel_extravios')
                                         ->select( 'painel_extravios.*' )
                                         ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                         ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                         ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                         ->get();
@@ -1121,7 +1121,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $painel_extravios = DB::table('painel_extravios')
                                         ->select( 'painel_extravios.*' )
                                         ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                         ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                         ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                         ->get();
@@ -1131,7 +1131,7 @@ class AvaliaInspecao implements ShouldQueue
                                 $painel_extravios = DB::table('painel_extravios')
                                     ->select( 'painel_extravios.*' )
                                     ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                    ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                    ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                     ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                     ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                     ->get();
@@ -1261,31 +1261,31 @@ class AvaliaInspecao implements ShouldQueue
 
                             switch ($registro->se) {
 
-                                case 1 :{ $superintendência = 'CS'; } break;
-                                case 4 :{ $superintendência = 'AL'; } break;
-                                case 6 :{ $superintendência = 'AM'; } break;
-                                case 8 :{ $superintendência = 'BA'; } break;
-                                case 10 :{ $superintendência = 'BSB'; } break;
-                                case 12 :{ $superintendência = 'CE'; } break;
-                                case 14 :{ $superintendência = 'ES'; } break;
-                                case 16 :{ $superintendência = 'GO'; } break;
-                                case 18 :{ $superintendência = 'MA'; } break;
-                                case 20 :{ $superintendência = 'MG'; } break;
-                                case 22 :{ $superintendência = 'MS'; } break;
-                                case 24 :{ $superintendência = 'MT'; } break;
-                                case 26 :{ $superintendência = 'RO'; } break;
-                                case 28 :{ $superintendência = 'PA'; } break;
-                                case 30 :{ $superintendência = 'PB'; } break;
-                                case 32 :{ $superintendência = 'PE'; } break;
-                                case 34 :{ $superintendência = 'PI'; } break;
-                                case 36 :{ $superintendência = 'PR'; } break;
-                                case 50 :{ $superintendência = 'RJ'; } break;
-                                case 60 :{ $superintendência = 'RN'; } break;
-                                case 64 :{ $superintendência = 'RS'; } break;
-                                case 68 :{ $superintendência = 'SC'; } break;
-                                case 72 :{ $superintendência = 'SPM'; } break;
-                                case 74 :{ $superintendência = 'SPI'; } break;
-                                case 75 :{ $superintendência = 'TO'; } break;
+                                case 1 :{ $superintendencia = 'CS'; } break;
+                                case 4 :{ $superintendencia = 'AL'; } break;
+                                case 6 :{ $superintendencia = 'AM'; } break;
+                                case 8 :{ $superintendencia = 'BA'; } break;
+                                case 10 :{ $superintendencia = 'BSB'; } break;
+                                case 12 :{ $superintendencia = 'CE'; } break;
+                                case 14 :{ $superintendencia = 'ES'; } break;
+                                case 16 :{ $superintendencia = 'GO'; } break;
+                                case 18 :{ $superintendencia = 'MA'; } break;
+                                case 20 :{ $superintendencia = 'MG'; } break;
+                                case 22 :{ $superintendencia = 'MS'; } break;
+                                case 24 :{ $superintendencia = 'MT'; } break;
+                                case 26 :{ $superintendencia = 'RO'; } break;
+                                case 28 :{ $superintendencia = 'PA'; } break;
+                                case 30 :{ $superintendencia = 'PB'; } break;
+                                case 32 :{ $superintendencia = 'PE'; } break;
+                                case 34 :{ $superintendencia = 'PI'; } break;
+                                case 36 :{ $superintendencia = 'PR'; } break;
+                                case 50 :{ $superintendencia = 'RJ'; } break;
+                                case 60 :{ $superintendencia = 'RN'; } break;
+                                case 64 :{ $superintendencia = 'RS'; } break;
+                                case 68 :{ $superintendencia = 'SC'; } break;
+                                case 72 :{ $superintendencia = 'SPM'; } break;
+                                case 74 :{ $superintendencia = 'SPI'; } break;
+                                case 75 :{ $superintendencia = 'TO'; } break;
                             }
 
                             $reincidencia = DB::table('snci')
@@ -1312,7 +1312,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $painel_extravios = DB::table('painel_extravios')
                                         ->select( 'painel_extravios.*' )
                                         ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                         ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                         ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                         ->get();
@@ -1322,7 +1322,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $painel_extravios = DB::table('painel_extravios')
                                         ->select( 'painel_extravios.*' )
                                         ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                         ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                         ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                         ->get();
@@ -1332,7 +1332,7 @@ class AvaliaInspecao implements ShouldQueue
                                 $painel_extravios = DB::table('painel_extravios')
                                     ->select( 'painel_extravios.*' )
                                     ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                    ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                    ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                     ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                     ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                     ->get();
@@ -1991,13 +1991,12 @@ class AvaliaInspecao implements ShouldQueue
                             if(! $controle_de_viagens->isEmpty()) {
                                 $count = $controle_de_viagens->count('ponto_parada');
                                 foreach($controle_de_viagens as $dados){
-                                    if( ( $controle_de_viagen->tipo_de_operacao == '' )
-                                        || ($controle_de_viagen->quantidade == '')
-                                        || ($controle_de_viagen->peso == '' )
-                                        || ($controle_de_viagen->unitizador == '')
-                                        || ($controle_de_viagen->descricao_do_servico == '')
-                                        || ($controle_de_viagen->local_de_destino == '')){
-
+                                    if( ( $dados->tipo_de_operacao == '' )
+                                        || ($dados->quantidade == '')
+                                        || ($dados->peso == '' )
+                                        || ($dados->unitizador == '')
+                                        || ($dados->descricao_do_servico == '')
+                                        || ($dados->local_de_destino == '')){
                                         $reg ++;
                                     }
                                 }
@@ -4468,31 +4467,31 @@ class AvaliaInspecao implements ShouldQueue
                                 $dtfim = $refini->max('ref');
 
                                 switch ($registro->se) {
-                                    case 1 :{ $superintendência = 'CS'; } break;
-                                    case 4 :{ $superintendência = 'AL'; } break;
-                                    case 6 :{ $superintendência = 'AM'; } break;
-                                    case 8 :{ $superintendência = 'BA'; } break;
-                                    case 10 :{ $superintendência = 'BSB'; } break;
-                                    case 12 :{ $superintendência = 'CE'; } break;
-                                    case 14 :{ $superintendência = 'ES'; } break;
-                                    case 16 :{ $superintendência = 'GO'; } break;
-                                    case 18 :{ $superintendência = 'MA'; } break;
-                                    case 20 :{ $superintendência = 'MG'; } break;
-                                    case 22 :{ $superintendência = 'MS'; } break;
-                                    case 24 :{ $superintendência = 'MT'; } break;
-                                    case 26 :{ $superintendência = 'RO'; } break;
-                                    case 28 :{ $superintendência = 'PA'; } break;
-                                    case 30 :{ $superintendência = 'PB'; } break;
-                                    case 32 :{ $superintendência = 'PE'; } break;
-                                    case 34 :{ $superintendência = 'PI'; } break;
-                                    case 36 :{ $superintendência = 'PR'; } break;
-                                    case 50 :{ $superintendência = 'RJ'; } break;
-                                    case 60 :{ $superintendência = 'RN'; } break;
-                                    case 64 :{ $superintendência = 'RS'; } break;
-                                    case 68 :{ $superintendência = 'SC'; } break;
-                                    case 72 :{ $superintendência = 'SPM'; } break;
-                                    case 74 :{ $superintendência = 'SPI'; } break;
-                                    case 75 :{ $superintendência = 'TO'; } break;
+                                    case 1 :{ $superintendencia = 'CS'; } break;
+                                    case 4 :{ $superintendencia = 'AL'; } break;
+                                    case 6 :{ $superintendencia = 'AM'; } break;
+                                    case 8 :{ $superintendencia = 'BA'; } break;
+                                    case 10 :{ $superintendencia = 'BSB'; } break;
+                                    case 12 :{ $superintendencia = 'CE'; } break;
+                                    case 14 :{ $superintendencia = 'ES'; } break;
+                                    case 16 :{ $superintendencia = 'GO'; } break;
+                                    case 18 :{ $superintendencia = 'MA'; } break;
+                                    case 20 :{ $superintendencia = 'MG'; } break;
+                                    case 22 :{ $superintendencia = 'MS'; } break;
+                                    case 24 :{ $superintendencia = 'MT'; } break;
+                                    case 26 :{ $superintendencia = 'RO'; } break;
+                                    case 28 :{ $superintendencia = 'PA'; } break;
+                                    case 30 :{ $superintendencia = 'PB'; } break;
+                                    case 32 :{ $superintendencia = 'PE'; } break;
+                                    case 34 :{ $superintendencia = 'PI'; } break;
+                                    case 36 :{ $superintendencia = 'PR'; } break;
+                                    case 50 :{ $superintendencia = 'RJ'; } break;
+                                    case 60 :{ $superintendencia = 'RN'; } break;
+                                    case 64 :{ $superintendencia = 'RS'; } break;
+                                    case 68 :{ $superintendencia = 'SC'; } break;
+                                    case 72 :{ $superintendencia = 'SPM'; } break;
+                                    case 74 :{ $superintendencia = 'SPI'; } break;
+                                    case 75 :{ $superintendencia = 'TO'; } break;
                                 }
 
                                 $reincidencia = DB::table('snci')
@@ -4519,7 +4518,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                         $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
                                             ->select( 'pagamentos_adicionais.*' )
-                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                             ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                             ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                             ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
@@ -4527,7 +4526,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                         $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
                                             ->select( 'pagamentos_adicionais.*' )
-                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                             ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                             ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                             ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
@@ -4536,14 +4535,14 @@ class AvaliaInspecao implements ShouldQueue
                                     } else {
                                         $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
                                             ->select( 'pagamentos_adicionais.*' )
-                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                             ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                             ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                             ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
                                             ->get();
                                         $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
                                             ->select( 'pagamentos_adicionais.*' )
-                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                            ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                             ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                             ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                             ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
@@ -4553,14 +4552,14 @@ class AvaliaInspecao implements ShouldQueue
                                 } catch (\Exception $e) {
                                     $pagamentos_adicionais_dist = DB::table('pagamentos_adicionais')
                                         ->select( 'pagamentos_adicionais.*' )
-                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                         ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                         ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                         ->where([['pagamentos_adicionais.rubrica', '=',  'AADC-Adic.Ativ. Distrib/Coleta Ext.' ]])
                                         ->get();
                                     $pagamentos_adicionais_atend = DB::table('pagamentos_adicionais')
                                         ->select( 'pagamentos_adicionais.*' )
-                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendência ]])
+                                        ->where([['pagamentos_adicionais.se', '>=', 'SE/'.$superintendencia ]])
                                         ->where([['pagamentos_adicionais.sigla_lotacao', 'like', '%' . trim($registro->descricao) . '%' ]])
                                         ->where([['pagamentos_adicionais.ref', '>=', $ref ]])
                                         ->where([['pagamentos_adicionais.rubrica', '=',  'AAG - Adic. de Atend. em Guichê' ]])
@@ -4585,7 +4584,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                 foreach ($pagamentos_adicionais_dist  as $adicionais) {
 
-                                    $situacao="Sem eventos de Distribuição Domiciliária.";
+                                    $situacao1="Sem eventos de Distribuição Domiciliária.";
                                     $mes = intval(substr($adicionais->ref,4,2));
                                     $sgdo_distribuicao = DB::table('sgdo_distribuicao')
                                         ->select('sgdo_distribuicao.*')
@@ -4611,7 +4610,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $pgtoAdicionaisTemp->rubrica = $adicionais->rubrica;
                                         $pgtoAdicionaisTemp->ref = $adicionais->ref;
                                         $pgtoAdicionaisTemp->valor = $adicionais->valor;
-                                        $pgtoAdicionaisTemp->situacao = $situacao;
+                                        $pgtoAdicionaisTemp->situacao = $situacao1;
 
                                         $ferias_por_mcu = DB::table('ferias_por_mcu')
                                             ->select('ferias_por_mcu.*')
@@ -4640,7 +4639,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                 foreach ($pagamentos_adicionais_atend  as $adicionais) {
 
-                                    $situacao="Sem eventos de atendimento a clientes.";
+                                    $situacao1="Sem eventos de atendimento a clientes.";
                                     $mes = intval(substr($adicionais->ref,4,2));
                                     $bdf_fat_02 = DB::table('bdf_fat_02')
                                         ->select('bdf_fat_02.*')
@@ -4661,7 +4660,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $pgtoAdicionaisTemp->rubrica = $adicionais->rubrica;
                                         $pgtoAdicionaisTemp->ref = $adicionais->ref;
                                         $pgtoAdicionaisTemp->valor = $adicionais->valor;
-                                        $pgtoAdicionaisTemp->situacao = $situacao;
+                                        $pgtoAdicionaisTemp->situacao = $situacao1;
 
                                         $ferias_por_mcu = DB::table('ferias_por_mcu')
                                             ->select('ferias_por_mcu.*')
@@ -5144,31 +5143,31 @@ class AvaliaInspecao implements ShouldQueue
                                 $count = 0;
 
                                 switch ($registro->se) {
-                                    case 1 :{ $superintendência = 'CS'; } break;
-                                    case 4 :{ $superintendência = 'AL'; } break;
-                                    case 6 :{ $superintendência = 'AM'; } break;
-                                    case 8 :{ $superintendência = 'BA'; } break;
-                                    case 10 :{ $superintendência = 'BSB'; } break;
-                                    case 12 :{ $superintendência = 'CE'; } break;
-                                    case 14 :{ $superintendência = 'ES'; } break;
-                                    case 16 :{ $superintendência = 'GO'; } break;
-                                    case 18 :{ $superintendência = 'MA'; } break;
-                                    case 20 :{ $superintendência = 'MG'; } break;
-                                    case 22 :{ $superintendência = 'MS'; } break;
-                                    case 24 :{ $superintendência = 'MT'; } break;
-                                    case 26 :{ $superintendência = 'RO'; } break;
-                                    case 28 :{ $superintendência = 'PA'; } break;
-                                    case 30 :{ $superintendência = 'PB'; } break;
-                                    case 32 :{ $superintendência = 'PE'; } break;
-                                    case 34 :{ $superintendência = 'PI'; } break;
-                                    case 36 :{ $superintendência = 'PR'; } break;
-                                    case 50 :{ $superintendência = 'RJ'; } break;
-                                    case 60 :{ $superintendência = 'RN'; } break;
-                                    case 64 :{ $superintendência = 'RS'; } break;
-                                    case 68 :{ $superintendência = 'SC'; } break;
-                                    case 72 :{ $superintendência = 'SPM'; } break;
-                                    case 74 :{ $superintendência = 'SPI'; } break;
-                                    case 75 :{ $superintendência = 'TO'; } break;
+                                    case 1 :{ $superintendencia = 'CS'; } break;
+                                    case 4 :{ $superintendencia = 'AL'; } break;
+                                    case 6 :{ $superintendencia = 'AM'; } break;
+                                    case 8 :{ $superintendencia = 'BA'; } break;
+                                    case 10 :{ $superintendencia = 'BSB'; } break;
+                                    case 12 :{ $superintendencia = 'CE'; } break;
+                                    case 14 :{ $superintendencia = 'ES'; } break;
+                                    case 16 :{ $superintendencia = 'GO'; } break;
+                                    case 18 :{ $superintendencia = 'MA'; } break;
+                                    case 20 :{ $superintendencia = 'MG'; } break;
+                                    case 22 :{ $superintendencia = 'MS'; } break;
+                                    case 24 :{ $superintendencia = 'MT'; } break;
+                                    case 26 :{ $superintendencia = 'RO'; } break;
+                                    case 28 :{ $superintendencia = 'PA'; } break;
+                                    case 30 :{ $superintendencia = 'PB'; } break;
+                                    case 32 :{ $superintendencia = 'PE'; } break;
+                                    case 34 :{ $superintendencia = 'PI'; } break;
+                                    case 36 :{ $superintendencia = 'PR'; } break;
+                                    case 50 :{ $superintendencia = 'RJ'; } break;
+                                    case 60 :{ $superintendencia = 'RN'; } break;
+                                    case 64 :{ $superintendencia = 'RS'; } break;
+                                    case 68 :{ $superintendencia = 'SC'; } break;
+                                    case 72 :{ $superintendencia = 'SPM'; } break;
+                                    case 74 :{ $superintendencia = 'SPI'; } break;
+                                    case 75 :{ $superintendencia = 'TO'; } break;
                                 }
 
                                 $reincidencia = DB::table('snci')
@@ -5193,7 +5192,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $cie_eletronicas = DB::table('cie_eletronicas')
                                             ->select( 'cie_eletronicas.*' )
                                             ->where([['cie_eletronicas.emissao', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendencia   ]])
                                             ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
 //                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
                                             ->get();
@@ -5203,7 +5202,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $cie_eletronicas = DB::table('cie_eletronicas')
                                             ->select( 'cie_eletronicas.*' )
                                             ->where([['cie_eletronicas.emissao', '>=',  $dtmenos12meses  ]])
-                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                            ->where([['cie_eletronicas.se_destino', '=',   $superintendencia   ]])
                                             ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
 //                                            ->where([['cie_eletronicas.respondida', '=',  'N' ]])
                                             ->get();
@@ -5212,7 +5211,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $cie_eletronicas = DB::table('cie_eletronicas')
                                         ->select( 'cie_eletronicas.*' )
                                         ->where([['cie_eletronicas.emissao', '>=',  $dtmenos12meses  ]])
-                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendência   ]])
+                                        ->where([['cie_eletronicas.se_destino', '=',   $superintendencia   ]])
                                         ->where([['cie_eletronicas.destino',  'like', '%' . $registro->descricao . '%']])
                                         ->get();
                                 }
@@ -5373,31 +5372,31 @@ class AvaliaInspecao implements ShouldQueue
 
                                 switch ($registro->se) {
 
-                                    case 1 :{ $superintendência = 'CS'; } break;
-                                    case 4 :{ $superintendência = 'AL'; } break;
-                                    case 6 :{ $superintendência = 'AM'; } break;
-                                    case 8 :{ $superintendência = 'BA'; } break;
-                                    case 10 :{ $superintendência = 'BSB'; } break;
-                                    case 12 :{ $superintendência = 'CE'; } break;
-                                    case 14 :{ $superintendência = 'ES'; } break;
-                                    case 16 :{ $superintendência = 'GO'; } break;
-                                    case 18 :{ $superintendência = 'MA'; } break;
-                                    case 20 :{ $superintendência = 'MG'; } break;
-                                    case 22 :{ $superintendência = 'MS'; } break;
-                                    case 24 :{ $superintendência = 'MT'; } break;
-                                    case 26 :{ $superintendência = 'RO'; } break;
-                                    case 28 :{ $superintendência = 'PA'; } break;
-                                    case 30 :{ $superintendência = 'PB'; } break;
-                                    case 32 :{ $superintendência = 'PE'; } break;
-                                    case 34 :{ $superintendência = 'PI'; } break;
-                                    case 36 :{ $superintendência = 'PR'; } break;
-                                    case 50 :{ $superintendência = 'RJ'; } break;
-                                    case 60 :{ $superintendência = 'RN'; } break;
-                                    case 64 :{ $superintendência = 'RS'; } break;
-                                    case 68 :{ $superintendência = 'SC'; } break;
-                                    case 72 :{ $superintendência = 'SPM'; } break;
-                                    case 74 :{ $superintendência = 'SPI'; } break;
-                                    case 75 :{ $superintendência = 'TO'; } break;
+                                    case 1 :{ $superintendencia = 'CS'; } break;
+                                    case 4 :{ $superintendencia = 'AL'; } break;
+                                    case 6 :{ $superintendencia = 'AM'; } break;
+                                    case 8 :{ $superintendencia = 'BA'; } break;
+                                    case 10 :{ $superintendencia = 'BSB'; } break;
+                                    case 12 :{ $superintendencia = 'CE'; } break;
+                                    case 14 :{ $superintendencia = 'ES'; } break;
+                                    case 16 :{ $superintendencia = 'GO'; } break;
+                                    case 18 :{ $superintendencia = 'MA'; } break;
+                                    case 20 :{ $superintendencia = 'MG'; } break;
+                                    case 22 :{ $superintendencia = 'MS'; } break;
+                                    case 24 :{ $superintendencia = 'MT'; } break;
+                                    case 26 :{ $superintendencia = 'RO'; } break;
+                                    case 28 :{ $superintendencia = 'PA'; } break;
+                                    case 30 :{ $superintendencia = 'PB'; } break;
+                                    case 32 :{ $superintendencia = 'PE'; } break;
+                                    case 34 :{ $superintendencia = 'PI'; } break;
+                                    case 36 :{ $superintendencia = 'PR'; } break;
+                                    case 50 :{ $superintendencia = 'RJ'; } break;
+                                    case 60 :{ $superintendencia = 'RN'; } break;
+                                    case 64 :{ $superintendencia = 'RS'; } break;
+                                    case 68 :{ $superintendencia = 'SC'; } break;
+                                    case 72 :{ $superintendencia = 'SPM'; } break;
+                                    case 74 :{ $superintendencia = 'SPI'; } break;
+                                    case 75 :{ $superintendencia = 'TO'; } break;
                                 }
 
                                 $reincidencia = DB::table('snci')
@@ -5425,7 +5424,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $painel_extravios = DB::table('painel_extravios')
                                             ->select( 'painel_extravios.*' )
                                             ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                             ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                             ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                             ->get();
@@ -5435,7 +5434,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $painel_extravios = DB::table('painel_extravios')
                                             ->select( 'painel_extravios.*' )
                                             ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                             ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                             ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                             ->get();
@@ -5445,7 +5444,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $painel_extravios = DB::table('painel_extravios')
                                         ->select( 'painel_extravios.*' )
                                         ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                         ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                         ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                         ->get();
@@ -5575,31 +5574,31 @@ class AvaliaInspecao implements ShouldQueue
 
                                 switch ($registro->se) {
 
-                                    case 1 :{ $superintendência = 'CS'; } break;
-                                    case 4 :{ $superintendência = 'AL'; } break;
-                                    case 6 :{ $superintendência = 'AM'; } break;
-                                    case 8 :{ $superintendência = 'BA'; } break;
-                                    case 10 :{ $superintendência = 'BSB'; } break;
-                                    case 12 :{ $superintendência = 'CE'; } break;
-                                    case 14 :{ $superintendência = 'ES'; } break;
-                                    case 16 :{ $superintendência = 'GO'; } break;
-                                    case 18 :{ $superintendência = 'MA'; } break;
-                                    case 20 :{ $superintendência = 'MG'; } break;
-                                    case 22 :{ $superintendência = 'MS'; } break;
-                                    case 24 :{ $superintendência = 'MT'; } break;
-                                    case 26 :{ $superintendência = 'RO'; } break;
-                                    case 28 :{ $superintendência = 'PA'; } break;
-                                    case 30 :{ $superintendência = 'PB'; } break;
-                                    case 32 :{ $superintendência = 'PE'; } break;
-                                    case 34 :{ $superintendência = 'PI'; } break;
-                                    case 36 :{ $superintendência = 'PR'; } break;
-                                    case 50 :{ $superintendência = 'RJ'; } break;
-                                    case 60 :{ $superintendência = 'RN'; } break;
-                                    case 64 :{ $superintendência = 'RS'; } break;
-                                    case 68 :{ $superintendência = 'SC'; } break;
-                                    case 72 :{ $superintendência = 'SPM'; } break;
-                                    case 74 :{ $superintendência = 'SPI'; } break;
-                                    case 75 :{ $superintendência = 'TO'; } break;
+                                    case 1 :{ $superintendencia = 'CS'; } break;
+                                    case 4 :{ $superintendencia = 'AL'; } break;
+                                    case 6 :{ $superintendencia = 'AM'; } break;
+                                    case 8 :{ $superintendencia = 'BA'; } break;
+                                    case 10 :{ $superintendencia = 'BSB'; } break;
+                                    case 12 :{ $superintendencia = 'CE'; } break;
+                                    case 14 :{ $superintendencia = 'ES'; } break;
+                                    case 16 :{ $superintendencia = 'GO'; } break;
+                                    case 18 :{ $superintendencia = 'MA'; } break;
+                                    case 20 :{ $superintendencia = 'MG'; } break;
+                                    case 22 :{ $superintendencia = 'MS'; } break;
+                                    case 24 :{ $superintendencia = 'MT'; } break;
+                                    case 26 :{ $superintendencia = 'RO'; } break;
+                                    case 28 :{ $superintendencia = 'PA'; } break;
+                                    case 30 :{ $superintendencia = 'PB'; } break;
+                                    case 32 :{ $superintendencia = 'PE'; } break;
+                                    case 34 :{ $superintendencia = 'PI'; } break;
+                                    case 36 :{ $superintendencia = 'PR'; } break;
+                                    case 50 :{ $superintendencia = 'RJ'; } break;
+                                    case 60 :{ $superintendencia = 'RN'; } break;
+                                    case 64 :{ $superintendencia = 'RS'; } break;
+                                    case 68 :{ $superintendencia = 'SC'; } break;
+                                    case 72 :{ $superintendencia = 'SPM'; } break;
+                                    case 74 :{ $superintendencia = 'SPI'; } break;
+                                    case 75 :{ $superintendencia = 'TO'; } break;
                                 }
 
                                 $reincidencia = DB::table('snci')
@@ -5626,7 +5625,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $painel_extravios = DB::table('painel_extravios')
                                             ->select( 'painel_extravios.*' )
                                             ->where([['painel_extravios.data_evento', '>=',  $reincidencia_dt_fim_inspecao  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                             ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                             ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                             ->get();
@@ -5636,7 +5635,7 @@ class AvaliaInspecao implements ShouldQueue
                                         $painel_extravios = DB::table('painel_extravios')
                                             ->select( 'painel_extravios.*' )
                                             ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                            ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                            ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                             ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                             ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                             ->get();
@@ -5646,7 +5645,7 @@ class AvaliaInspecao implements ShouldQueue
                                     $painel_extravios = DB::table('painel_extravios')
                                         ->select( 'painel_extravios.*' )
                                         ->where([['painel_extravios.data_evento', '>=',  $dtmenos150dias  ]])
-                                        ->where([['painel_extravios.dr_destino', '=',  $superintendência  ]])//o relatório não tem mcu
+                                        ->where([['painel_extravios.dr_destino', '=',  $superintendencia  ]])//o relatório não tem mcu
                                         ->where([['painel_extravios.unid_destino_apelido', '=',  $registro->descricao  ]])
                                         ->where([['painel_extravios.gestao_prealerta', '=',  'Gestão Automática' ]])
                                         ->get();

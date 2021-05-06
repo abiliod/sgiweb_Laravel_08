@@ -85,7 +85,7 @@
                         <th>Status</th>
                         <th>Coordenador</th>
                         <th>Colaborador</th>
-                        <th>Início</th>
+                        <th>Programada Para</th>
 						<th>Ação</th>
 					</tr>
 				</thead>
@@ -94,7 +94,7 @@
 				    @forelse($registros as $registro)
                         <tr>
 
-                        @if(($registro->status=='Em Inspeção'))
+                        @if($registro->status=='Em Inspeção')
 
                                 <td>{{ $registro->ciclo }}</td>
                                 <td>{{ $registro->tipoVerificacao }}</td>
@@ -103,7 +103,10 @@
                                 <td>{{ $registro->status }}</td>
                                 <td>{{ $registro->inspetorcoordenador }}</td>
                                 <td>{{ $registro->inspetorcolaborador }}</td>
-                                <td>{{ $registro->datainiPreInspeção }}</td>
+                                <td >{{ isset($registro->data_programacao)
+                                    ? \Carbon\Carbon::parse($registro->data_programacao)->format('d/m/Y')
+                                    : \Carbon\Carbon::parse($registro->datainiPreInspeção)->format('d/m/Y')
+                                    }} </td>
 
                         @else
                                 <td class="blue">{{ $registro->ciclo }}</td>
@@ -113,31 +116,44 @@
                                 <td class="blue">{{ $registro->status }}</td>
                                 <td class="blue">{{ $registro->inspetorcoordenador }}</td>
                                 <td class="blue">{{ $registro->inspetorcolaborador }}</td>
-                                <td class="blue">{{ $registro->datainiPreInspeção }}</td>
+                                <td class="blue">{{ isset($registro->data_programacao)
+                                    ? \Carbon\Carbon::parse($registro->data_programacao)->format('d/m/Y')
+                                    : \Carbon\Carbon::parse($registro->datainiPreInspeção)->format('d/m/Y')
+                                    }} </td>
+
 
                         @endif
-
-
-
-
-
-
                             <td>
                             @can('inspecao_editar')
 
-                                <a class="waves-effect waves-light btn orange"
-                                   href="{{ route('compliance.inspecao', $registro->id) }}">Inspecionar</a>
+                                @if ($registro->data_programacao <= now()->subDays(0))
+                                        <a class="waves-effect waves-light btn orange  "
+                                           href="{{ route('compliance.inspecao', $registro->id) }}">Inspecionar</a>
 
-                                <a class="waves-effect waves-light btn #00897b teal darken-1"
-                                   href="">NCI</a>
+                                        <a class="waves-effect waves-light btn #00897b teal darken-1  "
+                                           href="">NCI</a>
+                                    @else
+                                        <a class="waves-effect waves-light btn orange disabled"
+                                           href="{{ route('compliance.inspecao', $registro->id) }}">Inspecionar</a>
+
+                                        <a class="waves-effect waves-light btn #00897b teal darken-1 disabled"
+                                           href="">NCI</a>
+                                @endif
+
 
                                 <a class="waves-effect waves-light btn blue"
                                    href="{{ route('compliance.inspecionados.papelTrabalho',$registro->id) }}">Previa_Rel</a>
                             @endcan
 
                             @can('inspecao_deletar')
-                                <a class="btn red" href="javascript: if(confirm('Deletar esse registro?'))
-                                { window.location.href = '{{ route('compliance.verificacoes.destroy',$registro->id) }}' }">Deletar</a>
+                                @if ($registro->job_programado >=  1  )
+                                        <a class="btn red disabled" href="javascript: if(confirm('Deletar esse registro?'))
+                                        { window.location.href = '{{ route('compliance.verificacoes.destroy',$registro->id) }}' }">Deletar</a>
+                                    @else
+                                        <a class="btn red " href="javascript: if(confirm('Deletar esse registro?'))
+                                        { window.location.href = '{{ route('compliance.verificacoes.destroy',$registro->id) }}' }">Deletar</a>
+
+                                @endif
                             @endcan
 
                         </td>

@@ -47,13 +47,21 @@ return [
             'queue' => 'importacao',
             'retry_after' => 720,
         ],
-// php artisan queue:work --queue=avaliaInspecao
-        'avaliaInspecao' => [
+// php artisan queue:work --queue=atualizaInspecao
+        'atualizaInspecao' => [
             'driver' => 'database',
             'table' => 'jobs',
-            'queue' => 'avaliaInspecao',
+            'queue' => 'atualizaInspecao',
             'retry_after' => 720,
         ],
+
+// php artisan queue:work --queue=avaliaInspecao
+        'avaliaInspecao' => [
+    'driver' => 'database',
+    'table' => 'jobs',
+    'queue' => 'avaliaInspecao',
+    'retry_after' => 720,
+],
 // php artisan queue:work --queue=geraInspecao
         'geraInspecao' => [
             'driver' => 'database',
@@ -68,6 +76,14 @@ return [
         'table' => 'jobs',
         'queue' => 'geraXmlInspecao',
         'retry_after' => 720,
+        ],
+
+//  php artisan queue:work --queue=concluirInspecao
+        'concluirInspecao' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'concluirInspecao',
+            'retry_after' => 720,
         ],
 
         'database' => [

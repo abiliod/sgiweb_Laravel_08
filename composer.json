@@ -22,8 +22,9 @@
         "maatwebsite/excel": "^3.1",
         "nesbot/carbon": "^2.32",
         "phpoffice/phpspreadsheet": "^1.16",
-        "tymon/jwt-auth": "~1.0.0-rc.4.1"
-    },
+        "tymon/jwt-auth": "~1.0.0-rc.4.1",
+	  "ext-json": "*"
+	},
     "require-dev": {
         "facade/ignition": "^2.3.6",
         "fzaninotto/faker": "^1.9.1",

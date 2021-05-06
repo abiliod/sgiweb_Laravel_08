@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Correios;
 
 use App\Http\Controllers\Controller;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
@@ -531,8 +532,10 @@ class VerificacoesController extends Controller
         //return view('compliance.verificacoes.index',compact('registros', 'tiposDeUnidade'));
     }
 
-    public function index()
-    {
+    public function index( ) {
+
+//        $now->format('Y-m-d');
+
         try
         {
            $businessUnitUser = DB::table('unidades')
@@ -579,6 +582,7 @@ class VerificacoesController extends Controller
                         $registros = DB::table('unidades')
                             ->join('inspecoes', 'unidades.id',  '=',   'unidade_id')
                             ->select('inspecoes.*','unidades.se','unidades.seDescricao')
+                            ->where([['data_programacao', '!=', null]])
                             ->where([['status', '=', 'Em Inspeção']])
                             ->Orwhere([['status', '=', 'Inspecionado']])
                             ->orderBy('codigo' , 'asc')
@@ -597,12 +601,14 @@ class VerificacoesController extends Controller
                         $first = DB::table('unidades')
                             ->join('inspecoes', 'unidades.id',  '=',   'unidade_id')
                             ->select('inspecoes.*','unidades.se','unidades.seDescricao')
+
                             ->where([['status', '=', 'Em Inspeção']])
                             ->where([['inspetorcoordenador', '=', auth()->user()->document]]);
 
                         $registros = DB::table('unidades')
                             ->join('inspecoes', 'unidades.id',  '=',   'unidade_id')
                             ->select('inspecoes.*','unidades.se','unidades.seDescricao')
+                            ->where([['data_programacao', '!=', null]])
                             ->where([['status', '=', 'Em Inspeção']])
                             ->Orwhere([['status', '=', 'Inspecionado']])
                             ->Where([['inspetorcolaborador', '=', auth()->user()->document]])
@@ -631,6 +637,7 @@ class VerificacoesController extends Controller
                         $registros = DB::table('unidades')
                             ->join('inspecoes', 'unidades.id',  '=',   'unidade_id')
                             ->select('inspecoes.*','unidades.se','unidades.seDescricao')
+                            ->where([['data_programacao', '!=', null]])
                             ->where([['status', '=', 'Em Inspeção']])
                             ->Orwhere([['status', '=', 'Inspecionado']])
                             ->union($first)
@@ -666,6 +673,7 @@ class VerificacoesController extends Controller
                         $registros = DB::table('unidades')
                             ->join('inspecoes', 'unidades.id',  '=',   'unidade_id')
                             ->select('inspecoes.*','unidades.se','unidades.seDescricao')
+                            ->where([['data_programacao', '!=', null]])
                             ->where([['status', '=', 'Em Inspeção']])
                             ->Orwhere([['status', '=', 'Inspecionado']])
                             ->Where([['inspetorcolaborador', '=', auth()->user()->document]])
@@ -677,8 +685,9 @@ class VerificacoesController extends Controller
                     break;
                 default:  return redirect()->route('home');
             }
-//dd($registros);
-            return view('compliance.verificacoes.index',compact('registros','tiposDeUnidade', 'inspetores'));
+            $now = Carbon::now();
+//            dd($now);
+            return view('compliance.verificacoes.index',compact('now','registros','tiposDeUnidade', 'inspetores'));
         }
         else
         {

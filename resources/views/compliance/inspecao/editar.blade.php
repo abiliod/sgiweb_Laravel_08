@@ -157,22 +157,14 @@
                                     @include('compliance.inspecao.modal._form275-1')
                             @endif
 
-
-                            @if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==5))
-                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==4))
-                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==3))
-                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==2)))
+                                @if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==5))
+                                      || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==4))
+                                      || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==3))
+                                      || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==2)))
 
                                     @include('compliance.inspecao.modal._form277-2')
-                            @endif
+                                @endif
 
-                            @if((($registro->numeroGrupoVerificacao==201) && ($registro->numeroDoTeste==6))
-                                || (($registro->numeroGrupoVerificacao==331) && ($registro->numeroDoTeste==5))
-                                || (($registro->numeroGrupoVerificacao==240) && ($registro->numeroDoTeste==4))
-                                || (($registro->numeroGrupoVerificacao==277) && ($registro->numeroDoTeste==3)))
-
-                                    @include('compliance.inspecao.modal._form277-3')
-                            @endif
 
                             @if( (($registro->numeroGrupoVerificacao==201)&&($registro->numeroDoTeste==7))
 	                            || ( ($registro->numeroGrupoVerificacao==331)&&($registro->numeroDoTeste==6) )

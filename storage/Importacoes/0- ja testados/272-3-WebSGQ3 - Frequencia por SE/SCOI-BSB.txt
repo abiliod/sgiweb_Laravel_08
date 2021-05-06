@@ -1,0 +1,13 @@
+AM
+BSB
+GO
+PA
+RO
+TO
+
+Imprima o Relatório WebSGQ3 - Frequencia por SE
+Menu; Frequencia e Jornada -> Dias Não Trabalhados PGP -> Por SE
+Selecione a SE e o mês da referência, opção Listar em Data Table
+VEJA o lay-out:
+[Matrícula	Nome	Cargo	Lotação	Data evento	Dias	Motivo]
+Frequencia: MENSAL. É necessário que os ultimos 12 meses

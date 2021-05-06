@@ -1,0 +1,20 @@
+AM
+BSB
+GO
+PA
+RO
+TO
+
+Alarme
+Acessar o Sistema http://10.120.9.38/rel, informe a SE o período, marque todas unidades e selecione a opção ambos.
+Importar os dados do relatório de alarme monitorado ARME/DESARME para uma planilha formato xlsx.
+marque a partir do cabeçalho da pagina até a ultima linha copie e cole na planilha (utilize a opção colar valores do excel)
+
+VEJA o lay-out:
+[CLIENTE	        MCU	USUÁRIO	MATRÍCULA	ARME/DESARME	DATA	      HORA]
+[AC MATRINCHÃ - GO	6866	1	8332425- 9	Desarme 	26/10/2020   08:19:05]   -> observe essa formatação na colunas equivalente
+
+Tipo de importação: Por incremento.O Sistema ao importar a planilha grava os registros não existentes Em seguida irá apagará os registros existentes na tabela com data  maior que 12 meses.
+tamanho aproximado do arquifo 90 kb  2000 linhas
+  ano passado até o dia 04/11
+

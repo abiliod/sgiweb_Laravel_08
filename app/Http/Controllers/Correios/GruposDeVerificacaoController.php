@@ -175,6 +175,7 @@ class GruposDeVerificacaoController extends Controller
             ->select('tipoUnidade_id','sigla','tipodescricao')
             ->groupBy('tipodescricao')
             ->get();
+
         return view('compliance.grupoVerificacao.index',compact('registros', 'tiposDeUnidade','gruposdeverificacao','dados'));
     }
 }

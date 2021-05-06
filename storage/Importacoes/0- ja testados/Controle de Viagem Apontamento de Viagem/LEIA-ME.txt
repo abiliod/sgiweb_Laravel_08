@@ -1,0 +1,5 @@
+Acessar o Sistema ERP, função Gestão de Linha de Transportes, no programa Desempenho das linhas de transportes.
+Como parâmetro informar apenas um unico dia da semana entre segunda e sexta feira para os parametros datas inicio e final da viagem.
+Coloque status V1 e V5 informe a SE. Clicar em procurar e exibir todas linhas na tela. em seguida exporte para excel.
+Executar esse processo para todas SEs e todos tipos de linhas exceto LTNs.
+Após o download do arquivo abrir e salvar como pasta de trabalho excel para que o mesmo passe a ter a extensão xlsx.

@@ -23,7 +23,6 @@ class Inspecao extends Model
         'numHrsDesloc',
         'numHrsInsp',
         'eventoInspecao',
-
         'totalPontos',
         'valor_ref_itens_inspecionados',
         'totalpontosnaoconforme',
@@ -31,7 +30,8 @@ class Inspecao extends Model
         'classificacao',
         'totalitensavaliados',
         'totalitensnaoconforme',
-
+        'data_programacao',
+        'job_programado',
         'xml'
     ];
 

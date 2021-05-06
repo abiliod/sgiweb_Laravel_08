@@ -22,7 +22,8 @@
                             <option value="Em Inspeção">Em Inspeção</option>
                             <option value="Inspecionado">Inspecionado</option>
                             <option value="Corroborado">Corroborado</option>
-                            <option value="Pendente na Unidade">Outros..nnn</option>
+                            <option value="Concluido">Concluido</option>
+
 
                          </select>
                         <label for="situacao" >Situação do Item Inspecionado</label>
@@ -199,6 +200,7 @@
 		</nav>
 
         <div class="row">
+
 		<table class="highlight">
 				<thead>
 					<tr>
@@ -208,60 +210,61 @@
                         <th>Teste</th>
                         <th>Situação</th>
 
-                        @foreach($registros as $registro)
 
-                        @endforeach
+{{--                        $countEmInsp--}}
+{{--                        $countInspecionado--}}
+{{--                        $countCorroborado--}}
 
-                        @if($registro->situacao == 'Inspecionado')
-                            <th>
-                                @if($registro->tipoVerificacao == 'Monitorada')
-                                <th>Ação:</th>
-                                @else
-                                    @if($dado->inspetorcolaborador ==  auth()->user()->document)
-                                        <a class="btn blue" href="javascript: if(confirm('Corroborar Todos Registros dessa Inspeção?'))
-                                     { window.location.href = '{{ route('compliance.inspecao.corroborar',$registro->inspecao_id) }}' }">Corroborar_Tudo</a>
-                                    @endif
-                                @endif
-
-                            </th>
+                        @if(($dado->situacao == 'Inspecionado') && ($countEmInsp==0) || ($dado->situacao == 'Corroborado'))
+                            @if(($dado->inspetorcoordenador ==  auth()->user()->document) || ($dado->inspetorcolaborador ==  auth()->user()->document))
+                                <th>Ação:    <a class="btn blue" href="javascript: if(confirm('Corroborar Todos Registros dessa Inspeção?'))
+                                     { window.location.href = '{{ route('compliance.inspecao.corroborar',$dado->inspecao_id) }}' }">Corroborar_Tudo</a>
+                                </th>
+                            @else
+                                    <th>Ação: Você não Pode Corroborar Essa inspeção {{$dado->inspetorcoordenador}} </th>
+                            @endif
                         @else
-                            <th>Ação:</th>
+                            <th>Ação: {{$dado->situacao}}</th>
                         @endif
+
 					</tr>
 				</thead>
 				<tbody>
-				@foreach($registros as $registro)
-					<tr>
-				    	<td>{{ $registro->numeroGrupoVerificacao }}</td>
+
+
+                @foreach($registros as $registro)
+                    <tr>
+                        <td>{{ $registro->numeroGrupoVerificacao }}</td>
                         <td>{{ $registro->nomegrupo }}</td>
                         <td>{{ $registro->numeroDoTeste }}</td>
                         <td>{{ $registro->teste }}</td>
 
                         @if($registro->situacao == 'Inspecionado')
                             <td class="card-panel teal lighten-2">
-                                    {{ $registro->situacao }}
+                                {{ $registro->situacao }}
                             </td>
                             <td>
-{{--                                @if($dado->inspetorcolaborador ==  auth()->user()->document)--}}
-{{--                                    <a class="waves-effect waves-light btn orange"--}}
-{{--                                       href="{{ route('compliance.inspecao.editar',$registro->id) }}">Corroborar</a>--}}
-{{--                                @endif--}}
+
+                                @if($dado->inspetorcolaborador ==  auth()->user()->document)
+                                    <a class="waves-effect waves-light btn orange"
+                                       href="{{ route('compliance.inspecao.editar',$registro->id) }}">Corroborar</a>
+                                @endif
                             </td>
+
                         @elseif($registro->situacao == 'Corroborado')
-                        <td class="card-panel teal lighten-2">
-                            <button
-                                data-target="modal1"
-                                class="btn modal-trigger waves-effect waves-light" >
-                                {{ $registro->situacao }}
-                                <i class="material-icons right">event_note</i>
-                            </button>
-                        </td>
+                            <td class="card-panel teal lighten-2">
+                                <button
+                                    data-target="modal1"
+                                    class="btn modal-trigger waves-effect waves-light" >
+                                    {{ $registro->situacao }}
+                                    <i class="material-icons right">event_note</i>
+                                </button>
+                            </td>
 
                         @elseif($registro->situacao == 'Em Inspeção')
                             <td>
-                                    {{ $registro->situacao }}
+                                {{ $registro->situacao }}
                             </td>
-
                             <td>
 
                                 @can('inspecao_editar')
@@ -270,18 +273,34 @@
                                 @endcan
 
                             </td>
+                        @elseif($registro->situacao == 'Concluido')
+                            <td>
+                                {{ $registro->situacao }}
+                            </td>
+                            <td>
+
+                                @can('inspecao_editar')
+                                    <a class="waves-effect waves-light btn orange disabled"
+                                       href="{{ route('compliance.inspecao.editar',$registro->id) }}">Avaliar</a>
+                                @endcan
+
+                            </td>
+
                         @endif
 
-					</tr>
+
+
+                    </tr>
                 @endforeach
 
 
 
 				</tbody>
 			</table>
-            <div class="row">
-                    {!! $registros->links() !!}
-            </div>
+
+        <div class="row">
+                {!! $registros->links() !!}
+        </div>
 		</div>
    	</div>
 @endsection

@@ -2,7 +2,9 @@
     <div id="aprimoramento">
         <span>
             Até a data da inspeção, a relação de Processos de Apuração de Extravio
-            de Bens Móveis Pendentes, não foi disponibilizada pela Gerência Regional de Serviços - GERES. A solicitação foi efetuada por meio do Oficio 13026536 - SEI: 53191.002165/2020-34 de 06/03/2020.
+            de Bens Móveis Pendentes, não foi disponibilizada pela Gerência Regional de Serviços
+            - GERES. A solicitação foi efetuada por meio de Oficio
+            xxxxxxx - SEI: xxxxxxxx de xx/xx/xxxx.
         </span>
     </div>
     <div id="historico"></div>

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Jobs\AvaliaInspecao;
 use App\Jobs\GeraInspecao;
 use App\Jobs\JobConclui_Inspecao;
-use App\Jobs\JobXml_Inspecao;
 use App\Models\Correios\Inspecao;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -57,6 +56,7 @@ class MonitoramentoController extends Controller {
             $superintendencias = $request->all(['superintendencia']);
             $tipodeunidade = $request->all(['tipodeunidade']);
             $ciclo = $request->all(['ciclo']);
+
 //#########################################################################################################
 //            para ativar a fila no console
 //            php artisan queue:work --queue=avaliaInspecao
@@ -282,7 +282,7 @@ class MonitoramentoController extends Controller {
 
                     // testa se o primeiro parâmetro é para todas superintendecia onde SE == 1
                     // Inicio do teste para todas superintendencias
-                    if ($superintendencia == 1) {
+                    if ($superintendencia === 1) {
 
                         // se verdadeiro se SE == 1 seleciona todas superintendência cujo a SE > 1
 
@@ -335,7 +335,6 @@ class MonitoramentoController extends Controller {
                                 ->orderBy('itensdeinspecoes.testeVerificacao_id' , 'asc')
                                 ->get();
 
-                            $row=0;
 //                            $totalPontosNaInspecao =  $registros->sum('pontuado');
 // Gera  XML
                             $xml = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
@@ -439,11 +438,11 @@ class MonitoramentoController extends Controller {
 //                        ################ FIM  verificar quais os campos corretos no Sistema SNCI se não existir pedir para criar#############
 
                                 $xml .= "\n\t\t".'<INP_HrsPreInspecao>'.$registro->NumHrsPreInsp.'</INP_HrsPreInspecao>';
-                                $xml .= "\n\t\t".'<INP_DtInicDeslocamento>'.\Carbon\Carbon::parse($registro->datainiPreInspeção)->format( 'd/m/Y' ).'</INP_DtInicDeslocamento>';
-                                $xml .= "\n\t\t".'<INP_DtFimDeslocamento>'.\Carbon\Carbon::parse($inspecao->updated_at)->format( 'd/m/Y' ).'</INP_DtFimDeslocamento>';
+                                $xml .= "\n\t\t".'<INP_DtInicDeslocamento>'.Carbon::parse($registro->datainiPreInspeção)->format( 'd/m/Y' ).'</INP_DtInicDeslocamento>';
+                                $xml .= "\n\t\t".'<INP_DtFimDeslocamento>'.Carbon::parse($inspecao->updated_at)->format( 'd/m/Y' ).'</INP_DtFimDeslocamento>';
                                 $xml .= "\n\t\t".'<INP_HrsDeslocamento>'.$registro->NumHrsDesloc.'</INP_HrsDeslocamento>';
-                                $xml .= "\n\t\t".'<INP_DtInicInspecao>'.\Carbon\Carbon::parse($registro->datainiPreInspeção)->format( 'd/m/Y' ).'</INP_DtInicInspecao>';
-                                $xml .= "\n\t\t".'<INP_DtFimInspecao>'.\Carbon\Carbon::parse($inspecao->updated_at)->format( 'd/m/Y' ).'</INP_DtFimInspecao>';
+                                $xml .= "\n\t\t".'<INP_DtInicInspecao>'.Carbon::parse($registro->datainiPreInspeção)->format( 'd/m/Y' ).'</INP_DtInicInspecao>';
+                                $xml .= "\n\t\t".'<INP_DtFimInspecao>'.Carbon::parse($inspecao->updated_at)->format( 'd/m/Y' ).'</INP_DtFimInspecao>';
                                 $xml .= "\n\t\t".'<INP_HrsInspecao>'.$registro->NumHrsInsp.'</INP_HrsInspecao>';
                                 $xml .= "\n\t\t".'<INP_Situacao>'.$situacao.'</INP_Situacao>';
 
