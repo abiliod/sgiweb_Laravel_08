@@ -94,7 +94,7 @@ Route::get('/compliance/inspecionados', 'Correios\InspecionadosController@index'
 Route::post('/compliance/inspecionados{search?}', 'Correios\InspecionadosController@search')->name('compliance.inspecionados.search');
 Route::get('/compliance/inspecionados/{id}', 'Correios\InspecionadosController@papelTrabalho')->name('compliance.inspecionados.papelTrabalho');
 Route::get('/compliance/inspecionados/pdf/{id}','Correios\InspecionadosController@createPDF')->name('compliance.inspecionados.pdfPapelTrabalho');
-Route::get('/compliance/inspecionados/xml/{id}','Correios\InspecionadosController@createXML')->name('compliance.inspecionados.xml');
+//Route::get('/compliance/inspecionados/xml/{id}','Correios\InspecionadosController@createXML')->name('compliance.inspecionados.xml');
 Route::get('/compliance/inspecionados/recusar/{id}', 'Correios\InspecionadosController@recusar')->name('compliance.inspecionados.recusar');
 
 Route::get('/compliance/verificacoes/destroy/{id}', 'Correios\VerificacoesController@destroy')->name('compliance.verificacoes.destroy');

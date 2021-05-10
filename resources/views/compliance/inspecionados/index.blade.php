@@ -99,14 +99,7 @@
                          href="{{ route('compliance.inspecionados.papelTrabalho',$registro->id) }}">Papel_Rel</a>
 
                     </td>
-                    @can('inspecao_gerar_xml')   @endcan
-                        <td>
-                            <a class="waves-effect waves-light btn orange"
-                               href="{{ route('compliance.inspecionados.xml',$registro->id) }}">XML</a>
 
-                            <a class="waves-effect waves-light btn #00897b teal darken-1"
-                               href="">NCI</a>
-                        </td>
 
                     <td>
                          <a class="btn btn-primary"

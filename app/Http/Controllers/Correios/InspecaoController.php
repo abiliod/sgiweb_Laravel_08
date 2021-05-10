@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Correios;
 
 use App\Http\Controllers\Controller;
-use Auth;
+//use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -855,7 +855,7 @@ class InspecaoController extends Controller {
                 ->where([['inspecao_id', '=', $id]])
                 ->Where([['situacao', '!=', 'Corroborado' ]])
                 ->orderBy('itensdeinspecoes.testeVerificacao_id' , 'asc')
-            ->get();
+            ->paginate(10);
             $contasituacao = $registros->count('situacao');
             $countCorroborado = $registros->count('situacao');
         }
@@ -942,6 +942,7 @@ class InspecaoController extends Controller {
             ->select('itensdeinspecoes.*','inspecoes.*','unidades.*','testesdeverificacao.*','gruposdeverificacao.*')
             ->where([['inspecoes.id', '=', $id ]])
             ->first();
+  //      dd($registros);
         return view('compliance.inspecao.index',compact('inspecao','registros'
             ,'gruposdeverificacao','dado','countEmInsp', 'countInspecionado','countCorroborado'));
     }
@@ -950,6 +951,7 @@ class InspecaoController extends Controller {
         $now = Carbon::now();
         $now->format('d-m-Y H:i:s');
         $inspecao = Inspecao::find($id);
+
         $registros = DB::table('itensdeinspecoes')
             ->select('itensdeinspecoes.*')
             ->where([['inspecao_id', '=', $id]])
@@ -1022,10 +1024,15 @@ class InspecaoController extends Controller {
              $inspecao->classificacao =  $classificacao;
              $inspecao->status = $status;
              $inspecao->eventoInspecao = $inspecao->eventoInspecao . "\r\n".'Inspeção corroborada, concluida por '.Auth::user()->name." em ".\Carbon\Carbon::parse($now)->format( 'd/m/Y' );
-dd('linha 1043' , $inspecao) ;
+//dd('linha 1043' , $inspecao) ;
              $inspecao->save();
+             \Session::flash('mensagem',['msg'=>'Inspeção Corroborada. Concluida por: ' .Auth::user()->name." em ".\Carbon\Carbon::parse($now)->format( 'd/m/Y' ),'class'=>'blue white-text']);
+             return redirect()-> route('compliance.verificacoes');
         }
-        \Session::flash('mensagem',['msg'=>'Inspeção Corroborada. Concluida por: ' .Auth::user()->name." em ".\Carbon\Carbon::parse($now)->format( 'd/m/Y' ),'class'=>'blue white-text']);
-        return redirect()-> route('compliance.verificacoes');
+         else{
+             \Session::flash('mensagem',['msg'=>'Inspeção com pendência de avaliação de testes','class'=>'red white-text']);
+             return redirect()-> back();
+         }
+
     }
 }

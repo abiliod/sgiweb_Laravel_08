@@ -210,18 +210,15 @@
                         <th>Teste</th>
                         <th>Situação</th>
 
-
-{{--                        $countEmInsp--}}
-{{--                        $countInspecionado--}}
-{{--                        $countCorroborado--}}
-
                         @if(($dado->situacao == 'Inspecionado') && ($countEmInsp==0) || ($dado->situacao == 'Corroborado'))
                             @if(($dado->inspetorcoordenador ==  auth()->user()->document) || ($dado->inspetorcolaborador ==  auth()->user()->document))
                                 <th>Ação:    <a class="btn blue" href="javascript: if(confirm('Corroborar Todos Registros dessa Inspeção?'))
                                      { window.location.href = '{{ route('compliance.inspecao.corroborar',$dado->inspecao_id) }}' }">Corroborar_Tudo</a>
                                 </th>
                             @else
-                                    <th>Ação: Você não Pode Corroborar Essa inspeção {{$dado->inspetorcoordenador}} </th>
+                                <th>Ação:    <a class="btn blue disabled" href="javascript: if(confirm('Corroborar Todos Registros dessa Inspeção?'))
+                                     { window.location.href = '{{ route('compliance.inspecao.corroborar',$dado->inspecao_id) }}' }">Corroborar_Tudo</a>
+                                </th>
                             @endif
                         @else
                             <th>Ação: {{$dado->situacao}}</th>
@@ -245,8 +242,8 @@
                             </td>
                             <td>
 
-                                @if($dado->inspetorcolaborador ==  auth()->user()->document)
-                                    <a class="waves-effect waves-light btn orange"
+                                @if($dado->inspetorcolaborador !==  auth()->user()->document)
+                                    <a class="waves-effect waves-light btn orange disabled"
                                        href="{{ route('compliance.inspecao.editar',$registro->id) }}">Corroborar</a>
                                 @endif
                             </td>
@@ -273,12 +270,12 @@
                                 @endcan
 
                             </td>
-                        @elseif($registro->situacao == 'Concluido')
+                        @elseif($registro->situacao == 'Inspecionado')
                             <td>
                                 {{ $registro->situacao }}
                             </td>
-                            <td>
 
+                            <td>
                                 @can('inspecao_editar')
                                     <a class="waves-effect waves-light btn orange disabled"
                                        href="{{ route('compliance.inspecao.editar',$registro->id) }}">Avaliar</a>

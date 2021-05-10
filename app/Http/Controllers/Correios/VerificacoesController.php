@@ -532,7 +532,7 @@ class VerificacoesController extends Controller
         //return view('compliance.verificacoes.index',compact('registros', 'tiposDeUnidade'));
     }
 
-    public function index( ) {
+    public function index() {
 
 //        $now->format('Y-m-d');
 
@@ -686,7 +686,7 @@ class VerificacoesController extends Controller
                 default:  return redirect()->route('home');
             }
             $now = Carbon::now();
-//            dd($now);
+
             return view('compliance.verificacoes.index',compact('now','registros','tiposDeUnidade', 'inspetores'));
         }
         else

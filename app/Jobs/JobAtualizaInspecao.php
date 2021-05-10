@@ -3493,6 +3493,7 @@ class JobAtualizaInspecao implements ShouldQueue
             }
 
             if(($registro->numeroGrupoVerificacao==239) && ($registro->numeroDoTeste==3)) {
+
                 $reincidencia = DB::table('snci')
                     ->select('no_inspecao',   'no_grupo',  'no_item','dt_fim_inspecao','dt_inic_inspecao')
                     ->where([['descricao_item',  'like', '%utilização e a devolução dos unitizadores%']])

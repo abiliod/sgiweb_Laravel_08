@@ -62,7 +62,7 @@ class JobXml_Inspecao implements ShouldQueue
 
                     foreach ($inspecoes as $resp) {
                         $inspecao = Inspecao::find($resp->inspecao_id);
-                        $situacao = 'AN';
+                        //$situacao = 'AN';
                         $dtEncerramento = date('Y-m-d', strtotime($dtnow));
                         $vazio = ' ';
                         $totalPontosNaInspecao = null;
@@ -199,7 +199,7 @@ class JobXml_Inspecao implements ShouldQueue
                             $xml .= "\n\t\t".'<INP_DtInicInspecao>'.Carbon::parse($registro->datainiPreInspeção)->format( 'd/m/Y' ).'</INP_DtInicInspecao>';
                             $xml .= "\n\t\t".'<INP_DtFimInspecao>'.Carbon::parse($inspecao->updated_at)->format( 'd/m/Y' ).'</INP_DtFimInspecao>';
                             $xml .= "\n\t\t".'<INP_HrsInspecao>'.$registro->NumHrsInsp.'</INP_HrsInspecao>';
-                            $xml .= "\n\t\t".'<INP_Situacao>'.$situacao.'</INP_Situacao>';
+                            $xml .= "\n\t\t".'<INP_Situacao>'. $registro->situacao .'</INP_Situacao>';
 
 //                        ################  Checar se a formatação do campo  INP_DtEncerramento está correta #############
                             $xml .= "\n\t\t".'<INP_DtEncerramento>'.$dtEncerramento.'</INP_DtEncerramento>';
@@ -256,7 +256,7 @@ class JobXml_Inspecao implements ShouldQueue
 
                     foreach ($inspecoes as $resp) {
                         $inspecao = Inspecao::find($resp->inspecao_id);
-                        $situacao = 'AN';
+//                        $situacao = 'AN';
                         $dtEncerramento = date('Y-m-d', strtotime($dtnow));
                         $vazio = ' ';
                         $totalPontosNaInspecao = null;
@@ -393,7 +393,7 @@ class JobXml_Inspecao implements ShouldQueue
                             $xml .= "\n\t\t".'<INP_DtInicInspecao>'.Carbon::parse($registro->datainiPreInspeção)->format( 'd/m/Y' ).'</INP_DtInicInspecao>';
                             $xml .= "\n\t\t".'<INP_DtFimInspecao>'.Carbon::parse($inspecao->updated_at)->format( 'd/m/Y' ).'</INP_DtFimInspecao>';
                             $xml .= "\n\t\t".'<INP_HrsInspecao>'.$registro->NumHrsInsp.'</INP_HrsInspecao>';
-                            $xml .= "\n\t\t".'<INP_Situacao>'.$situacao.'</INP_Situacao>';
+                            $xml .= "\n\t\t".'<INP_Situacao>'.$registro->situacao.'</INP_Situacao>';
 
 //                        ################  Checar se a formatação do campo  INP_DtEncerramento está correta #############
                             $xml .= "\n\t\t".'<INP_DtEncerramento>'.$dtEncerramento.'</INP_DtEncerramento>';
