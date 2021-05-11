@@ -45,9 +45,8 @@ class JobAtualizaInspecao implements ShouldQueue
         $dt_data_programacao  = $this->dt_data_programacao;
         $inspecao = Inspecao::find($id);
         $data_programacao = $inspecao->data_programacao;
-        $periodo = CarbonPeriod::create($updated_atinspecao, $dt_data_programacao);
-
         $dtnow = new Carbon();
+        $periodo = CarbonPeriod::create($dtnow, $dt_data_programacao);
         $dtmenos30dias = new Carbon();
         $dtmenos60dias = new Carbon();
         $dtmenos90dias = new Carbon();
