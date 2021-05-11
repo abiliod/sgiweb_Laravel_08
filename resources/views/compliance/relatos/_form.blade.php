@@ -31,9 +31,7 @@
     <select name="preVerificar" id="preVerificar">
         <option value="Não" {{(isset($registro->preVerificar) && $registro->preVerificar == 'Não'  ? 'selected' : '')}}>Não</option>
         <option value="Sim" {{(isset($registro->preVerificar) && $registro->preVerificar == 'Sim'  ? 'selected' : '')}}>Sim</option>
-        <option value="Gerar_Conteúdo" {{(isset($registro->preVerificar) && $registro->preVerificar == 'Gerar_Conteúdo'  ? 'selected' : '')}}>Gerar Conteúdo</option>
-
-        Gerar_Conteúdo
+     
     </select>
     <label>Utilizar Modal?</label>
 </div>
