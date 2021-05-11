@@ -37,6 +37,7 @@ class JobApontamentoCV implements ShouldQueue
     {
         $controle_de_viagens = $this->controle_de_viagens;
         $dt_job = $this->dt_job;
+
         foreach ($controle_de_viagens as $dados) {
             foreach ($dados as $row) {
                 //trata data   inicio_viagem
@@ -124,7 +125,8 @@ class JobApontamentoCV implements ShouldQueue
                     $data_conclusao = null;
                 }
                 ApontamentoCV:: firstOrCreate([
-                    'controle_viagem' => $row['controle_viagem']
+                    'controle_viagem' => $row['controle_viagem'],
+                    'sequencia_do_cv' => $row['sequencia_do_cv']
                 ], [
                     'dr_detentora' => $row['dr_detentora'],
                     'unidade_detentora' => $row['unidade_detentora'],
