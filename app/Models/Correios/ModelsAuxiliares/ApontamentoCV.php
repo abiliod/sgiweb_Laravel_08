@@ -46,14 +46,14 @@ class ApontamentoCV extends Model {
 
         'inicio_viagem' => 'date:Y-m-d',
         'data_chegada' => 'date:Y-m-d',
-        'hora_chegada' => 'time:H:i:s',
+//        'hora_chegada' => 'time:H:i:s',
         'data_chegada_prevista' => 'date:Y-m-d',
-        'horario_chegada_previsto' => 'time:H:i:s',
+//        'horario_chegada_previsto' => 'time:H:i:s',
         'data_partida' => 'date:Y-m-d',
-        'hora_partida' => 'time:H:i:s',
+//        'hora_partida' => 'time:H:i:s',
         'data_partida_prevista' =>'date:Y-m-d',
         'data_conclusao' => 'date:Y-m-d',
-        'horario_partida_previsto' => 'time:H:i:s',
+//        'horario_partida_previsto' => 'time:H:i:s',
 
     ];
 }

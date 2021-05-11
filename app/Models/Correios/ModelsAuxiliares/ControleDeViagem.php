@@ -46,7 +46,7 @@ class ControleDeViagem extends Model
         'inicio_viagem' => 'date:Y-m-d',
         'data_chegada_prevista' => 'date:Y-m-d',
         'data_partida_prevista' => 'date:Y-m-d',
-        'horario_chegada_prevista' => 'time:H:m:s',
-        'horario_partida_prevista' => 'time:H:m:s',
+//        'horario_chegada_prevista' => 'time:H:m:s',
+//        'horario_partida_prevista' => 'time:H:m:s',
     ];
 }

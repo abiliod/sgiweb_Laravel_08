@@ -3335,12 +3335,12 @@ class JobAtualizaInspecao implements ShouldQueue
                 if(! $controle_de_viagens->isEmpty()) {
                     $count = $controle_de_viagens->count('ponto_parada');
                     foreach($controle_de_viagens as $dados){
-                        if( ( $controle_de_viagen->tipo_de_operacao == '' )
-                            || ($controle_de_viagen->quantidade == '')
-                            || ($controle_de_viagen->peso == '' )
-                            || ($controle_de_viagen->unitizador == '')
-                            || ($controle_de_viagen->descricao_do_servico == '')
-                            || ($controle_de_viagen->local_de_destino == '')){
+                        if( ( $dados->tipo_de_operacao == '' )
+                            || ($dados->quantidade == '')
+                            || ($dados->peso == '' )
+                            || ($dados->unitizador == '')
+                            || ($dados->descricao_do_servico == '')
+                            || ($dados->local_de_destino == '')){
 
                             $reg ++;
                         }
@@ -5119,8 +5119,9 @@ class JobAtualizaInspecao implements ShouldQueue
                             $situacao = 'O  Acórdão do Dissídio Coletivo 2020/2021, vigente a partir de 01/08/2020, não prevê a manutenção do pagamento do Adicional de Fim de Semana.';
                         }
                         $insp = Inspecao::find($registro->inspecao_id);
-                        if (!$situacao==null) {
+                        if ( !$situacao == null) {
                             $pgtoAdicionaisTemp = new PgtoAdicionaisTemp();
+
                             $pgtoAdicionaisTemp->sto = $registro->sto;
                             $pgtoAdicionaisTemp->mcu = $registro->mcu;
                             $pgtoAdicionaisTemp->codigo = $insp->codigo;
