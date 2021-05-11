@@ -67,10 +67,6 @@ class InspecionadosController extends Controller {
 
 
         $inspecao = Inspecao::find($id);
-
-       //var_dump($inspecao );
-       // dd($inspecao );
-
         $registros = DB::table('itensdeinspecoes')
         ->join('inspecoes', 'itensdeinspecoes.inspecao_id', '=', 'inspecoes.id')
         ->join('gruposdeverificacao', 'itensdeinspecoes.grupoVerificacao_id', '=', 'gruposdeverificacao.id')

@@ -910,18 +910,18 @@ class AvaliaInspecao implements ShouldQueue
                             $nlidaNresp=0;
                             $lidaNresp=0;
                             $respForaprazo3dias=0;
-                            $ocorrências = 0;
+                            $ocorrencias = 0;
                             foreach($cie_eletronicas as $dados) {
                                 if (($dados->lida == 'N') && ($dados->respondida == 'S')) {
                                     $nlida ++;
-                                    $ocorrências ++;
+                                    $ocorrencias ++;
                                 }
                                 if (($dados->lida == 'N') && ($dados->respondida == 'N')) {
                                     $nlidaNresp ++;
-                                    $ocorrências ++;
+                                    $ocorrencias ++;
                                 }
                                 if (($dados->lida == 'S') && ($dados->respondida == 'N')) {
-                                    $ocorrências ++;
+                                    $ocorrencias ++;
                                     $lidaNresp ++;
                                 }
                                 if (($dados->lida == 'S') && ($dados->respondida == 'S')) {
@@ -929,14 +929,14 @@ class AvaliaInspecao implements ShouldQueue
                                         $periodo = CarbonPeriod::create($dados->emissao, $dados->data_de_resposta);
                                         $respostaforaprazo = $periodo->count() - 1;
                                         if ($respostaforaprazo > 3) {
-                                            $ocorrências ++;
+                                            $ocorrencias ++;
                                             $respForaprazo3dias ++;
                                         }
                                     }
                                 }
                             }
 
-                            if($ocorrências >=1){
+                            if($ocorrencias >=1){
 
                                 //       a) Documentos respondidos acima do prazo de 03 dias úteis;
                                 //       b) Se há CIEs sem registro das providências adotadas ou com ações genéricas, que não demonstrem assertividade ou não comprovem efetividade, como por exemplo: ""Empregado orientado"", ""Estamos apurando o ocorrido"";
@@ -5222,18 +5222,18 @@ class AvaliaInspecao implements ShouldQueue
                                 $nlidaNresp=0;
                                 $lidaNresp=0;
                                 $respForaprazo3dias=0;
-                                $ocorrências = 0;
+                                $ocorrencias = 0;
                                 foreach($cie_eletronicas as $dados) {
                                     if (($dados->lida == 'N') && ($dados->respondida == 'S')) {
                                         $nlida ++;
-                                        $ocorrências ++;
+                                        $ocorrencias ++;
                                     }
                                     if (($dados->lida == 'N') && ($dados->respondida == 'N')) {
                                         $nlidaNresp ++;
-                                        $ocorrências ++;
+                                        $ocorrencias ++;
                                     }
                                     if (($dados->lida == 'S') && ($dados->respondida == 'N')) {
-                                        $ocorrências ++;
+                                        $ocorrencias ++;
                                         $lidaNresp ++;
                                     }
                                     if (($dados->lida == 'S') && ($dados->respondida == 'S')) {
@@ -5241,14 +5241,14 @@ class AvaliaInspecao implements ShouldQueue
                                             $periodo = CarbonPeriod::create($dados->emissao, $dados->data_de_resposta);
                                             $respostaforaprazo = $periodo->count() - 1;
                                             if ($respostaforaprazo > 3) {
-                                                $ocorrências ++;
+                                                $ocorrencias ++;
                                                 $respForaprazo3dias ++;
                                             }
                                         }
                                     }
                                 }
 
-                                if($ocorrências >=1){
+                                if($ocorrencias >=1){
 
                                     //       a) Documentos respondidos acima do prazo de 03 dias úteis;
                                     //       b) Se há CIEs sem registro das providências adotadas ou com ações genéricas, que não demonstrem assertividade ou não comprovem efetividade, como por exemplo: ""Empregado orientado"", ""Estamos apurando o ocorrido"";

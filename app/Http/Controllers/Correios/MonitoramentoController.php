@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Jobs\AvaliaInspecao;
 use App\Jobs\GeraInspecao;
 use App\Jobs\JobConclui_Inspecao;
-use App\Models\Correios\Inspecao;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -484,7 +483,7 @@ class MonitoramentoController extends Controller {
 //                }
 //            }
 //            ini_set('memory_limit', '128M');
-//            
+//
         }
     }
 
@@ -948,7 +947,7 @@ class MonitoramentoController extends Controller {
 //                Date ::excelToDateTimeObject($value));
             \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
         }
-        catch (\ErrorException $e) {
+        catch (\Exception $e) {
             return Carbon::createFromFormat($format, $value);
         }
     }

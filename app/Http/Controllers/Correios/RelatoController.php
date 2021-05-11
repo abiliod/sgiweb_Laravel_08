@@ -17,31 +17,31 @@ use App\Http\Requests\Compliance\SalvarTesteDeVerificacao;
 class RelatoController extends Controller
 {
 
-    public function destroy($id) {
-
-//        $testeDeVerificacao = DB::table('testesDeVerificacao')
- //          ->select('numeroDoTeste','teste')
-  //         ->where([
-   //             ['grupoVerificacao_id', '=', $id]
-    //    ])
-     //   ->first();
-
- //       if($testeDeVerificacao){
- //           \Session::flash('mensagem',['msg'=>'Registro Não pode ser excluido, pois está  Relacionado ao item de Verificação Número. '.$testeDeVerificacao->numeroDoTeste.''
- //           ,'class'=>'red white-text']);
- //   		return redirect()->route('compliance.grupoVerificacao');
- //       }else{
-  //      }
-
-
-      //      $registro = TesteDeVerificacao::find($id);
-        //     $registro->delete();
-             \Session::flash('mensagem',['msg'=>'Registro Nâo deletado! Funcionalidade não disponibilizada  por motivos  de segurança.'
-             ,'class'=>'red white-text']);
-             return redirect()->route('compliance.relatos');
-
-
-    }
+//    public function destroy($id) {
+//
+////        $testeDeVerificacao = DB::table('testesDeVerificacao')
+// //          ->select('numeroDoTeste','teste')
+//  //         ->where([
+//   //             ['grupoVerificacao_id', '=', $id]
+//    //    ])
+//     //   ->first();
+//
+// //       if($testeDeVerificacao){
+// //           \Session::flash('mensagem',['msg'=>'Registro Não pode ser excluido, pois está  Relacionado ao item de Verificação Número. '.$testeDeVerificacao->numeroDoTeste.''
+// //           ,'class'=>'red white-text']);
+// //   		return redirect()->route('compliance.grupoVerificacao');
+// //       }else{
+//  //      }
+//
+//
+//      //      $registro = TesteDeVerificacao::find($id);
+//        //     $registro->delete();
+//             \Session::flash('mensagem',['msg'=>'Registro Nâo deletado! Funcionalidade não disponibilizada  por motivos  de segurança.'
+//             ,'class'=>'red white-text']);
+//             return redirect()->route('compliance.relatos');
+//
+//
+//    }
 
     public function salvar(SalvarTesteDeVerificacao $request)
     {

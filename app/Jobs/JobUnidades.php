@@ -51,8 +51,7 @@ class JobUnidades implements ShouldQueue
                         'unidades.*'
                     )
                     ->first();
-
-                $tipodeunidade = DB::table('tiposdeunidade')
+                  $tipodeunidade = DB::table('tiposdeunidade')
                     ->where('codigo', '=',  (int)$registro['tipo_do_orgao'])
                     ->orWhere('tipodescricao', '=',  $registro['descricao_tp_orgao'])
                     ->select(

@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 
 use Illuminate\Support\Facades\DB;
-use App\Models\Correios\TesteDeVerificacao;
 use App\Models\Correios\GrupoDeVerificacao;
 use App\Models\Correios\TipoDeUnidade;
 use App\Http\Requests\Compliance\SalvarGruposDeVerificacao;

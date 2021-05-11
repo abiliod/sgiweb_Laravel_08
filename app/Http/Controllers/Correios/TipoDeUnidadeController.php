@@ -4,18 +4,14 @@ namespace App\Http\Controllers\Correios;
 
 use App\Http\Controllers\Controller;
 use App\Models\Correios\TipoDeUnidade;
-use App\Models\Correios\Unidade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TipoDeUnidadeController extends Controller
 {
-
-
-    public function salvar(Request $request )
-    {
-        dd('aki salva');
-    }
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function adicionar()
     {
         return view('compliance.tipounidades.adicionar');
@@ -30,13 +26,10 @@ class TipoDeUnidadeController extends Controller
     {
         $registro = TipoDeUnidade::find($id);
         $dados = $request->all();
-        $registro->codigo = $dados['codigo'];
         $registro->sigla = $dados['sigla'];
         $registro->tipodescricao = $dados['descricao'];
         $registro->inspecionar = $dados['inspecionar'];
         $registro->tipoInspecao = $dados['tipoInspecao'];
-
-    //    dd($registro);
         $registro->update();
 
         \Session::flash('mensagem',['msg'=>'O Tipo de Unidade:  '.$registro->descricao.' foi atualizado com sucesso !'

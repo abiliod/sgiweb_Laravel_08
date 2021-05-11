@@ -862,6 +862,7 @@ class InspecaoController extends Controller {
         if($contasituacao == 0) {
             $totalitensnaoconforme=0;
             $totalpontosnaoconforme=0;
+            $valor_ref_itens_inspecionados = 0;
             $itensdeinspecao = DB::table('itensdeinspecoes')
                 ->where([['inspecao_id', '=', $inspecao->id]])
                 ->where([['situacao', '=', 'Inspecionado']])
@@ -964,6 +965,7 @@ class InspecaoController extends Controller {
              $totalitensnaoconforme=0;
              $totalpontosnaoconforme=0;
              $totalitensavaliados=0;
+             $valor_ref_itens_inspecionados = 0;
 
             foreach ($registros as $registro) {
 

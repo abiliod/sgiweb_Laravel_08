@@ -1,10 +1,8 @@
 <div class="input-field col s6">
     <select name="ciclo" id="ciclo" class="validate">
         <option value="" {{(!empty($registro->ciclo) ? 'selected' : '')}}>Selecione um Ciclo</option>
-        <option value="2019" {{(isset($registro->ciclo) && $registro->ciclo == '2019'  ? 'selected' : '')}}>2019</option>
-        <option value="2020" {{(isset($registro->ciclo) && $registro->ciclo == '2020'  ? 'selected' : '')}}>2020</option>
         <option value="2021" {{(isset($registro->ciclo) && $registro->ciclo == '2021'  ? 'selected' : '')}}>2021</option>
-        <option value="2022" {{(isset($registro->ciclo) && $registro->ciclo == '2022'  ? 'selected' : '')}}>2022</option>
+{{--        <option value="2022" {{(isset($registro->ciclo) && $registro->ciclo == '2022'  ? 'selected' : '')}}>2022</option>--}}
     </select>
     <label for="ciclo" >Ciclo de Verificação</label>
 </div>
@@ -13,6 +11,7 @@
 <div class="input-field col s6">
     <select name="tipoVerificacao" id="tipoVerificacao" class="validate">
         <option value="" {{(!empty($registro->tipoVerificacao) ? 'selected' : '')}}>Selecione um Tipo de Verificação</option>
+        <option value="Monitorada" {{(isset($registro->tipoVerificacao) && $registro->tipoVerificacao == 'Monitorada'  ? 'selected' : '')}}>Monitorada</option>
         <option value="Presencial" {{(isset($registro->tipoVerificacao) && $registro->tipoVerificacao == 'Presencial'  ? 'selected' : '')}}>Presencial</option>
         <option value="Remoto" {{(isset($registro->tipoVerificacao) && $registro->tipoVerificacao == 'Remoto'  ? 'selected' : '')}}>Remoto</option>
     </select>
