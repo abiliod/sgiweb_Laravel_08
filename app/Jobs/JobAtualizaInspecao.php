@@ -5115,13 +5115,13 @@ class JobAtualizaInspecao implements ShouldQueue
                             }
 
                         }
-                        if(($adicional-> rubrica == 'Trabalho Fins Semana' )&&($pgtoAdicionaisTemp->ref > '202008')){
-                            $situacao = 'O  Acórdão do Dissídio Coletivo 2020/2021, vigente a partir de 01/08/2020, não prevê a manutenção do pagamento do Adicional de Fim de Semana.';
+                        if(($adicional-> rubrica == 'Trabalho Fins Semana' )&&($adicional->ref > '202008')){
+                            $situacao = 'O  Acórdão do Dissídio Coletivo 2020/2021, vigente a partir de 01/08/2020,
+                             não prevê a manutenção do pagamento do Adicional de Fim de Semana.';
                         }
                         $insp = Inspecao::find($registro->inspecao_id);
                         if ( !$situacao == null) {
                             $pgtoAdicionaisTemp = new PgtoAdicionaisTemp();
-
                             $pgtoAdicionaisTemp->sto = $registro->sto;
                             $pgtoAdicionaisTemp->mcu = $registro->mcu;
                             $pgtoAdicionaisTemp->codigo = $insp->codigo;
