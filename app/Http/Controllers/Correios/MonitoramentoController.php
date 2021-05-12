@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-//use Illuminate\PhpOffice\PhpSpreadsheet\Shared\Date;
+use Illuminate\PhpOffice\PhpSpreadsheet\Shared\Date;
 use Auth;
 
 
@@ -941,16 +941,13 @@ class MonitoramentoController extends Controller {
     public function show(){
         return view('compliance.monitoramento.show');  //
     }
-
-//    public function transformDate($value, $format = 'Y-m-d') {
-//        try {
-//            return Carbon::instance(
-////                Date ::excelToDateTimeObject($value));
-//            \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
-//        }
-//        catch (\Exception $e) {
-//            return Carbon::createFromFormat($format, $value);
-//        }
-//    }
-
+    public function transformDate($value, $format = 'Y-m-d') {
+        try {
+            return Carbon::instance(
+            \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+        }
+        catch (\Exception $e) {
+            return Carbon::createFromFormat($format, $value);
+        }
+    }
 }
