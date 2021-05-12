@@ -2029,7 +2029,7 @@ class AvaliaInspecao implements ShouldQueue
                                     foreach ($controle_de_viagens as $controle_de_viagen) {
                                         $evidencia = $evidencia
                                             . "\n"
-                                            . ($controle_de_viagen->inicio_viagem == '' ? '   ----------  ' : \Carbon\Carbon::parse($controle_de_viagen->inicio_viagem)->format('d/m/Y')) . "\t"
+                                            . ($controle_de_viagen->inicio_viagem == '' ? '   ----------  ' : Carbon::parse($controle_de_viagen->inicio_viagem)->format('d/m/Y')) . "\t"
                                             . ($controle_de_viagen->controle_viagem == '' ? '   ----------  ' : $controle_de_viagen->controle_viagem) . "\t"
                                             . ($controle_de_viagen->tipo_de_operacao == '' ? '   ----------  ' : $controle_de_viagen->tipo_de_operacao) . "\t"
                                             . ($controle_de_viagen->quantidade == '' ? '   ----------  ' : $controle_de_viagen->quantidade) . "\t"
@@ -2040,7 +2040,7 @@ class AvaliaInspecao implements ShouldQueue
                                     }
 
                                     $evidencia = $evidencia. "\n" . ' Foram verificada(s) todas programações de viagens no período do dia '
-                                        . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y')
+                                        . Carbon::parse($dtini)->format('d/m/Y') . ' até ' . Carbon::parse($dtfim)->format('d/m/Y')
                                         . "\n" . ' a) verificou-se que houve ' . $count . ' viagen(s) realizadas e com possíveis operações de Embarque/Desembarque a serem realizadas.'
                                         . "\n" . ' b) Verificou a necessidade de aprimoramento na qualidade do apontamento colunas com falhas ou informações genéricas/incompletas.';
 
@@ -2054,7 +2054,7 @@ class AvaliaInspecao implements ShouldQueue
                                 }
                                 else{
                                     $avaliacao = 'Conforme';
-                                    $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se que não havia operações de Embarque/Desembarque em falta ou incompletas.' .' Foram verificada(s) todas programações de viagens no período do dia ' .\Carbon\Carbon::parse($dtini)->format('d/m/Y').' até '.\Carbon\Carbon::parse($dtfim)->format('d/m/Y').'.';
+                                    $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se que não havia operações de Embarque/Desembarque em falta ou incompletas.' .' Foram verificada(s) todas programações de viagens no período do dia ' .Carbon::parse($dtini)->format('d/m/Y').' até '.Carbon::parse($dtfim)->format('d/m/Y').'.';
 
                                 }
 
@@ -2062,7 +2062,7 @@ class AvaliaInspecao implements ShouldQueue
                             else  {
                                 $avaliacao = 'Não Conforme';
                                 $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se o descumprimento dos procedimentos de embarque e desembarque da carga, conforme relatado a seguir:';
-                                $evidencia = $evidencia . "\n" . '- Verificou-se que a unidade não está executando os lançamentos obrigatórios das informações de embarque e desembarque da carga no Sistema ERP. Não há histórico de registro de embarque/desembarque para troca de expedições. - Foram verificadas as programações de viagens no período de ' . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y') .', sendo que em 100% das viagens não foi encontrado registros de apontamentos de Embarque/Desembarque.';
+                                $evidencia = $evidencia . "\n" . '- Verificou-se que a unidade não está executando os lançamentos obrigatórios das informações de embarque e desembarque da carga no Sistema ERP. Não há histórico de registro de embarque/desembarque para troca de expedições. - Foram verificadas as programações de viagens no período de ' . Carbon::parse($dtini)->format('d/m/Y') . ' até ' . Carbon::parse($dtfim)->format('d/m/Y') .', sendo que em 100% das viagens não foi encontrado registros de apontamentos de Embarque/Desembarque.';
                             }
 
                             $quebra = DB::table('relevancias')
@@ -2361,7 +2361,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                 $dtmax = $eventos->max('data');
                                 $periodo = CarbonPeriod::create($dtmax, $dtnow);
-                                $dataultimoevento = \Carbon\Carbon::parse($dtmax)->format('d/m/Y');
+                                $dataultimoevento = Carbon::parse($dtmax)->format('d/m/Y');
 
                                 if ($periodo->count() >= 15) $aviso = 'a) A unidade inspecionada não está
                                     sendo monitorada há '
@@ -2472,7 +2472,7 @@ class AvaliaInspecao implements ShouldQueue
                                     ->get();
 
                                 $count = $compartilhaSenhas->count('codigo');
-                                $dtmax = \Carbon\Carbon::parse($eventos->max('data'))->format('d/m/Y');
+                                $dtmax = Carbon::parse($eventos->max('data'))->format('d/m/Y');
                             } //tem dados de alarme
                             if ($count == null) $compartilhaSenhas = null;
                             if ($count >= 1) {
@@ -2837,7 +2837,7 @@ class AvaliaInspecao implements ShouldQueue
                                     foreach ($eventosf  as $evento) {
                                         if($feriadoporUnidade->data_do_feriado   ==  $evento->data) {
                                             $acessosEmFeriados = ([
-                                                $row => ['Acesso' => \Carbon\Carbon::parse($evento->data)->format('d/m/Y'), 'hora' => $evento->hora],
+                                                $row => ['Acesso' => Carbon::parse($evento->data)->format('d/m/Y'), 'hora' => $evento->hora],
                                             ]);
                                         }
                                         $row++;
@@ -3184,25 +3184,24 @@ class AvaliaInspecao implements ShouldQueue
                                 $valorFalta = $total;
                                 $evidencia = $evidencia . "\n" . 'Número Objeto' . "\t" . 'Número Processo' . "\t" . 'Data Processo' . "\t" . 'Data Atualização' . "\t" . 'Última Atualização' . "\t" . 'Valor';
 
-                                foreach ($resp_definidas as $tabela) {
-                                    foreach ($resp_definidas as $tabela) {
-//      ########## ATENÇÃO ##########
-// 01/04/2020 Abilio esse trecho de código precisa ser testado não havia dados suficiete para implementar o
-// teste no desenvolvimento caso houver algum ajuste  aualizar o controller InspeçãoController para esse item.
+                               foreach ($resp_definidas as $tabela) {
+    //      ########## ATENÇÃO ##########
+    // 01/04/2020 Abilio esse trecho de código precisa ser testado não havia dados suficiete para implementar o
+    // teste no desenvolvimento caso houver algum ajuste  aualizar o controller InspeçãoController para esse item.
 
-                                        $evidencia = $evidencia . "\n" . $tabela->objeto . "\t"
-                                            . (isset($tabela->nu_sei) && $tabela->nu_sei == '' ? '   ----------  ' : $tabela->nu_sei)
-                                            . "\t" . (isset($tabela->data_pagamento) && $tabela->data_pagamento == '' ? '   ----------  '
-                                                : date('d/m/Y', strtotime($tabela->data_pagamento)))
-                                            . "\t" . (isset($tabela->data) && $tabela->data == '' ? '   ----------  '
-                                                : date('d/m/Y', strtotime($tabela->data)))
-                                            . "\t" . (isset($tabela->situacao) && $tabela->situacao == '' ? '   ----------  '
-                                                : $tabela->situacao)
-                                            . "\t" . 'R$' . number_format($tabela->valor_da_indenizacao, 2, ',', '.');
-                                    }
-                                    $evidencia = $evidencia . "\n" . 'Valor em Falta :' . "\t" . 'R$' . number_format($valorFalta, 2, ',', '.');
-//        ####################
+                                    $evidencia = $evidencia . "\n" . $tabela->objeto . "\t"
+                                        . (isset($tabela->nu_sei) && $tabela->nu_sei == '' ? '   ----------  ' : $tabela->nu_sei)
+                                        . "\t" . (isset($tabela->data_pagamento) && $tabela->data_pagamento == '' ? '   ----------  '
+                                            : date('d/m/Y', strtotime($tabela->data_pagamento)))
+                                        . "\t" . (isset($tabela->data) && $tabela->data == '' ? '   ----------  '
+                                            : date('d/m/Y', strtotime($tabela->data)))
+                                        . "\t" . (isset($tabela->situacao) && $tabela->situacao == '' ? '   ----------  '
+                                            : $tabela->situacao)
+                                        . "\t" . 'R$' . number_format($tabela->valor_da_indenizacao, 2, ',', '.');
                                 }
+                                $evidencia = $evidencia . "\n" . 'Valor em Falta :' . "\t" . 'R$' . number_format($valorFalta, 2, ',', '.');
+    //        ####################
+
                             }
                             else {
                                     $dtmax = $dtmenos90dias;
@@ -6342,7 +6341,7 @@ class AvaliaInspecao implements ShouldQueue
                                         foreach ($controle_de_viagens as $controle_de_viagen) {
                                             $evidencia = $evidencia
                                                 . "\n"
-                                                . ($controle_de_viagen->inicio_viagem == '' ? '   ----------  ' : \Carbon\Carbon::parse($controle_de_viagen->inicio_viagem)->format('d/m/Y')) . "\t"
+                                                . ($controle_de_viagen->inicio_viagem == '' ? '   ----------  ' : Carbon::parse($controle_de_viagen->inicio_viagem)->format('d/m/Y')) . "\t"
                                                 . ($controle_de_viagen->controle_viagem == '' ? '   ----------  ' : $controle_de_viagen->controle_viagem) . "\t"
                                                 . ($controle_de_viagen->tipo_de_operacao == '' ? '   ----------  ' : $controle_de_viagen->tipo_de_operacao) . "\t"
                                                 . ($controle_de_viagen->quantidade == '' ? '   ----------  ' : $controle_de_viagen->quantidade) . "\t"
@@ -6353,7 +6352,7 @@ class AvaliaInspecao implements ShouldQueue
                                         }
 
                                         $evidencia = $evidencia. "\n" . ' Foram verificada(s) todas programações de viagens no período do dia '
-                                            . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y')
+                                            . Carbon::parse($dtini)->format('d/m/Y') . ' até ' . Carbon::parse($dtfim)->format('d/m/Y')
                                             . "\n" . ' a) verificou-se que houve ' . $count . ' viagen(s) realizadas e com possíveis operações de Embarque/Desembarque a serem realizadas.'
                                             . "\n" . ' b) Verificou a necessidade de aprimoramento na qualidade do apontamento colunas com falhas ou informações genéricas/incompletas.';
 
@@ -6367,7 +6366,7 @@ class AvaliaInspecao implements ShouldQueue
                                     }
                                     else{
                                         $avaliacao = 'Conforme';
-                                        $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se que não havia operações de Embarque/Desembarque em falta ou incompletas.' .' Foram verificada(s) todas programações de viagens no período do dia ' .\Carbon\Carbon::parse($dtini)->format('d/m/Y').' até '.\Carbon\Carbon::parse($dtfim)->format('d/m/Y').'.';
+                                        $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se que não havia operações de Embarque/Desembarque em falta ou incompletas.' .' Foram verificada(s) todas programações de viagens no período do dia ' .Carbon::parse($dtini)->format('d/m/Y').' até '.Carbon::parse($dtfim)->format('d/m/Y').'.';
 
                                     }
 
@@ -6375,7 +6374,7 @@ class AvaliaInspecao implements ShouldQueue
                                 else  {
                                     $avaliacao = 'Não Conforme';
                                     $oportunidadeAprimoramento = 'Em análise aos dados do sistema ERP - GESTÃO DE LINHAS DE TRANSPORTE, constatou-se o descumprimento dos procedimentos de embarque e desembarque da carga, conforme relatado a seguir:';
-                                    $evidencia = $evidencia . "\n" . '- Verificou-se que a unidade não está executando os lançamentos obrigatórios das informações de embarque e desembarque da carga no Sistema ERP. Não há histórico de registro de embarque/desembarque para troca de expedições. - Foram verificadas as programações de viagens no período de ' . \Carbon\Carbon::parse($dtini)->format('d/m/Y') . ' até ' . \Carbon\Carbon::parse($dtfim)->format('d/m/Y') .', sendo que em 100% das viagens não foi encontrado registros de apontamentos de Embarque/Desembarque.';
+                                    $evidencia = $evidencia . "\n" . '- Verificou-se que a unidade não está executando os lançamentos obrigatórios das informações de embarque e desembarque da carga no Sistema ERP. Não há histórico de registro de embarque/desembarque para troca de expedições. - Foram verificadas as programações de viagens no período de ' . Carbon::parse($dtini)->format('d/m/Y') . ' até ' . Carbon::parse($dtfim)->format('d/m/Y') .', sendo que em 100% das viagens não foi encontrado registros de apontamentos de Embarque/Desembarque.';
                                 }
 
                                 $quebra = DB::table('relevancias')
@@ -6674,7 +6673,7 @@ class AvaliaInspecao implements ShouldQueue
 
                                     $dtmax = $eventos->max('data');
                                     $periodo = CarbonPeriod::create($dtmax, $dtnow);
-                                    $dataultimoevento = \Carbon\Carbon::parse($dtmax)->format('d/m/Y');
+                                    $dataultimoevento = Carbon::parse($dtmax)->format('d/m/Y');
 
                                     if ($periodo->count() >= 15) $aviso = 'a) A unidade inspecionada não está
                                     sendo monitorada há '
@@ -6785,7 +6784,7 @@ class AvaliaInspecao implements ShouldQueue
                                         ->get();
 
                                     $count = $compartilhaSenhas->count('codigo');
-                                    $dtmax = \Carbon\Carbon::parse($eventos->max('data'))->format('d/m/Y');
+                                    $dtmax = Carbon::parse($eventos->max('data'))->format('d/m/Y');
                                 } //tem dados de alarme
                                 if ($count == null) $compartilhaSenhas = null;
                                 if ($count >= 1) {
@@ -7149,7 +7148,7 @@ class AvaliaInspecao implements ShouldQueue
                                         foreach ($eventosf  as $evento) {
                                             if($feriadoporUnidade->data_do_feriado   ==  $evento->data) {
                                                 $acessosEmFeriados = ([
-                                                    $row => ['Acesso' => \Carbon\Carbon::parse($evento->data)->format('d/m/Y'), 'hora' => $evento->hora],
+                                                    $row => ['Acesso' => Carbon::parse($evento->data)->format('d/m/Y'), 'hora' => $evento->hora],
                                                 ]);
                                             }
                                             $row++;
@@ -7482,7 +7481,6 @@ class AvaliaInspecao implements ShouldQueue
                                     $evidencia = $evidencia . "\n" . 'Número Objeto' . "\t" . 'Número Processo' . "\t" . 'Data Processo' . "\t" . 'Data Atualização' . "\t" . 'Última Atualização' . "\t" . 'Valor';
 
                                     foreach ($resp_definidas as $tabela) {
-
 
 //      ########## ATENÇÃO ##########
 // 01/04/2020 Abilio esse trecho de código precisa ser testado não havia dados suficiete para implementar o
@@ -8702,7 +8700,6 @@ class AvaliaInspecao implements ShouldQueue
             }
             ini_set('memory_limit', '128M');
         }
-
 //$this->command->info('Avaliação Realizada com sucesso!');
 
 }
