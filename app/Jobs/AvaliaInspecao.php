@@ -99,7 +99,9 @@ class AvaliaInspecao implements ShouldQueue
                         ->select('itensdeinspecoes.*', 'inspecoes.*', 'unidades.*', 'testesdeverificacao.*', 'gruposdeverificacao.*')
                         ->where([['situacao', '=', 'Em Inspeção']])
                         ->where([['se', '=', 1]])
+                        ->where([['job_programado', '=', null]])
                         ->where([['inspecoes.ciclo', '=', $ciclo]])
+
                         ->where([['itensdeinspecoes.tipoUnidade_id', '=', $tipodeunidade]])
                         ->get();
 
@@ -4410,6 +4412,7 @@ class AvaliaInspecao implements ShouldQueue
                             ->select('itensdeinspecoes.*', 'inspecoes.*', 'unidades.*', 'testesdeverificacao.*', 'gruposdeverificacao.*')
                             ->where([['situacao', '=', 'Em Inspeção']])
                             ->where([['se', '=', $superintendencia]])
+                            ->where([['job_programado', '=', null]])
                             ->where([['inspecoes.ciclo', '=', $ciclo]])
                             ->where([['itensdeinspecoes.tipoUnidade_id', '=', $tipodeunidade]])
                             ->get();

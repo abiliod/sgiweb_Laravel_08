@@ -24,7 +24,6 @@ class GeraInspecao implements ShouldQueue
         $this->status = $status;
         $this->ciclo = $ciclo;
         $this->dataAgenda = $dataAgenda;
-        //dd($superintendencias, $status , $ciclo, $dataAgenda);
     }
 
     public function handle()
