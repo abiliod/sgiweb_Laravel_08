@@ -7988,6 +7988,31 @@ class AvaliaInspecao implements ShouldQueue
                                             }
 //                                          Final Testa ultimo registro com compensação
                                         }
+                                        else{
+                                            $avaliacao = 'Conforme';
+                                            $oportunidadeAprimoramento = 'Em análise ao sistema SDE – Sistema de Depósito Bancário, na opção "Contabilização", Conciliação SMB x BDF – dados “Não Conciliados”, referente ao período de ' . date('d/m/Y', strtotime($dtmenos90dias)) . ' a ' . date('d/m/Y', strtotime($dtnow)) . ', verificou-se a inexistência de divergências.';
+
+                                            $dto = DB::table('itensdeinspecoes')
+                                                ->Where([['inspecao_id', '=', $registro->inspecao_id]])
+                                                ->Where([['testeVerificacao_id', '=', $registro->testeVerificacao_id]])
+                                                ->select('itensdeinspecoes.*')
+                                                ->first();
+                                            $itensdeinspecao = Itensdeinspecao::find($dto->id);
+                                            $itensdeinspecao->avaliacao = $avaliacao;
+                                            $itensdeinspecao->oportunidadeAprimoramento = $oportunidadeAprimoramento;
+                                            $itensdeinspecao->evidencia = $evidencia;
+//                                    $itensdeinspecao->valorFalta = $valorFalta;
+//                                    $itensdeinspecao->valorSobra = $valorSobra;
+//                                    $itensdeinspecao->valorRisco = $valorRisco;
+                                            $itensdeinspecao->situacao = 'Inspecionado';
+                                            $itensdeinspecao->pontuado = 0.00;
+                                            $itensdeinspecao->itemQuantificado = 'Não';
+                                            $itensdeinspecao->consequencias = null;
+                                            $itensdeinspecao->orientacao = null;
+                                            $itensdeinspecao->eventosSistema = 'Item avaliado remotamente por Websgi em ' . date('d/m/Y', strtotime($dtnow)) . '.';
+//                                    dd('line -> 1027 não tem registro de pendências SMB_BDF' ,$itensdeinspecao);
+                                            $itensdeinspecao->update();
+                                        }
 //                                      Final  se divergencia é um valor diferente de zero
 
 //                                      Inicio  se divergencia é um valor igual zero
