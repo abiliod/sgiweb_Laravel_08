@@ -105,6 +105,7 @@ use App\Jobs\JobHorariosDERAT;
 use App\Models\Correios\ModelsAuxiliares\SMBxBDF_NaoConciliado;
 use App\Imports\ImportSMBxBDF_NaoConciliado;
 use App\Exports\ExportSMBxBDF_NaoConciliado;
+use App\Jobs\JobSMBxBDF;
 
 //   ################## INICIO   PENDENTES DE CRIAR ROTINAS DE JOBs   ########################
 
