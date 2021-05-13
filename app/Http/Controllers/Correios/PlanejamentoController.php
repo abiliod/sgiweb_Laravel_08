@@ -669,7 +669,7 @@ class PlanejamentoController extends Controller {
             $data_programacao = new Carbon($dados ['data_programacao']);
             $dt_data_programacao = $data_programacao->subDays(2);
             $registro = Inspecao::find($id);
-
+//
 //#########################################################################################################
 //            para ativar a fila no console
 //            php artisan queue:work --queue=atualizaInspecao
