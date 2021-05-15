@@ -105,6 +105,9 @@ class GeraInspecao implements ShouldQueue
                                 $inspecao->tipoUnidade_id = $unidade->tipoUnidade_id;
                                 $inspecao->tipoVerificacao = 'Monitorada';
                                 $inspecao->status =  'Em Inspeção';
+                                $inspecao->inspetorcoordenador =  null;
+                                $inspecao->inspetorcolaborador =  null;
+
                                 $inspecao->unidade_id = $unidade->id;
                                 $inspecao->save();
                                 $parametros = DB::table('tiposdeunidade')

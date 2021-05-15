@@ -311,6 +311,8 @@ class JobConclui_Inspecao implements ShouldQueue
                                 'tnc' => $tnc,
                                 'status' => $status,
                                 'pontuacaoFinal' =>  $pontuacaoFinal,
+                                'inspetorcoordenador' =>  null,
+                                'inspetorcolaborador' =>  null,
                                 'classificacao' => $classificacao
                             ]);
 
