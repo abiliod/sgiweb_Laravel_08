@@ -147,7 +147,7 @@ class JobConclui_Inspecao implements ShouldQueue
                             $status = 'Corroborado';
                             $pontuacaoFinal = $totalPontos;
                         }
-                        elseif ($tnc === 0 ){
+                        elseif ($tnc == 0 ){
                             $classificacao = 'Controle plenamente eficaz';
                             $status = 'Concluida' ;
                             $pontuacaoFinal = $totalPontos;
@@ -181,7 +181,7 @@ class JobConclui_Inspecao implements ShouldQueue
 ############ STATUS PARA CONTINUAÇÃO DE AVALIAÇÃO PRESENCIAL
 
 ############ STATUS PARA ENVIO DA INSPEÇÃO PARA O SNCI
-                        if  (($tnc < 20) && ($totalitensnaoconforme>1)){
+                        if  (($tnc < 20) && ($totalitensnaoconforme >=1)){
                             DB::table('itensdeinspecoes')
                                 ->where([['inspecao_id', '=', $inspecao->id]])
                                 ->where([['avaliacao', '=', 'Não Conforme']])
@@ -224,7 +224,7 @@ class JobConclui_Inspecao implements ShouldQueue
                             ->where([['inspecao_id', '=', $inspecao->id]])
                             ->where([['situacao', '=', 'Inspecionado']])
                             ->orderBy('testeVerificacao_id' , 'asc')
-                            ->get();
+                        ->get();
 
 //                            dd($itensdeinspecao);
 
@@ -302,7 +302,7 @@ class JobConclui_Inspecao implements ShouldQueue
                             $status = 'Corroborado';
                             $pontuacaoFinal = $totalPontos;
                         }
-                        elseif ($tnc === 0 ){
+                        elseif ($tnc == 0 ){
                             $classificacao = 'Controle plenamente eficaz';
                             $status = 'Concluida' ;
                             $pontuacaoFinal = $totalPontos;
@@ -339,7 +339,7 @@ class JobConclui_Inspecao implements ShouldQueue
 ############ STATUS PARA CONTINUAÇÃO DE AVALIAÇÃO PRESENCIAL
 
 ############ STATUS PARA ENVIO DA INSPEÇÃO PARA O SNCI
-                        if  (($tnc < 20) && ($totalitensnaoconforme>1)){
+                        if  (($tnc < 20) && ($totalitensnaoconforme >=1)){
                             DB::table('itensdeinspecoes')
                                 ->where([['inspecao_id', '=', $inspecao->id]])
                                 ->where([['avaliacao', '=', 'Não Conforme']])
