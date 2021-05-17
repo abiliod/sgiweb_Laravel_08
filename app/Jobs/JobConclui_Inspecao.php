@@ -55,13 +55,17 @@ class JobConclui_Inspecao implements ShouldQueue
                         ->get();
 //                      Início Todas Inspeções da Superintendencia
                     foreach ($inspecoes as $inspecao){
+
+
 //                          inicio percorrida das inspeções
                         $totalPontos = 0;
+                        $totalitensavaliados = 0;
                         $valor_ref_itens_inspecionados = 0;
                         $totalpontosnaoconforme =0;
                         $totalitensnaoconforme = 0;
                         $classificacao = null;
                         $pontuacaoFinal=0;
+
 
                         $itensdeinspecao = DB::table('itensdeinspecoes')
                             ->where([['inspecao_id', '=', $inspecao->id]])
@@ -69,14 +73,10 @@ class JobConclui_Inspecao implements ShouldQueue
                             ->orderBy('testeVerificacao_id' , 'asc')
                             ->get();
 
-//                            dd($itensdeinspecao);
-
                         if (!empty($itensdeinspecao)) $totalPontos =  $itensdeinspecao->sum('pontuado');
-
                         $totalitensavaliados =  $itensdeinspecao->count('eventosSistema');
-
 //                      Inicio itens das inspeções  == Registro
-                        foreach ($itensdeinspecao as $registro) {
+                        foreach ($itensdeinspecao as $registro){
                             $consequencias = $registro->consequencias;
                             $eventosSistema = "Corroborado remotamente por Websgi em ".date('d/m/Y H:m:s', strtotime($dtnow))
                                 ."\n"
@@ -98,6 +98,8 @@ class JobConclui_Inspecao implements ShouldQueue
                                 $consequencias = null;
                                 $situacao = 'Concluido' ;
                             }
+
+
 
 //                           GRAVA ITEM DA INSPEÇÃO
                             DB::table('itensdeinspecoes')
@@ -152,7 +154,20 @@ class JobConclui_Inspecao implements ShouldQueue
                             $status = 'Concluida' ;
                             $pontuacaoFinal = $totalPontos;
                         }
+
 #################   CLASSIFICA A  INSPEÇÃO
+
+//                            dd($inspecao,
+//                                ' tottal de $totalPontos ->'.   $totalPontos,
+//                                ' tottal de $totalitensavaliados ->'. $totalitensavaliados,
+//                                ' tottal de $valor_ref_itens_inspecionados ->'.$valor_ref_itens_inspecionados,
+//                                ' tottal de $totalpontosnaoconforme ->'.$totalpontosnaoconforme ,
+//                                ' tottal de $totalitensnaoconforme ->'.$totalitensnaoconforme,
+//                                ' tottal de $classificacao ->'.$classificacao ,
+//                                ' tottal de $pontuacaoFinal ->'.$pontuacaoFinal,
+//                                ' tottal de $tnc ->'.$tnc,
+//                                ' tottal de $status ->'.$status
+//                            );
 
 ############  GRAVA A INSPEÇÃO
                         DB::table('inspecoes')
@@ -166,6 +181,8 @@ class JobConclui_Inspecao implements ShouldQueue
                                 'tnc' => $tnc,
                                 'status' => $status,
                                 'pontuacaoFinal' =>  $pontuacaoFinal,
+                                'inspetorcoordenador' =>  null,
+                                'inspetorcolaborador' =>  null,
                                 'classificacao' => $classificacao
                             ]);
 
@@ -173,7 +190,7 @@ class JobConclui_Inspecao implements ShouldQueue
                         if  ($tnc > 20){
                             DB::table('itensdeinspecoes')
                                 ->where([['inspecao_id', '=', $inspecao->id]])
-                                ->where([['avaliacao', '=', 'Não Conforme']])
+//                                    ->where([['avaliacao', '=', 'Não Conforme']])
                                 ->update([
                                     'situacao' =>  'Em Inspeção'
                                 ]);
@@ -211,6 +228,8 @@ class JobConclui_Inspecao implements ShouldQueue
                         ->get();
 //                      Início Todas Inspeções da Superintendencia
                     foreach ($inspecoes as $inspecao){
+
+
 //                          inicio percorrida das inspeções
                         $totalPontos = 0;
                         $totalitensavaliados = 0;
@@ -220,16 +239,15 @@ class JobConclui_Inspecao implements ShouldQueue
                         $classificacao = null;
                         $pontuacaoFinal=0;
 
+
                         $itensdeinspecao = DB::table('itensdeinspecoes')
                             ->where([['inspecao_id', '=', $inspecao->id]])
                             ->where([['situacao', '=', 'Inspecionado']])
                             ->orderBy('testeVerificacao_id' , 'asc')
-                        ->get();
-
-//                            dd($itensdeinspecao);
+                            ->get();
 
                         if (!empty($itensdeinspecao)) $totalPontos =  $itensdeinspecao->sum('pontuado');
-
+                        $totalitensavaliados =  $itensdeinspecao->count('eventosSistema');
 //                      Inicio itens das inspeções  == Registro
                         foreach ($itensdeinspecao as $registro){
                             $consequencias = $registro->consequencias;
@@ -253,6 +271,8 @@ class JobConclui_Inspecao implements ShouldQueue
                                 $consequencias = null;
                                 $situacao = 'Concluido' ;
                             }
+
+
 
 //                           GRAVA ITEM DA INSPEÇÃO
                             DB::table('itensdeinspecoes')
@@ -310,6 +330,18 @@ class JobConclui_Inspecao implements ShouldQueue
 
 #################   CLASSIFICA A  INSPEÇÃO
 
+//                            dd($inspecao,
+//                                ' tottal de $totalPontos ->'.   $totalPontos,
+//                                ' tottal de $totalitensavaliados ->'. $totalitensavaliados,
+//                                ' tottal de $valor_ref_itens_inspecionados ->'.$valor_ref_itens_inspecionados,
+//                                ' tottal de $totalpontosnaoconforme ->'.$totalpontosnaoconforme ,
+//                                ' tottal de $totalitensnaoconforme ->'.$totalitensnaoconforme,
+//                                ' tottal de $classificacao ->'.$classificacao ,
+//                                ' tottal de $pontuacaoFinal ->'.$pontuacaoFinal,
+//                                ' tottal de $tnc ->'.$tnc,
+//                                ' tottal de $status ->'.$status
+//                            );
+
 ############  GRAVA A INSPEÇÃO
                         DB::table('inspecoes')
                             ->where([['id', '=', $inspecao->id]])
@@ -331,7 +363,7 @@ class JobConclui_Inspecao implements ShouldQueue
                         if  ($tnc > 20){
                             DB::table('itensdeinspecoes')
                                 ->where([['inspecao_id', '=', $inspecao->id]])
-                                ->where([['avaliacao', '=', 'Não Conforme']])
+//                                    ->where([['avaliacao', '=', 'Não Conforme']])
                                 ->update([
                                     'situacao' =>  'Em Inspeção'
                                 ]);
