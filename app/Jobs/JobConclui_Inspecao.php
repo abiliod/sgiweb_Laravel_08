@@ -142,9 +142,14 @@ class JobConclui_Inspecao implements ShouldQueue
                             $status = 'Corroborado';
                             $pontuacaoFinal = $totalPontos;
                         }
-                        elseif ($tnc <= 5 ){
+                        elseif(($tnc > 0 ) && ($tnc <= 5 )){
                             $classificacao = 'Controle plenamente eficaz';
                             $status = 'Corroborado';
+                            $pontuacaoFinal = $totalPontos;
+                        }
+                        elseif ($tnc === 0 ){
+                            $classificacao = 'Controle plenamente eficaz';
+                            $status = 'Concluida' ;
                             $pontuacaoFinal = $totalPontos;
                         }
 #################   CLASSIFICA A  INSPEÇÃO
@@ -292,11 +297,17 @@ class JobConclui_Inspecao implements ShouldQueue
                             $status = 'Corroborado';
                             $pontuacaoFinal = $totalPontos;
                         }
-                        elseif ($tnc <= 5 ){
+                        elseif(($tnc > 0 ) && ($tnc <= 5 )){
                             $classificacao = 'Controle plenamente eficaz';
                             $status = 'Corroborado';
                             $pontuacaoFinal = $totalPontos;
                         }
+                        elseif ($tnc === 0 ){
+                            $classificacao = 'Controle plenamente eficaz';
+                            $status = 'Concluida' ;
+                            $pontuacaoFinal = $totalPontos;
+                        }
+
 #################   CLASSIFICA A  INSPEÇÃO
 
 ############  GRAVA A INSPEÇÃO
